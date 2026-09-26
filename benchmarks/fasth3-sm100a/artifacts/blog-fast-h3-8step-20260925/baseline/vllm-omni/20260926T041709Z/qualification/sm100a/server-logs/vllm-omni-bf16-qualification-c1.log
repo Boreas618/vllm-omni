@@ -1,0 +1,1297 @@
+/workspace/UniServe/refs/vllm-omni/vllm_omni/version.py:55: RuntimeWarning: vLLM and vLLM-Omni appear to have mismatched major/minor versions:
+ --> vLLM-Omni version 0.29.0rc2.dev348+gbcb4ae288
+ --> vLLM version 0.30.0
+This will likely cause compatibility issues.
+  warn_if_misaligned_vllm_version()
+INFO 09-26 04:17:43 [patch.py:253] NVFP4 W4A4 weight_scale NaN-clamp: skipped — upstream serves ModelOpt linears through the generic ModelOptLinearMethod and rejects any NaN weight_scale (unloaded-scale sentinel), so a load-time error replaces the `!!!!` decode-time collapse.
+INFO 09-26 04:17:44 [quack_fp8.py:115] Quack FP8 fused-bias GEMM enabled (CuteDSL).
+INFO 09-26 04:17:44 [quack_fp8.py:221] Patched FlashInfer FP8 ScaledMM to use quack fused-bias GEMM.
+INFO 09-26 04:17:45 [patch.py:565] inductor factorable-divisibility patch: installed.
+INFO 09-26 04:17:45 [patch.py:630] [cumem-cuda] CuMemAllocator._python_free_callback patched: asleep guard extended to all platforms.
+INFO 09-26 04:17:47 [fa.py:105] Using CuTe FlashAttention-4 on Blackwell
+INFO 09-26 04:17:50 [main.py:33] Delegating entrypoint handling to vllm-omni
+INFO 09-26 04:17:50 [serve.py:314] Detected diffusion model: /workspace/models/FastVideo-FastH3-8-Step-V2
+INFO 09-26 04:17:50 [logo.py:52]        █     █     █▄   ▄█       ▄▀▀▀▀▄ █▄   ▄█ █▄    █ ▀█▀ 
+INFO 09-26 04:17:50 [logo.py:52]  ▄▄ ▄█ █     █     █ ▀▄▀ █  ▄▄▄  █    █ █ ▀▄▀ █ █ ▀▄  █  █  
+INFO 09-26 04:17:50 [logo.py:52]   █▄█▀ █     █     █     █       █    █ █     █ █   ▀▄█  █  
+INFO 09-26 04:17:50 [logo.py:52]    ▀▀  ▀▀▀▀▀ ▀▀▀▀▀ ▀     ▀        ▀▀▀▀  ▀     ▀ ▀     ▀ ▀▀▀ 
+INFO 09-26 04:17:50 [logo.py:52] 
+(APIServer pid=808899) INFO 09-26 04:17:50 [api_utils.py:347] vLLM server version 0.30.0, serving model /workspace/models/FastVideo-FastH3-8-Step-V2
+(APIServer pid=808899) INFO 09-26 04:17:50 [api_utils.py:286] non-default args: {'model_tag': '/workspace/models/FastVideo-FastH3-8-Step-V2', 'host': '127.0.0.1', 'port': 18083, 'model': '/workspace/models/FastVideo-FastH3-8-Step-V2', 'trust_remote_code': True, 'served_model_name': ['FastH3']}
+(APIServer pid=808899) INFO 09-26 04:17:50 [omni_base.py:208] [AsyncOmni] Initializing with model /workspace/models/FastVideo-FastH3-8-Step-V2
+(APIServer pid=808899) INFO 09-26 04:17:50 [omni_engine_base.py:163] [OmniEngine] Initializing with model /workspace/models/FastVideo-FastH3-8-Step-V2
+(APIServer pid=808899) /workspace/UniServe/refs/vllm-omni/vllm_omni/config/omni_config.py:1389: FutureWarning: Diffusion config field 'diffusion_attention_backend' is deprecated; use 'diffusion_attention_config'.
+(APIServer pid=808899)   normalized = normalize_omni_diffusion_kwargs(mixed_kwargs, apply_defaults=False)
+(APIServer pid=808899) INFO 09-26 04:17:50 [config_factory.py:697] Resolved generic diffusion final_output_type='video' for model_class_name='MiniMaxH3ModularPipeline'.
+(APIServer pid=808899) INFO 09-26 04:17:50 [omni_engine_base.py:312] [OmniEngine] Launching Orchestrator thread with 1 stages
+(APIServer pid=808899) INFO 09-26 04:17:50 [stage_utils.py:178] Stage 0 logical-to-physical device mapping: 0->0, 1->1, 2->2, 3->3
+(APIServer pid=808899) INFO 09-26 04:17:51 [multiproc_executor.py:372] Starting server...
+/workspace/UniServe/refs/vllm-omni/vllm_omni/version.py:55: RuntimeWarning: vLLM and vLLM-Omni appear to have mismatched major/minor versions:
+ --> vLLM-Omni version 0.29.0rc2.dev348+gbcb4ae288
+ --> vLLM version 0.30.0
+This will likely cause compatibility issues.
+  warn_if_misaligned_vllm_version()
+/workspace/UniServe/refs/vllm-omni/vllm_omni/version.py:55: RuntimeWarning: vLLM and vLLM-Omni appear to have mismatched major/minor versions:
+ --> vLLM-Omni version 0.29.0rc2.dev348+gbcb4ae288
+ --> vLLM version 0.30.0
+This will likely cause compatibility issues.
+  warn_if_misaligned_vllm_version()
+/workspace/UniServe/refs/vllm-omni/vllm_omni/version.py:55: RuntimeWarning: vLLM and vLLM-Omni appear to have mismatched major/minor versions:
+ --> vLLM-Omni version 0.29.0rc2.dev348+gbcb4ae288
+ --> vLLM version 0.30.0
+This will likely cause compatibility issues.
+  warn_if_misaligned_vllm_version()
+/workspace/UniServe/refs/vllm-omni/vllm_omni/version.py:55: RuntimeWarning: vLLM and vLLM-Omni appear to have mismatched major/minor versions:
+ --> vLLM-Omni version 0.29.0rc2.dev348+gbcb4ae288
+ --> vLLM version 0.30.0
+This will likely cause compatibility issues.
+  warn_if_misaligned_vllm_version()
+INFO 09-26 04:18:00 [patch.py:253] NVFP4 W4A4 weight_scale NaN-clamp: skipped — upstream serves ModelOpt linears through the generic ModelOptLinearMethod and rejects any NaN weight_scale (unloaded-scale sentinel), so a load-time error replaces the `!!!!` decode-time collapse.
+INFO 09-26 04:18:00 [patch.py:253] NVFP4 W4A4 weight_scale NaN-clamp: skipped — upstream serves ModelOpt linears through the generic ModelOptLinearMethod and rejects any NaN weight_scale (unloaded-scale sentinel), so a load-time error replaces the `!!!!` decode-time collapse.
+INFO 09-26 04:18:01 [patch.py:253] NVFP4 W4A4 weight_scale NaN-clamp: skipped — upstream serves ModelOpt linears through the generic ModelOptLinearMethod and rejects any NaN weight_scale (unloaded-scale sentinel), so a load-time error replaces the `!!!!` decode-time collapse.
+INFO 09-26 04:18:01 [patch.py:253] NVFP4 W4A4 weight_scale NaN-clamp: skipped — upstream serves ModelOpt linears through the generic ModelOptLinearMethod and rejects any NaN weight_scale (unloaded-scale sentinel), so a load-time error replaces the `!!!!` decode-time collapse.
+INFO 09-26 04:18:01 [quack_fp8.py:115] Quack FP8 fused-bias GEMM enabled (CuteDSL).
+INFO 09-26 04:18:01 [quack_fp8.py:221] Patched FlashInfer FP8 ScaledMM to use quack fused-bias GEMM.
+INFO 09-26 04:18:01 [quack_fp8.py:115] Quack FP8 fused-bias GEMM enabled (CuteDSL).
+INFO 09-26 04:18:01 [quack_fp8.py:221] Patched FlashInfer FP8 ScaledMM to use quack fused-bias GEMM.
+INFO 09-26 04:18:01 [patch.py:565] inductor factorable-divisibility patch: installed.
+INFO 09-26 04:18:01 [patch.py:565] inductor factorable-divisibility patch: installed.
+INFO 09-26 04:18:01 [patch.py:630] [cumem-cuda] CuMemAllocator._python_free_callback patched: asleep guard extended to all platforms.
+INFO 09-26 04:18:01 [patch.py:630] [cumem-cuda] CuMemAllocator._python_free_callback patched: asleep guard extended to all platforms.
+INFO 09-26 04:18:01 [quack_fp8.py:115] Quack FP8 fused-bias GEMM enabled (CuteDSL).
+INFO 09-26 04:18:01 [quack_fp8.py:221] Patched FlashInfer FP8 ScaledMM to use quack fused-bias GEMM.
+INFO 09-26 04:18:01 [patch.py:565] inductor factorable-divisibility patch: installed.
+INFO 09-26 04:18:01 [patch.py:630] [cumem-cuda] CuMemAllocator._python_free_callback patched: asleep guard extended to all platforms.
+INFO 09-26 04:18:02 [quack_fp8.py:115] Quack FP8 fused-bias GEMM enabled (CuteDSL).
+INFO 09-26 04:18:02 [quack_fp8.py:221] Patched FlashInfer FP8 ScaledMM to use quack fused-bias GEMM.
+INFO 09-26 04:18:02 [patch.py:565] inductor factorable-divisibility patch: installed.
+INFO 09-26 04:18:02 [patch.py:630] [cumem-cuda] CuMemAllocator._python_free_callback patched: asleep guard extended to all platforms.
+INFO 09-26 04:18:03 [fa.py:105] Using CuTe FlashAttention-4 on Blackwell
+INFO 09-26 04:18:04 [fa.py:105] Using CuTe FlashAttention-4 on Blackwell
+INFO 09-26 04:18:04 [fa.py:105] Using CuTe FlashAttention-4 on Blackwell
+INFO 09-26 04:18:04 [fa.py:105] Using CuTe FlashAttention-4 on Blackwell
+(DiffusionWorker pid=809678) INFO 09-26 04:18:05 [diffusion_worker.py:1169] Worker 1 created result MessageQueue
+(DiffusionWorker pid=809677) INFO 09-26 04:18:05 [diffusion_worker.py:1169] Worker 0 created result MessageQueue
+(DiffusionWorker pid=809679) INFO 09-26 04:18:05 [diffusion_worker.py:1169] Worker 2 created result MessageQueue
+(DiffusionWorker pid=809678) INFO 09-26 04:18:05 [scheduler.py:288] Chunked prefill is enabled with max_num_batched_tokens=2048.
+(DiffusionWorker pid=809678) INFO 09-26 04:18:05 [kernel.py:416] Final IR op priority after setting platform defaults: IrOpPriorityConfig(rms_norm=['native'], fused_add_rms_norm=['native'], gelu_and_mul_sparse=['triton', 'native'])
+(DiffusionWorker pid=809678) INFO 09-26 04:18:05 [diffusion_worker.py:346] Final IR op priority after setting vLLM-Omni overrides: IrOpPriorityConfig(rms_norm=['vllm_c', 'native'], fused_add_rms_norm=['vllm_c', 'native'], gelu_and_mul_sparse=['triton', 'native'])
+(DiffusionWorker pid=809677) INFO 09-26 04:18:05 [scheduler.py:288] Chunked prefill is enabled with max_num_batched_tokens=2048.
+(DiffusionWorker pid=809677) INFO 09-26 04:18:05 [kernel.py:416] Final IR op priority after setting platform defaults: IrOpPriorityConfig(rms_norm=['native'], fused_add_rms_norm=['native'], gelu_and_mul_sparse=['triton', 'native'])
+(DiffusionWorker pid=809677) INFO 09-26 04:18:05 [diffusion_worker.py:346] Final IR op priority after setting vLLM-Omni overrides: IrOpPriorityConfig(rms_norm=['vllm_c', 'native'], fused_add_rms_norm=['vllm_c', 'native'], gelu_and_mul_sparse=['triton', 'native'])
+(DiffusionWorker pid=809679) INFO 09-26 04:18:05 [scheduler.py:288] Chunked prefill is enabled with max_num_batched_tokens=2048.
+(DiffusionWorker pid=809679) INFO 09-26 04:18:05 [kernel.py:416] Final IR op priority after setting platform defaults: IrOpPriorityConfig(rms_norm=['native'], fused_add_rms_norm=['native'], gelu_and_mul_sparse=['triton', 'native'])
+(DiffusionWorker pid=809679) INFO 09-26 04:18:05 [diffusion_worker.py:346] Final IR op priority after setting vLLM-Omni overrides: IrOpPriorityConfig(rms_norm=['vllm_c', 'native'], fused_add_rms_norm=['vllm_c', 'native'], gelu_and_mul_sparse=['triton', 'native'])
+(DiffusionWorker pid=809680) INFO 09-26 04:18:05 [diffusion_worker.py:1169] Worker 3 created result MessageQueue
+(DiffusionWorker pid=809680) INFO 09-26 04:18:05 [scheduler.py:288] Chunked prefill is enabled with max_num_batched_tokens=2048.
+(DiffusionWorker pid=809680) INFO 09-26 04:18:05 [kernel.py:416] Final IR op priority after setting platform defaults: IrOpPriorityConfig(rms_norm=['native'], fused_add_rms_norm=['native'], gelu_and_mul_sparse=['triton', 'native'])
+(DiffusionWorker pid=809680) INFO 09-26 04:18:05 [diffusion_worker.py:346] Final IR op priority after setting vLLM-Omni overrides: IrOpPriorityConfig(rms_norm=['vllm_c', 'native'], fused_add_rms_norm=['vllm_c', 'native'], gelu_and_mul_sparse=['triton', 'native'])
+(DiffusionWorker pid=809680) INFO 09-26 04:18:06 [diffusion_worker.py:358] Worker 3: Initialized device and distributed environment.
+(DiffusionWorker pid=809677) INFO 09-26 04:18:06 [diffusion_worker.py:358] Worker 0: Initialized device and distributed environment.
+(DiffusionWorker pid=809679) INFO 09-26 04:18:06 [diffusion_worker.py:358] Worker 2: Initialized device and distributed environment.
+(DiffusionWorker pid=809678) INFO 09-26 04:18:06 [diffusion_worker.py:358] Worker 1: Initialized device and distributed environment.
+(DiffusionWorker pid=809680) INFO 09-26 04:18:06 [parallel_state.py:610] Building SP subgroups from explicit sp_group_ranks (sp_size=4, ulysses=4, ring=1, use_ulysses_low=True).
+(DiffusionWorker pid=809678) INFO 09-26 04:18:06 [parallel_state.py:610] Building SP subgroups from explicit sp_group_ranks (sp_size=4, ulysses=4, ring=1, use_ulysses_low=True).
+(DiffusionWorker pid=809679) INFO 09-26 04:18:06 [parallel_state.py:610] Building SP subgroups from explicit sp_group_ranks (sp_size=4, ulysses=4, ring=1, use_ulysses_low=True).
+(DiffusionWorker pid=809677) INFO 09-26 04:18:06 [parallel_state.py:610] Building SP subgroups from explicit sp_group_ranks (sp_size=4, ulysses=4, ring=1, use_ulysses_low=True).
+(DiffusionWorker pid=809680) INFO 09-26 04:18:06 [parallel_state.py:652] SP group details for rank 3: sp_group=[0, 1, 2, 3], ulysses_group=[0, 1, 2, 3], ring_group=[3]
+(DiffusionWorker pid=809678) INFO 09-26 04:18:06 [parallel_state.py:652] SP group details for rank 1: sp_group=[0, 1, 2, 3], ulysses_group=[0, 1, 2, 3], ring_group=[1]
+(DiffusionWorker pid=809679) INFO 09-26 04:18:06 [parallel_state.py:652] SP group details for rank 2: sp_group=[0, 1, 2, 3], ulysses_group=[0, 1, 2, 3], ring_group=[2]
+(DiffusionWorker pid=809677) INFO 09-26 04:18:06 [parallel_state.py:652] SP group details for rank 0: sp_group=[0, 1, 2, 3], ulysses_group=[0, 1, 2, 3], ring_group=[0]
+(DiffusionWorker_SP1 pid=809678) INFO 09-26 04:18:06 [weight_utils.py:58] Using model weights format ['FL2VA/video_vae/**', 'FL2VA/audio_vae/**']
+(DiffusionWorker_SP2 pid=809679) INFO 09-26 04:18:06 [weight_utils.py:58] Using model weights format ['FL2VA/video_vae/**', 'FL2VA/audio_vae/**']
+(DiffusionWorker_SP1 pid=809678) INFO 09-26 04:18:06 [selector.py:84] Resolved diffusion attention backend 'FASTVIDEO_VSA' for role='minimax_h3.token_refiner' (role_category='self') via attention_config.default
+(DiffusionWorker_SP1 pid=809678) INFO 09-26 04:18:06 [selector.py:93] Resolved diffusion attention backend 'FASTVIDEO_VSA' for role='self' via attention_config.default
+(DiffusionWorker_SP3 pid=809680) INFO 09-26 04:18:06 [weight_utils.py:58] Using model weights format ['FL2VA/video_vae/**', 'FL2VA/audio_vae/**']
+(DiffusionWorker_SP2 pid=809679) INFO 09-26 04:18:06 [selector.py:84] Resolved diffusion attention backend 'FASTVIDEO_VSA' for role='minimax_h3.token_refiner' (role_category='self') via attention_config.default
+(DiffusionWorker_SP2 pid=809679) INFO 09-26 04:18:06 [selector.py:93] Resolved diffusion attention backend 'FASTVIDEO_VSA' for role='self' via attention_config.default
+(DiffusionWorker_SP3 pid=809680) INFO 09-26 04:18:06 [selector.py:84] Resolved diffusion attention backend 'FASTVIDEO_VSA' for role='minimax_h3.token_refiner' (role_category='self') via attention_config.default
+(DiffusionWorker_SP3 pid=809680) INFO 09-26 04:18:06 [selector.py:93] Resolved diffusion attention backend 'FASTVIDEO_VSA' for role='self' via attention_config.default
+(DiffusionWorker_SP1 pid=809678) INFO 09-26 04:18:06 [pipeline_minimax_h3.py:956] FastH3 V2 full checkpoint: 8 transformer forwards, video/audio shifts 10/3, VSA sparsity=0.8 tile=64
+(DiffusionWorker_SP2 pid=809679) INFO 09-26 04:18:06 [pipeline_minimax_h3.py:956] FastH3 V2 full checkpoint: 8 transformer forwards, video/audio shifts 10/3, VSA sparsity=0.8 tile=64
+(DiffusionWorker_SP3 pid=809680) INFO 09-26 04:18:06 [pipeline_minimax_h3.py:956] FastH3 V2 full checkpoint: 8 transformer forwards, video/audio shifts 10/3, VSA sparsity=0.8 tile=64
+(DiffusionWorker_SP0 pid=809677) INFO 09-26 04:18:06 [weight_utils.py:58] Using model weights format ['FL2VA/video_vae/**', 'FL2VA/audio_vae/**']
+(DiffusionWorker_SP0 pid=809677) INFO 09-26 04:18:06 [selector.py:84] Resolved diffusion attention backend 'FASTVIDEO_VSA' for role='minimax_h3.token_refiner' (role_category='self') via attention_config.default
+(DiffusionWorker_SP0 pid=809677) INFO 09-26 04:18:06 [selector.py:93] Resolved diffusion attention backend 'FASTVIDEO_VSA' for role='self' via attention_config.default
+(DiffusionWorker_SP0 pid=809677) INFO 09-26 04:18:07 [pipeline_minimax_h3.py:956] FastH3 V2 full checkpoint: 8 transformer forwards, video/audio shifts 10/3, VSA sparsity=0.8 tile=64
+(DiffusionWorker_SP0 pid=809677) INFO 09-26 04:18:07 [encoder.py:1133] MiniMax H3 Qwen3-VL encoder: 50 retained decoder layers, text_encoder_tp_size=1, vision replicated
+(DiffusionWorker_SP0 pid=809677) The config attributes {'vae_ratio': 16, 'vae_ratio_t': 4} were passed to AutoencoderKLLegacy, but are not expected and will be ignored. Please verify your config.json configuration file.
+(DiffusionWorker_SP2 pid=809679) INFO 09-26 04:18:23 [vae_temporal.py:261] MiniMax-H3 VAE encode_temporal tail-padding patch installed
+(DiffusionWorker_SP2 pid=809679) INFO 09-26 04:18:23 [vae_temporal.py:266] MiniMax-H3 VAE streaming uint8 decode patch installed
+(DiffusionWorker_SP3 pid=809680) INFO 09-26 04:18:23 [vae_temporal.py:261] MiniMax-H3 VAE encode_temporal tail-padding patch installed
+(DiffusionWorker_SP3 pid=809680) INFO 09-26 04:18:23 [vae_temporal.py:266] MiniMax-H3 VAE streaming uint8 decode patch installed
+(DiffusionWorker_SP1 pid=809678) INFO 09-26 04:18:23 [vae_temporal.py:261] MiniMax-H3 VAE encode_temporal tail-padding patch installed
+(DiffusionWorker_SP1 pid=809678) INFO 09-26 04:18:23 [vae_temporal.py:266] MiniMax-H3 VAE streaming uint8 decode patch installed
+(DiffusionWorker_SP0 pid=809677) INFO 09-26 04:18:23 [vae_temporal.py:261] MiniMax-H3 VAE encode_temporal tail-padding patch installed
+(DiffusionWorker_SP0 pid=809677) INFO 09-26 04:18:23 [vae_temporal.py:266] MiniMax-H3 VAE streaming uint8 decode patch installed
+(DiffusionWorker_SP2 pid=809679) INFO 09-26 04:18:26 [registry.py:612] Applying sequence parallelism to MiniMaxH3DiTModel (transformer) (sp_size=4, mode=ulysses, ulysses=4, ring=1)
+(DiffusionWorker_SP3 pid=809680) INFO 09-26 04:18:26 [registry.py:612] Applying sequence parallelism to MiniMaxH3DiTModel (transformer) (sp_size=4, mode=ulysses, ulysses=4, ring=1)
+(DiffusionWorker_SP1 pid=809678) INFO 09-26 04:18:26 [registry.py:612] Applying sequence parallelism to MiniMaxH3DiTModel (transformer) (sp_size=4, mode=ulysses, ulysses=4, ring=1)
+(DiffusionWorker_SP0 pid=809677) INFO 09-26 04:18:26 [registry.py:612] Applying sequence parallelism to MiniMaxH3DiTModel (transformer) (sp_size=4, mode=ulysses, ulysses=4, ring=1)
+(DiffusionWorker_SP0 pid=809677) Multi-thread loading shards:   0% Completed | 0/14 [00:00<?, ?it/s]
+(DiffusionWorker_SP0 pid=809677) Multi-thread loading shards:   7% Completed | 1/14 [00:14<03:03, 14.13s/it]
+(DiffusionWorker_SP0 pid=809677) Multi-thread loading shards:  14% Completed | 2/14 [00:14<01:15,  6.32s/it]
+(DiffusionWorker_SP0 pid=809677) Multi-thread loading shards:  21% Completed | 3/14 [00:16<00:43,  3.92s/it]
+(DiffusionWorker_SP0 pid=809677) Multi-thread loading shards:  29% Completed | 4/14 [00:16<00:27,  2.74s/it]
+(DiffusionWorker_SP0 pid=809677) Multi-thread loading shards:  36% Completed | 5/14 [00:40<01:32, 10.28s/it]
+(DiffusionWorker_SP0 pid=809677) Multi-thread loading shards:  43% Completed | 6/14 [00:55<01:35, 11.90s/it]
+(DiffusionWorker_SP0 pid=809677) Multi-thread loading shards:  50% Completed | 7/14 [01:16<01:43, 14.72s/it]
+(DiffusionWorker_SP0 pid=809677) Multi-thread loading shards:  57% Completed | 8/14 [01:16<01:01, 10.28s/it]
+(DiffusionWorker_SP0 pid=809677) Multi-thread loading shards:  64% Completed | 9/14 [01:34<01:02, 12.47s/it]
+(DiffusionWorker_SP0 pid=809677) Multi-thread loading shards:  71% Completed | 10/14 [01:36<00:37,  9.35s/it]
+(DiffusionWorker_SP0 pid=809677) Multi-thread loading shards:  79% Completed | 11/14 [01:52<00:33, 11.27s/it]
+(DiffusionWorker_SP0 pid=809677) Multi-thread loading shards:  86% Completed | 12/14 [01:52<00:15,  7.96s/it]
+(DiffusionWorker_SP0 pid=809677) Multi-thread loading shards:  93% Completed | 13/14 [01:54<00:06,  6.06s/it]
+(DiffusionWorker_SP0 pid=809677) Multi-thread loading shards: 100% Completed | 14/14 [01:55<00:00,  4.52s/it]
+(DiffusionWorker_SP0 pid=809677) Multi-thread loading shards: 100% Completed | 14/14 [01:55<00:00,  8.23s/it]
+(DiffusionWorker_SP0 pid=809677) 
+(DiffusionWorker_SP0 pid=809677) Multi-thread loading shards:   0% Completed | 0/14 [00:00<?, ?it/s]
+(DiffusionWorker_SP2 pid=809679) INFO 09-26 04:20:21 [diffusion_model_runner.py:352] Model loading took 71.1942 GiB and 135.609522 seconds
+(DiffusionWorker_SP2 pid=809679) INFO 09-26 04:20:21 [diffusion_model_runner.py:358] Model runner: Model loaded successfully.
+(DiffusionWorker_SP2 pid=809679) INFO 09-26 04:20:21 [compile.py:103] Regional compilation applied to 52 module(s) for repeated blocks ['MiniMaxH3DiTBlock'].
+(DiffusionWorker_SP2 pid=809679) INFO 09-26 04:20:21 [diffusion_model_runner.py:267] Model runner: transformer configured for lazy regional torch.compile with dynamic=True; compilation errors may surface on the first request.
+(DiffusionWorker_SP2 pid=809679) INFO 09-26 04:20:21 [diffusion_model_runner.py:449] Model runner: Initialization complete.
+(DiffusionWorker_SP2 pid=809679) INFO 09-26 04:20:22 [diffusion_worker.py:439] Worker 2: Process-scoped GPU memory after model loading: 72.46 GiB.
+(DiffusionWorker_SP2 pid=809679) INFO 09-26 04:20:22 [manager.py:112] Initializing DiffusionLoRAManager: device=cuda:2, dtype=torch.bfloat16, max_cached_adapters=1, static_lora_path=None
+(DiffusionWorker_SP2 pid=809679) INFO 09-26 04:20:22 [diffusion_worker.py:316] Worker 2: Initialization complete.
+(DiffusionWorker_SP2 pid=809679) INFO 09-26 04:20:22 [diffusion_worker.py:1642] Worker 2: Scheduler loop started.
+(DiffusionWorker_SP2 pid=809679) INFO 09-26 04:20:22 [diffusion_worker.py:1486] Worker 2 ready to receive requests via shared memory
+(DiffusionWorker_SP3 pid=809680) INFO 09-26 04:20:22 [diffusion_model_runner.py:352] Model loading took 71.1942 GiB and 136.287589 seconds
+(DiffusionWorker_SP3 pid=809680) INFO 09-26 04:20:22 [diffusion_model_runner.py:358] Model runner: Model loaded successfully.
+(DiffusionWorker_SP3 pid=809680) INFO 09-26 04:20:22 [compile.py:103] Regional compilation applied to 52 module(s) for repeated blocks ['MiniMaxH3DiTBlock'].
+(DiffusionWorker_SP3 pid=809680) INFO 09-26 04:20:22 [diffusion_model_runner.py:267] Model runner: transformer configured for lazy regional torch.compile with dynamic=True; compilation errors may surface on the first request.
+(DiffusionWorker_SP3 pid=809680) INFO 09-26 04:20:22 [diffusion_model_runner.py:449] Model runner: Initialization complete.
+(DiffusionWorker_SP0 pid=809677) Multi-thread loading shards:   7% Completed | 1/14 [00:01<00:13,  1.01s/it]
+(DiffusionWorker_SP1 pid=809678) INFO 09-26 04:20:22 [diffusion_model_runner.py:352] Model loading took 71.1942 GiB and 136.708683 seconds
+(DiffusionWorker_SP1 pid=809678) INFO 09-26 04:20:22 [diffusion_model_runner.py:358] Model runner: Model loaded successfully.
+(DiffusionWorker_SP1 pid=809678) INFO 09-26 04:20:22 [compile.py:103] Regional compilation applied to 52 module(s) for repeated blocks ['MiniMaxH3DiTBlock'].
+(DiffusionWorker_SP1 pid=809678) INFO 09-26 04:20:22 [diffusion_model_runner.py:267] Model runner: transformer configured for lazy regional torch.compile with dynamic=True; compilation errors may surface on the first request.
+(DiffusionWorker_SP1 pid=809678) INFO 09-26 04:20:22 [diffusion_model_runner.py:449] Model runner: Initialization complete.
+(DiffusionWorker_SP3 pid=809680) INFO 09-26 04:20:23 [diffusion_worker.py:439] Worker 3: Process-scoped GPU memory after model loading: 72.46 GiB.
+(DiffusionWorker_SP3 pid=809680) INFO 09-26 04:20:23 [manager.py:112] Initializing DiffusionLoRAManager: device=cuda:3, dtype=torch.bfloat16, max_cached_adapters=1, static_lora_path=None
+(DiffusionWorker_SP3 pid=809680) INFO 09-26 04:20:23 [diffusion_worker.py:316] Worker 3: Initialization complete.
+(DiffusionWorker_SP3 pid=809680) INFO 09-26 04:20:23 [diffusion_worker.py:1642] Worker 3: Scheduler loop started.
+(DiffusionWorker_SP3 pid=809680) INFO 09-26 04:20:23 [diffusion_worker.py:1486] Worker 3 ready to receive requests via shared memory
+(DiffusionWorker_SP1 pid=809678) INFO 09-26 04:20:23 [diffusion_worker.py:439] Worker 1: Process-scoped GPU memory after model loading: 72.46 GiB.
+(DiffusionWorker_SP1 pid=809678) INFO 09-26 04:20:23 [manager.py:112] Initializing DiffusionLoRAManager: device=cuda:1, dtype=torch.bfloat16, max_cached_adapters=1, static_lora_path=None
+(DiffusionWorker_SP1 pid=809678) INFO 09-26 04:20:23 [diffusion_worker.py:316] Worker 1: Initialization complete.
+(DiffusionWorker_SP1 pid=809678) INFO 09-26 04:20:23 [diffusion_worker.py:1642] Worker 1: Scheduler loop started.
+(DiffusionWorker_SP1 pid=809678) INFO 09-26 04:20:23 [diffusion_worker.py:1486] Worker 1 ready to receive requests via shared memory
+(DiffusionWorker_SP0 pid=809677) Multi-thread loading shards:  14% Completed | 2/14 [00:01<00:10,  1.11it/s]
+(DiffusionWorker_SP0 pid=809677) Multi-thread loading shards:  21% Completed | 3/14 [00:02<00:09,  1.13it/s]
+(DiffusionWorker_SP0 pid=809677) Multi-thread loading shards:  29% Completed | 4/14 [00:03<00:08,  1.16it/s]
+(DiffusionWorker_SP0 pid=809677) Multi-thread loading shards:  36% Completed | 5/14 [00:04<00:07,  1.18it/s]
+(DiffusionWorker_SP0 pid=809677) Multi-thread loading shards:  43% Completed | 6/14 [00:16<00:36,  4.55s/it]
+(DiffusionWorker_SP0 pid=809677) Multi-thread loading shards:  50% Completed | 7/14 [00:31<00:56,  8.02s/it]
+(DiffusionWorker_SP0 pid=809677) Multi-thread loading shards:  57% Completed | 8/14 [00:31<00:33,  5.63s/it]
+(DiffusionWorker_SP0 pid=809677) Multi-thread loading shards:  64% Completed | 9/14 [00:47<00:44,  8.82s/it]
+(DiffusionWorker_SP0 pid=809677) Multi-thread loading shards:  71% Completed | 10/14 [00:47<00:24,  6.18s/it]
+(DiffusionWorker_SP0 pid=809677) Multi-thread loading shards:  79% Completed | 11/14 [00:57<00:22,  7.36s/it]
+(DiffusionWorker_SP0 pid=809677) Multi-thread loading shards: 100% Completed | 14/14 [00:58<00:00,  3.23s/it]
+(DiffusionWorker_SP0 pid=809677) Multi-thread loading shards: 100% Completed | 14/14 [00:58<00:00,  4.15s/it]
+(DiffusionWorker_SP0 pid=809677) 
+(DiffusionWorker_SP0 pid=809677) INFO 09-26 04:21:19 [diffusers_loader.py:1098] Loading weights took 173.45 seconds
+(DiffusionWorker_SP0 pid=809677) INFO 09-26 04:21:20 [diffusion_model_runner.py:352] Model loading took 119.1780 GiB and 194.334480 seconds
+(DiffusionWorker_SP0 pid=809677) INFO 09-26 04:21:20 [diffusion_model_runner.py:358] Model runner: Model loaded successfully.
+(DiffusionWorker_SP0 pid=809677) INFO 09-26 04:21:20 [compile.py:103] Regional compilation applied to 52 module(s) for repeated blocks ['MiniMaxH3DiTBlock'].
+(DiffusionWorker_SP0 pid=809677) INFO 09-26 04:21:20 [diffusion_model_runner.py:267] Model runner: transformer configured for lazy regional torch.compile with dynamic=True; compilation errors may surface on the first request.
+(DiffusionWorker_SP0 pid=809677) INFO 09-26 04:21:20 [diffusion_model_runner.py:449] Model runner: Initialization complete.
+(DiffusionWorker_SP0 pid=809677) INFO 09-26 04:21:20 [diffusion_worker.py:439] Worker 0: Process-scoped GPU memory after model loading: 120.46 GiB.
+(DiffusionWorker_SP0 pid=809677) INFO 09-26 04:21:20 [manager.py:112] Initializing DiffusionLoRAManager: device=cuda:0, dtype=torch.bfloat16, max_cached_adapters=1, static_lora_path=None
+(DiffusionWorker_SP0 pid=809677) INFO 09-26 04:21:20 [diffusion_worker.py:316] Worker 0: Initialization complete.
+(DiffusionWorker_SP0 pid=809677) INFO 09-26 04:21:20 [diffusion_worker.py:1642] Worker 0: Scheduler loop started.
+(DiffusionWorker_SP0 pid=809677) INFO 09-26 04:21:20 [diffusion_worker.py:1486] Worker 0 ready to receive requests via shared memory
+(APIServer pid=808899) INFO 09-26 04:21:20 [multiproc_executor.py:925] Async result pump started for 4 worker queue(s)
+(APIServer pid=808899) INFO 09-26 04:21:20 [diffusion_engine.py:430] [RequestBatch] engine init max_num_seqs=1 max_wait_ms=0.0
+(APIServer pid=808899) INFO 09-26 04:21:20 [diffusion_engine.py:1419] Skipping dummy warmup run (num_frames=0)
+(APIServer pid=808899) INFO 09-26 04:21:20 [inline_stage_diffusion_client.py:82] [InlineStageDiffusionClient] stage-0 [rep-0] initialized inline (max_num_seqs=1)
+(APIServer pid=808899) INFO 09-26 04:21:20 [stage_runtime.py:1210] [StageRuntime] Stage 0 replica 0 initialized (diffusion)
+(APIServer pid=808899) INFO 09-26 04:21:20 [orchestrator.py:432] [Orchestrator] Starting event loop
+(APIServer pid=808899) INFO 09-26 04:21:20 [omni_engine_base.py:344] [OmniEngine] Orchestrator ready with 1 stages
+(APIServer pid=808899) INFO 09-26 04:21:20 [omni_base.py:227] [AsyncOmni] AsyncOmniEngine initialized in 210.66 seconds
+(APIServer pid=808899) INFO 09-26 04:21:20 [omni_base.py:246] [AsyncOmni] Initialized with 1 stages for model /workspace/models/FastVideo-FastH3-8-Step-V2
+(APIServer pid=808899) INFO 09-26 04:21:21 [factories.py:76] Scale-out endpoints are disabled. Set --enable-scale-out to enable them.
+(APIServer pid=808899) INFO 09-26 04:21:21 [api_server.py:776] Detected pure diffusion mode (single diffusion stage)
+(APIServer pid=808899) INFO 09-26 04:21:21 [serving_video.py:170] Video response frame conversion pool configured: workers=8
+(APIServer pid=808899) INFO 09-26 04:21:21 [speaker_cache.py:239] Speaker cache ready (max_bytes=536870912)
+(APIServer pid=808899) INFO 09-26 04:21:21 [serving_speech.py:270] Speaker storage: dir=/root/.cache/vllm-omni/speakers, max_speakers=1000, restored=0
+(APIServer pid=808899) INFO 09-26 04:21:21 [serving.py:91] Robot OpenPI serving disabled for model FastH3
+(APIServer pid=808899) INFO 09-26 04:21:21 [api_server.py:864] Pure diffusion API server initialized for model: FastH3
+(APIServer pid=808899) INFO 09-26 04:21:21 [api_server.py:373] Starting vLLM API server (pure diffusion mode) on http://127.0.0.1:18083
+(APIServer pid=808899) INFO 09-26 04:21:21 [launcher.py:61] Available routes are:
+(APIServer pid=808899) INFO 09-26 04:21:21 [launcher.py:70] Route: /openapi.json, Methods: GET, HEAD
+(APIServer pid=808899) INFO 09-26 04:21:21 [launcher.py:70] Route: /docs, Methods: GET, HEAD
+(APIServer pid=808899) INFO 09-26 04:21:21 [launcher.py:70] Route: /docs/oauth2-redirect, Methods: GET, HEAD
+(APIServer pid=808899) INFO 09-26 04:21:21 [launcher.py:70] Route: /redoc, Methods: GET, HEAD
+(APIServer pid=808899) INFO 09-26 04:21:21 [launcher.py:70] Route: /load, Methods: GET
+(APIServer pid=808899) INFO 09-26 04:21:21 [launcher.py:70] Route: /version, Methods: GET
+(APIServer pid=808899) INFO 09-26 04:21:21 [launcher.py:70] Route: /metrics, Methods: GET
+(APIServer pid=808899) INFO 09-26 04:21:21 [launcher.py:70] Route: /tokenize, Methods: POST
+(APIServer pid=808899) INFO 09-26 04:21:21 [launcher.py:70] Route: /detokenize, Methods: POST
+(APIServer pid=808899) INFO 09-26 04:21:21 [launcher.py:70] Route: /ping, Methods: GET
+(APIServer pid=808899) INFO 09-26 04:21:21 [launcher.py:70] Route: /ping, Methods: POST
+(APIServer pid=808899) INFO 09-26 04:21:21 [launcher.py:70] Route: /invocations, Methods: POST
+(APIServer pid=808899) INFO 09-26 04:21:21 [launcher.py:70] Route: /v1/responses, Methods: POST
+(APIServer pid=808899) INFO 09-26 04:21:21 [launcher.py:70] Route: /v1/responses/{response_id}, Methods: GET
+(APIServer pid=808899) INFO 09-26 04:21:21 [launcher.py:70] Route: /v1/responses/{response_id}/cancel, Methods: POST
+(APIServer pid=808899) INFO 09-26 04:21:21 [launcher.py:70] Route: /v1/completions, Methods: POST
+(APIServer pid=808899) INFO 09-26 04:21:21 [launcher.py:70] Route: /v1/messages, Methods: POST
+(APIServer pid=808899) INFO 09-26 04:21:21 [launcher.py:70] Route: /v1/messages/count_tokens, Methods: POST
+(APIServer pid=808899) INFO 09-26 04:21:21 [launcher.py:70] Route: /generative_scoring, Methods: POST
+(APIServer pid=808899) INFO 09-26 04:21:21 [launcher.py:70] Route: /scale_elastic_ep, Methods: POST
+(APIServer pid=808899) INFO 09-26 04:21:21 [launcher.py:70] Route: /is_scaling_elastic_ep, Methods: POST
+(APIServer pid=808899) INFO 09-26 04:21:21 [launcher.py:70] Route: /v1/chat/completions, Methods: POST
+(APIServer pid=808899) INFO 09-26 04:21:21 [launcher.py:70] Route: /v1/chat/completions/batch, Methods: POST
+(APIServer pid=808899) INFO 09-26 04:21:21 [launcher.py:70] Route: /v1/audio/speech, Methods: POST
+(APIServer pid=808899) INFO 09-26 04:21:21 [launcher.py:70] Route: /v1/audio/speech/batch, Methods: POST
+(APIServer pid=808899) INFO 09-26 04:21:21 [launcher.py:70] Route: /v1/audio/generate, Methods: POST
+(APIServer pid=808899) INFO 09-26 04:21:21 [launcher.py:70] Route: /v1/audio/voices, Methods: GET
+(APIServer pid=808899) INFO 09-26 04:21:21 [launcher.py:70] Route: /v1/audio/voices, Methods: POST
+(APIServer pid=808899) INFO 09-26 04:21:21 [launcher.py:70] Route: /v1/audio/voices/{name}, Methods: DELETE
+(APIServer pid=808899) INFO 09-26 04:21:21 [launcher.py:70] Route: /v1/realtime/sessions, Methods: POST
+(APIServer pid=808899) INFO 09-26 04:21:21 [launcher.py:70] Route: /v1/realtime/sessions/{session_id}/step, Methods: POST
+(APIServer pid=808899) INFO 09-26 04:21:21 [launcher.py:70] Route: /v1/realtime/sessions/{session_id}/reset, Methods: POST
+(APIServer pid=808899) INFO 09-26 04:21:21 [launcher.py:70] Route: /v1/realtime/sessions/{session_id}/close, Methods: POST
+(APIServer pid=808899) INFO 09-26 04:21:21 [launcher.py:70] Route: /v1/realtime/sessions/{session_id}/status, Methods: GET
+(APIServer pid=808899) INFO 09-26 04:21:21 [launcher.py:70] Route: /health, Methods: GET
+(APIServer pid=808899) INFO 09-26 04:21:21 [launcher.py:70] Route: /v1/models, Methods: GET
+(APIServer pid=808899) INFO 09-26 04:21:21 [launcher.py:70] Route: /v1/images/generations, Methods: POST
+(APIServer pid=808899) INFO 09-26 04:21:21 [launcher.py:70] Route: /v1/images/edits, Methods: POST
+(APIServer pid=808899) INFO 09-26 04:21:21 [launcher.py:70] Route: /v1/videos, Methods: POST
+(APIServer pid=808899) INFO 09-26 04:21:21 [launcher.py:70] Route: /v1/videos/sync, Methods: POST
+(APIServer pid=808899) INFO 09-26 04:21:21 [launcher.py:70] Route: /v1/videos, Methods: GET
+(APIServer pid=808899) INFO 09-26 04:21:21 [launcher.py:70] Route: /v1/videos/{video_id}, Methods: GET
+(APIServer pid=808899) INFO 09-26 04:21:21 [launcher.py:70] Route: /v1/videos/{video_id}, Methods: DELETE
+(APIServer pid=808899) INFO 09-26 04:21:21 [launcher.py:70] Route: /v1/videos/{video_id}/content, Methods: GET
+(APIServer pid=808899) INFO 09-26 04:21:21 [launcher.py:70] Route: /v1/omni/sleep, Methods: POST
+(APIServer pid=808899) INFO 09-26 04:21:21 [launcher.py:70] Route: /v1/omni/wakeup, Methods: POST
+(APIServer pid=808899) INFO 09-26 04:21:21 [launcher.py:81] Route: /v1/audio/speech/stream, Endpoint: streaming_speech
+(APIServer pid=808899) INFO 09-26 04:21:21 [launcher.py:81] Route: /v1/video/chat/stream, Endpoint: streaming_video_chat
+(APIServer pid=808899) INFO 09-26 04:21:21 [launcher.py:81] Route: /v1/realtime/video, Endpoint: streaming_video_output
+(APIServer pid=808899) INFO 09-26 04:21:21 [launcher.py:81] Route: /v1/realtime, Endpoint: realtime_websocket
+(APIServer pid=808899) INFO 09-26 04:21:21 [launcher.py:81] Route: /v1/duplex, Endpoint: duplex_websocket
+(APIServer pid=808899) INFO 09-26 04:21:21 [launcher.py:81] Route: /v1/realtime/robot/openpi, Endpoint: realtime_robot_openpi
+(APIServer pid=808899) INFO:     Started server process [808899]
+(APIServer pid=808899) INFO:     Waiting for application startup.
+(APIServer pid=808899) INFO:     Application startup complete.
+(APIServer pid=808899) INFO 09-26 04:21:22 [helpers.py:986] Video generation handler: OmniOpenAIServingVideo
+(APIServer pid=808899) INFO 09-26 04:21:22 [serving_video.py:430] Boundary ratio parse: request=None gen_params=None
+(APIServer pid=808899) INFO 09-26 04:21:22 [serving_video.py:472] Applied extra_params: {'task': 't2va', 'duration': 5.0, 'audio_flow_shift': 3.0}
+(APIServer pid=808899) INFO 09-26 04:21:22 [serving_video.py:476] Video sampling params: steps=8 guidance=1.0 guidance_2=None seed=1131
+(DiffusionWorker_SP1 pid=809678) INFO 09-26 04:21:25 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline.encode_prompt took 0.787200s
+(DiffusionWorker_SP0 pid=809677) INFO 09-26 04:21:25 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline.encode_prompt took 0.800065s
+(DiffusionWorker_SP2 pid=809679) INFO 09-26 04:21:25 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline.encode_prompt took 0.786924s
+(DiffusionWorker_SP3 pid=809680) INFO 09-26 04:21:25 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline.encode_prompt took 0.786933s
+(DiffusionWorker_SP0 pid=809677) INFO 09-26 04:21:25 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline._encode_local_media took 0.006563s
+(DiffusionWorker_SP1 pid=809678) INFO 09-26 04:21:25 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline._encode_local_media took 0.006790s
+(DiffusionWorker_SP3 pid=809680) INFO 09-26 04:21:25 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline._encode_local_media took 0.006461s
+(DiffusionWorker_SP2 pid=809679) INFO 09-26 04:21:25 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline._encode_local_media took 0.006468s
+(DiffusionWorker_SP0 pid=809677)   0%|          | 0/8 [00:00<?, ?it/s](DiffusionWorker_SP0 pid=809677) WARNING 09-26 04:21:29 [fastvideo_vsa.py:289] FASTVIDEO_VSA falling back to SDPA: vsa_dit_seq_shape metadata is required
+(DiffusionWorker_SP0 pid=809677) INFO 09-26 04:21:32 [fastvideo_h3.py:144] FASTVIDEO_VSA H3 routing: seq_len=38710, prefix_segments=(1000, 414), video_shape=(37, 24, 42), prefix_blocks=23, video_blocks=660, topk=132, kernel_blocks=684
+(DiffusionWorker_SP0 pid=809677) INFO 09-26 04:21:33 [block_sparse.py:53] FASTVIDEO_VSA block-sparse provider: sm100a
+(DiffusionWorker_SP1 pid=809678) /workspace/UniServe/.venv-vllm-omni/lib/python3.12/site-packages/torch/distributed/c10d_logger.py:83: FutureWarning: `torch.distributed.all_gather_into_tensor` is deprecated. Please use `torch.distributed.all_gather_single` instead.
+(DiffusionWorker_SP1 pid=809678)   return func(*args, **kwargs)
+/workspace/UniServe/.venv-vllm-omni/lib/python3.12/site-packages/torch/distributed/c10d_logger.py:83: FutureWarning: `torch.distributed.all_gather_into_tensor` is deprecated. Please use `torch.distributed.all_gather_single` instead.
+(DiffusionWorker_SP0 pid=809677)   return func(*args, **kwargs)
+(DiffusionWorker_SP3 pid=809680) /workspace/UniServe/.venv-vllm-omni/lib/python3.12/site-packages/torch/distributed/c10d_logger.py:83: FutureWarning: `torch.distributed.all_gather_into_tensor` is deprecated. Please use `torch.distributed.all_gather_single` instead.
+(DiffusionWorker_SP3 pid=809680)   return func(*args, **kwargs)
+(DiffusionWorker_SP2 pid=809679) /workspace/UniServe/.venv-vllm-omni/lib/python3.12/site-packages/torch/distributed/c10d_logger.py:83: FutureWarning: `torch.distributed.all_gather_into_tensor` is deprecated. Please use `torch.distributed.all_gather_single` instead.
+(DiffusionWorker_SP2 pid=809679)   return func(*args, **kwargs)
+(DiffusionWorker_SP0 pid=809677)  12%|█▎        | 1/8 [00:10<01:11, 10.18s/it] 25%|██▌       | 2/8 [00:10<00:27,  4.63s/it] 38%|███▊      | 3/8 [00:11<00:14,  2.85s/it] 50%|█████     | 4/8 [00:12<00:08,  2.02s/it] 62%|██████▎   | 5/8 [00:13<00:04,  1.56s/it] 75%|███████▌  | 6/8 [00:13<00:02,  1.28s/it] 88%|████████▊ | 7/8 [00:14<00:01,  1.10s/it]100%|██████████| 8/8 [00:15<00:00,  1.02it/s]100%|██████████| 8/8 [00:15<00:00,  1.92s/it]
+(DiffusionWorker_SP1 pid=809678) INFO 09-26 04:21:40 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline.diffuse took 15.396490s
+(DiffusionWorker_SP0 pid=809677) INFO 09-26 04:21:40 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline.diffuse took 15.396771s
+(DiffusionWorker_SP3 pid=809680) INFO 09-26 04:21:40 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline.diffuse took 15.396991s
+(DiffusionWorker_SP2 pid=809679) INFO 09-26 04:21:40 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline.diffuse took 15.397279s
+(DiffusionWorker_SP0 pid=809677) /workspace/UniServe/.venv-vllm-omni/lib/python3.12/site-packages/torch/distributed/c10d_logger.py:83: UserWarning: barrier(): using the device under current context. You can specify `device_id` in `init_process_group` to mute this warning.
+(DiffusionWorker_SP0 pid=809677)   return func(*args, **kwargs)
+(DiffusionWorker_SP0 pid=809677) INFO 09-26 04:21:42 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline.video_vae.decode_latent took 1.685033s
+(DiffusionWorker_SP1 pid=809678) INFO 09-26 04:21:42 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline.video_vae.decode_latent took 1.685962s
+(DiffusionWorker_SP3 pid=809680) INFO 09-26 04:21:42 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline.video_vae.decode_latent took 1.686455s
+(DiffusionWorker_SP2 pid=809679) INFO 09-26 04:21:42 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline.video_vae.decode_latent took 1.686830s
+(DiffusionWorker_SP1 pid=809678) INFO 09-26 04:21:42 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline.audio_vae.decode_latent took 0.485413s
+(DiffusionWorker_SP1 pid=809678) INFO 09-26 04:21:42 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline.decode took 2.185368s
+(DiffusionWorker_SP0 pid=809677) INFO 09-26 04:21:42 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline.audio_vae.decode_latent took 0.485807s
+(DiffusionWorker_SP0 pid=809677) INFO 09-26 04:21:42 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline.decode took 2.185542s
+(DiffusionWorker_SP3 pid=809680) INFO 09-26 04:21:42 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline.audio_vae.decode_latent took 0.486961s
+(DiffusionWorker_SP3 pid=809680) INFO 09-26 04:21:42 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline.decode took 2.187413s
+(DiffusionWorker_SP2 pid=809679) INFO 09-26 04:21:42 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline.audio_vae.decode_latent took 0.487053s
+(DiffusionWorker_SP2 pid=809679) INFO 09-26 04:21:42 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline.decode took 2.187612s
+(DiffusionWorker_SP1 pid=809678) INFO 09-26 04:21:42 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline.forward took 20.101142s
+(DiffusionWorker_SP0 pid=809677) INFO 09-26 04:21:42 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline.forward took 20.101784s
+(DiffusionWorker_SP3 pid=809680) INFO 09-26 04:21:42 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline.forward took 20.103954s
+(DiffusionWorker_SP2 pid=809679) INFO 09-26 04:21:42 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline.forward took 20.104116s
+(APIServer pid=808899) INFO 09-26 04:21:42 [stats.py:899] 
+(APIServer pid=808899) INFO 09-26 04:21:42 [stats.py:899] [Overall Summary]
+(APIServer pid=808899) INFO 09-26 04:21:42 [stats.py:899] +-----------------------------+------------+
+(APIServer pid=808899) INFO 09-26 04:21:42 [stats.py:899] | Field                       |      Value |
+(APIServer pid=808899) INFO 09-26 04:21:42 [stats.py:899] +-----------------------------+------------+
+(APIServer pid=808899) INFO 09-26 04:21:42 [stats.py:899] | e2e_requests                |          1 |
+(APIServer pid=808899) INFO 09-26 04:21:42 [stats.py:899] | e2e_wall_time_ms            | 20,213.021 |
+(APIServer pid=808899) INFO 09-26 04:21:42 [stats.py:899] | e2e_avg_time_per_request_ms | 20,213.021 |
+(APIServer pid=808899) INFO 09-26 04:21:42 [stats.py:899] | e2e_stage_0_wall_time_ms    | 20,212.904 |
+(APIServer pid=808899) INFO 09-26 04:21:42 [stats.py:899] +-----------------------------+------------+
+(APIServer pid=808899) INFO 09-26 04:21:42 [stats.py:925] 
+(APIServer pid=808899) INFO 09-26 04:21:42 [stats.py:925] [RequestE2EStats [request_id=video_sync-8bac7e4e6794321a-815c79e4]]
+(APIServer pid=808899) INFO 09-26 04:21:42 [stats.py:925] +--------------+------------+
+(APIServer pid=808899) INFO 09-26 04:21:42 [stats.py:925] | Field        |      Value |
+(APIServer pid=808899) INFO 09-26 04:21:42 [stats.py:925] +--------------+------------+
+(APIServer pid=808899) INFO 09-26 04:21:42 [stats.py:925] | e2e_total_ms | 20,212.904 |
+(APIServer pid=808899) INFO 09-26 04:21:42 [stats.py:925] +--------------+------------+
+(APIServer pid=808899) INFO 09-26 04:21:42 [stats.py:966] [OmniTiming] req=video_sync-8bac7e4e6794321a-815c79e4 total=20.21s engine=20.21s stages=[0:20.21s]
+(APIServer pid=808899) INFO 09-26 04:21:42 [stats.py:1009] 
+(APIServer pid=808899) INFO 09-26 04:21:42 [stats.py:1009] [StageRequestStats [request_id=video_sync-8bac7e4e6794321a-815c79e4]]
+(APIServer pid=808899) INFO 09-26 04:21:42 [stats.py:1009] +---------------------------------+------------+
+(APIServer pid=808899) INFO 09-26 04:21:42 [stats.py:1009] | Field                           |          0 |
+(APIServer pid=808899) INFO 09-26 04:21:42 [stats.py:1009] +---------------------------------+------------+
+(APIServer pid=808899) INFO 09-26 04:21:42 [stats.py:1009] | audio_duration_s                |      5.175 |
+(APIServer pid=808899) INFO 09-26 04:21:42 [stats.py:1009] | audio_generated_frames          |    165,600 |
+(APIServer pid=808899) INFO 09-26 04:21:42 [stats.py:1009] | audio_sample_rate               |     32,000 |
+(APIServer pid=808899) INFO 09-26 04:21:42 [stats.py:1009] | batch_id                        |          1 |
+(APIServer pid=808899) INFO 09-26 04:21:42 [stats.py:1009] | batch_size                      |          1 |
+(APIServer pid=808899) INFO 09-26 04:21:42 [stats.py:1009] | diffusion_engine_exec_time_s    |     20.113 |
+(APIServer pid=808899) INFO 09-26 04:21:42 [stats.py:1009] | forward_time_s                  |     15.397 |
+(APIServer pid=808899) INFO 09-26 04:21:42 [stats.py:1009] | height                          |    768.000 |
+(APIServer pid=808899) INFO 09-26 04:21:42 [stats.py:1009] | image_num                       |      1.000 |
+(APIServer pid=808899) INFO 09-26 04:21:42 [stats.py:1009] | inter_output_latencies_ms       |            |
+(APIServer pid=808899) INFO 09-26 04:21:42 [stats.py:1009] | kv_recv_time_s                  |      0.001 |
+(APIServer pid=808899) INFO 09-26 04:21:42 [stats.py:1009] | num_inference_steps             |      8.000 |
+(APIServer pid=808899) INFO 09-26 04:21:42 [stats.py:1009] | output_ready_wait_time_s        |      0.098 |
+(APIServer pid=808899) INFO 09-26 04:21:42 [stats.py:1009] | output_unit_count               |          1 |
+(APIServer pid=808899) INFO 09-26 04:21:42 [stats.py:1009] | output_unit_type                |      video |
+(APIServer pid=808899) INFO 09-26 04:21:42 [stats.py:1009] | postprocess_time_s              |      0.000 |
+(APIServer pid=808899) INFO 09-26 04:21:42 [stats.py:1009] | resolution                      |    640.000 |
+(APIServer pid=808899) INFO 09-26 04:21:42 [stats.py:1009] | scheduler_queue_wait_s          |      0.000 |
+(APIServer pid=808899) INFO 09-26 04:21:42 [stats.py:1009] | serving_time_to_first_output_ms | 20,212.528 |
+(APIServer pid=808899) INFO 09-26 04:21:42 [stats.py:1009] | stage_gen_time_ms               | 20,212.230 |
+(APIServer pid=808899) INFO 09-26 04:21:42 [stats.py:1009] | vllm_itls_ms                    |            |
+(APIServer pid=808899) INFO 09-26 04:21:42 [stats.py:1009] | width                           |  1,344.000 |
+(APIServer pid=808899) INFO 09-26 04:21:42 [stats.py:1009] +---------------------------------+------------+
+(APIServer pid=808899) INFO 09-26 04:21:42 [video_api_utils.py:765] Video response encoding route selected: selected_path=direct_planar frames=124 frame_shape=(768, 1344, 3) dtype=uint8 fps=24.0 audio_present=True effective_audio_sample_rate=32000 effective_frame_conversion_workers=8
+(APIServer pid=808899) INFO 09-26 04:21:43 [serving_video.py:627] Video response encoding (MP4 bytes): 294.64 ms
+(APIServer pid=808899) INFO:     127.0.0.1:36122 - "POST /v1/videos/sync HTTP/1.1" 200 OK
+(APIServer pid=808899) INFO 09-26 04:21:43 [helpers.py:986] Video generation handler: OmniOpenAIServingVideo
+(APIServer pid=808899) INFO 09-26 04:21:43 [serving_video.py:430] Boundary ratio parse: request=None gen_params=None
+(APIServer pid=808899) INFO 09-26 04:21:43 [serving_video.py:472] Applied extra_params: {'task': 't2va', 'duration': 5.0, 'audio_flow_shift': 3.0}
+(APIServer pid=808899) INFO 09-26 04:21:43 [serving_video.py:476] Video sampling params: steps=8 guidance=1.0 guidance_2=None seed=1131
+(DiffusionWorker_SP1 pid=809678) INFO 09-26 04:21:43 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline.encode_prompt took 0.585593s
+(DiffusionWorker_SP2 pid=809679) INFO 09-26 04:21:43 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline.encode_prompt took 0.585596s
+(DiffusionWorker_SP0 pid=809677) INFO 09-26 04:21:43 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline.encode_prompt took 0.586026s
+(DiffusionWorker_SP3 pid=809680) INFO 09-26 04:21:43 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline.encode_prompt took 0.585607s
+(DiffusionWorker_SP0 pid=809677) INFO 09-26 04:21:43 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline._encode_local_media took 0.002964s
+(DiffusionWorker_SP1 pid=809678) INFO 09-26 04:21:43 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline._encode_local_media took 0.003251s
+(DiffusionWorker_SP3 pid=809680) INFO 09-26 04:21:43 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline._encode_local_media took 0.003156s
+(DiffusionWorker_SP2 pid=809679) INFO 09-26 04:21:43 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline._encode_local_media took 0.003215s
+(DiffusionWorker_SP0 pid=809677)   0%|          | 0/8 [00:00<?, ?it/s](DiffusionWorker_SP0 pid=809677) INFO 09-26 04:21:43 [fastvideo_h3.py:144] FASTVIDEO_VSA H3 routing: seq_len=47710, prefix_segments=(10000, 414), video_shape=(37, 24, 42), prefix_blocks=164, video_blocks=660, topk=132, kernel_blocks=824
+ 12%|█▎        | 1/8 [00:01<00:08,  1.18s/it] 25%|██▌       | 2/8 [00:02<00:07,  1.17s/it] 38%|███▊      | 3/8 [00:03<00:05,  1.16s/it] 50%|█████     | 4/8 [00:04<00:04,  1.16s/it] 62%|██████▎   | 5/8 [00:05<00:03,  1.16s/it] 75%|███████▌  | 6/8 [00:06<00:02,  1.16s/it] 88%|████████▊ | 7/8 [00:08<00:01,  1.17s/it]100%|██████████| 8/8 [00:09<00:00,  1.16s/it]100%|██████████| 8/8 [00:09<00:00,  1.17s/it]
+(DiffusionWorker_SP0 pid=809677) INFO 09-26 04:21:53 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline.diffuse took 9.371389s
+(DiffusionWorker_SP1 pid=809678) INFO 09-26 04:21:53 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline.diffuse took 9.371297s
+(DiffusionWorker_SP3 pid=809680) INFO 09-26 04:21:53 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline.diffuse took 9.371542s
+(DiffusionWorker_SP2 pid=809679) INFO 09-26 04:21:53 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline.diffuse took 9.371529s
+(DiffusionWorker_SP0 pid=809677) INFO 09-26 04:21:54 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline.video_vae.decode_latent took 1.346394s
+(DiffusionWorker_SP1 pid=809678) INFO 09-26 04:21:54 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline.video_vae.decode_latent took 1.344018s
+(DiffusionWorker_SP3 pid=809680) INFO 09-26 04:21:54 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline.video_vae.decode_latent took 1.342861s
+(DiffusionWorker_SP2 pid=809679) INFO 09-26 04:21:54 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline.video_vae.decode_latent took 1.343190s
+(DiffusionWorker_SP0 pid=809677) INFO 09-26 04:21:54 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline.audio_vae.decode_latent took 0.060087s
+(DiffusionWorker_SP0 pid=809677) INFO 09-26 04:21:54 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline.decode took 1.420065s
+(DiffusionWorker_SP1 pid=809678) INFO 09-26 04:21:54 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline.audio_vae.decode_latent took 0.059879s
+(DiffusionWorker_SP1 pid=809678) INFO 09-26 04:21:54 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline.decode took 1.420087s
+(DiffusionWorker_SP1 pid=809678) INFO 09-26 04:21:54 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline.forward took 11.386339s
+(DiffusionWorker_SP0 pid=809677) INFO 09-26 04:21:54 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline.forward took 11.388327s
+(DiffusionWorker_SP3 pid=809680) INFO 09-26 04:21:54 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline.audio_vae.decode_latent took 0.065727s
+(DiffusionWorker_SP3 pid=809680) INFO 09-26 04:21:54 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline.decode took 1.426237s
+(DiffusionWorker_SP2 pid=809679) INFO 09-26 04:21:54 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline.audio_vae.decode_latent took 0.066356s
+(DiffusionWorker_SP2 pid=809679) INFO 09-26 04:21:54 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline.decode took 1.426868s
+(DiffusionWorker_SP3 pid=809680) INFO 09-26 04:21:54 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline.forward took 11.393003s
+(DiffusionWorker_SP2 pid=809679) INFO 09-26 04:21:54 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline.forward took 11.393835s
+(APIServer pid=808899) INFO 09-26 04:21:54 [stats.py:899] 
+(APIServer pid=808899) INFO 09-26 04:21:54 [stats.py:899] [Overall Summary]
+(APIServer pid=808899) INFO 09-26 04:21:54 [stats.py:899] +-----------------------------+------------+
+(APIServer pid=808899) INFO 09-26 04:21:54 [stats.py:899] | Field                       |      Value |
+(APIServer pid=808899) INFO 09-26 04:21:54 [stats.py:899] +-----------------------------+------------+
+(APIServer pid=808899) INFO 09-26 04:21:54 [stats.py:899] | e2e_requests                |          1 |
+(APIServer pid=808899) INFO 09-26 04:21:54 [stats.py:899] | e2e_wall_time_ms            | 11,504.685 |
+(APIServer pid=808899) INFO 09-26 04:21:54 [stats.py:899] | e2e_avg_time_per_request_ms | 11,504.685 |
+(APIServer pid=808899) INFO 09-26 04:21:54 [stats.py:899] | e2e_stage_0_wall_time_ms    | 11,504.454 |
+(APIServer pid=808899) INFO 09-26 04:21:54 [stats.py:899] +-----------------------------+------------+
+(APIServer pid=808899) INFO 09-26 04:21:54 [stats.py:925] 
+(APIServer pid=808899) INFO 09-26 04:21:54 [stats.py:925] [RequestE2EStats [request_id=video_sync-87f52890475fe705-80eea01f]]
+(APIServer pid=808899) INFO 09-26 04:21:54 [stats.py:925] +--------------+------------+
+(APIServer pid=808899) INFO 09-26 04:21:54 [stats.py:925] | Field        |      Value |
+(APIServer pid=808899) INFO 09-26 04:21:54 [stats.py:925] +--------------+------------+
+(APIServer pid=808899) INFO 09-26 04:21:54 [stats.py:925] | e2e_total_ms | 11,504.454 |
+(APIServer pid=808899) INFO 09-26 04:21:54 [stats.py:925] +--------------+------------+
+(APIServer pid=808899) INFO 09-26 04:21:54 [stats.py:966] [OmniTiming] req=video_sync-87f52890475fe705-80eea01f total=11.50s engine=11.50s stages=[0:11.50s]
+(APIServer pid=808899) INFO 09-26 04:21:54 [stats.py:1009] 
+(APIServer pid=808899) INFO 09-26 04:21:54 [stats.py:1009] [StageRequestStats [request_id=video_sync-87f52890475fe705-80eea01f]]
+(APIServer pid=808899) INFO 09-26 04:21:54 [stats.py:1009] +---------------------------------+------------+
+(APIServer pid=808899) INFO 09-26 04:21:54 [stats.py:1009] | Field                           |          0 |
+(APIServer pid=808899) INFO 09-26 04:21:54 [stats.py:1009] +---------------------------------+------------+
+(APIServer pid=808899) INFO 09-26 04:21:54 [stats.py:1009] | audio_duration_s                |      5.175 |
+(APIServer pid=808899) INFO 09-26 04:21:54 [stats.py:1009] | audio_generated_frames          |    165,600 |
+(APIServer pid=808899) INFO 09-26 04:21:54 [stats.py:1009] | audio_sample_rate               |     32,000 |
+(APIServer pid=808899) INFO 09-26 04:21:54 [stats.py:1009] | batch_id                        |          2 |
+(APIServer pid=808899) INFO 09-26 04:21:54 [stats.py:1009] | batch_size                      |          1 |
+(APIServer pid=808899) INFO 09-26 04:21:54 [stats.py:1009] | diffusion_engine_exec_time_s    |     11.394 |
+(APIServer pid=808899) INFO 09-26 04:21:54 [stats.py:1009] | forward_time_s                  |      9.371 |
+(APIServer pid=808899) INFO 09-26 04:21:54 [stats.py:1009] | height                          |    768.000 |
+(APIServer pid=808899) INFO 09-26 04:21:54 [stats.py:1009] | image_num                       |      1.000 |
+(APIServer pid=808899) INFO 09-26 04:21:54 [stats.py:1009] | inter_output_latencies_ms       |            |
+(APIServer pid=808899) INFO 09-26 04:21:54 [stats.py:1009] | kv_recv_time_s                  |      0.001 |
+(APIServer pid=808899) INFO 09-26 04:21:54 [stats.py:1009] | num_inference_steps             |      8.000 |
+(APIServer pid=808899) INFO 09-26 04:21:54 [stats.py:1009] | output_ready_wait_time_s        |      0.106 |
+(APIServer pid=808899) INFO 09-26 04:21:54 [stats.py:1009] | output_unit_count               |          1 |
+(APIServer pid=808899) INFO 09-26 04:21:54 [stats.py:1009] | output_unit_type                |      video |
+(APIServer pid=808899) INFO 09-26 04:21:54 [stats.py:1009] | postprocess_time_s              |      0.001 |
+(APIServer pid=808899) INFO 09-26 04:21:54 [stats.py:1009] | resolution                      |    640.000 |
+(APIServer pid=808899) INFO 09-26 04:21:54 [stats.py:1009] | scheduler_queue_wait_s          |      0.000 |
+(APIServer pid=808899) INFO 09-26 04:21:54 [stats.py:1009] | serving_time_to_first_output_ms | 11,501.583 |
+(APIServer pid=808899) INFO 09-26 04:21:54 [stats.py:1009] | stage_gen_time_ms               | 11,503.611 |
+(APIServer pid=808899) INFO 09-26 04:21:54 [stats.py:1009] | vllm_itls_ms                    |            |
+(APIServer pid=808899) INFO 09-26 04:21:54 [stats.py:1009] | width                           |  1,344.000 |
+(APIServer pid=808899) INFO 09-26 04:21:54 [stats.py:1009] +---------------------------------+------------+
+(APIServer pid=808899) INFO 09-26 04:21:54 [video_api_utils.py:765] Video response encoding route selected: selected_path=direct_planar frames=124 frame_shape=(768, 1344, 3) dtype=uint8 fps=24.0 audio_present=True effective_audio_sample_rate=32000 effective_frame_conversion_workers=8
+(APIServer pid=808899) INFO 09-26 04:21:55 [serving_video.py:627] Video response encoding (MP4 bytes): 353.95 ms
+(APIServer pid=808899) INFO:     127.0.0.1:36122 - "POST /v1/videos/sync HTTP/1.1" 200 OK
+(APIServer pid=808899) INFO 09-26 04:21:55 [helpers.py:986] Video generation handler: OmniOpenAIServingVideo
+(APIServer pid=808899) INFO 09-26 04:21:55 [serving_video.py:430] Boundary ratio parse: request=None gen_params=None
+(APIServer pid=808899) INFO 09-26 04:21:55 [serving_video.py:472] Applied extra_params: {'task': 't2va', 'duration': 10.0, 'audio_flow_shift': 3.0}
+(APIServer pid=808899) INFO 09-26 04:21:55 [serving_video.py:476] Video sampling params: steps=8 guidance=1.0 guidance_2=None seed=1131
+(DiffusionWorker_SP1 pid=809678) INFO 09-26 04:21:55 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline.encode_prompt took 0.068867s
+(DiffusionWorker_SP0 pid=809677) INFO 09-26 04:21:55 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline.encode_prompt took 0.069259s
+(DiffusionWorker_SP3 pid=809680) INFO 09-26 04:21:55 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline.encode_prompt took 0.068407s
+(DiffusionWorker_SP2 pid=809679) INFO 09-26 04:21:55 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline.encode_prompt took 0.068818s
+(DiffusionWorker_SP0 pid=809677) INFO 09-26 04:21:55 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline._encode_local_media took 0.002211s
+(DiffusionWorker_SP1 pid=809678) INFO 09-26 04:21:55 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline._encode_local_media took 0.002437s
+(DiffusionWorker_SP2 pid=809679) INFO 09-26 04:21:55 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline._encode_local_media took 0.002340s
+(DiffusionWorker_SP3 pid=809680) INFO 09-26 04:21:55 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline._encode_local_media took 0.002355s
+(DiffusionWorker_SP0 pid=809677)   0%|          | 0/8 [00:00<?, ?it/s](DiffusionWorker_SP0 pid=809677) INFO 09-26 04:21:55 [fastvideo_h3.py:144] FASTVIDEO_VSA H3 routing: seq_len=74386, prefix_segments=(1000, 810), video_shape=(72, 24, 42), prefix_blocks=29, video_blocks=1188, topk=238, kernel_blocks=1218
+ 12%|█▎        | 1/8 [00:01<00:11,  1.61s/it] 25%|██▌       | 2/8 [00:03<00:09,  1.59s/it] 38%|███▊      | 3/8 [00:04<00:07,  1.59s/it] 50%|█████     | 4/8 [00:06<00:06,  1.59s/it] 62%|██████▎   | 5/8 [00:07<00:04,  1.59s/it] 75%|███████▌  | 6/8 [00:09<00:03,  1.59s/it] 88%|████████▊ | 7/8 [00:11<00:01,  1.59s/it]100%|██████████| 8/8 [00:12<00:00,  1.58s/it]100%|██████████| 8/8 [00:12<00:00,  1.59s/it]
+(DiffusionWorker_SP0 pid=809677) INFO 09-26 04:22:08 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline.diffuse took 12.759533s
+(DiffusionWorker_SP2 pid=809679) INFO 09-26 04:22:08 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline.diffuse took 12.759664s
+(DiffusionWorker_SP1 pid=809678) INFO 09-26 04:22:08 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline.diffuse took 12.759893s
+(DiffusionWorker_SP3 pid=809680) INFO 09-26 04:22:08 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline.diffuse took 12.759997s
+(DiffusionWorker_SP0 pid=809677) INFO 09-26 04:22:10 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline.video_vae.decode_latent took 2.717013s
+(DiffusionWorker_SP1 pid=809678) INFO 09-26 04:22:10 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline.video_vae.decode_latent took 2.716833s
+(DiffusionWorker_SP2 pid=809679) INFO 09-26 04:22:10 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline.video_vae.decode_latent took 2.715382s
+(DiffusionWorker_SP3 pid=809680) INFO 09-26 04:22:10 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline.video_vae.decode_latent took 2.715251s
+(DiffusionWorker_SP1 pid=809678) INFO 09-26 04:22:10 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline.audio_vae.decode_latent took 0.111697s
+(DiffusionWorker_SP1 pid=809678) INFO 09-26 04:22:10 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline.decode took 2.845036s
+(DiffusionWorker_SP0 pid=809677) INFO 09-26 04:22:10 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline.audio_vae.decode_latent took 0.112473s
+(DiffusionWorker_SP0 pid=809677) INFO 09-26 04:22:10 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline.decode took 2.845614s
+(DiffusionWorker_SP0 pid=809677) INFO 09-26 04:22:10 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline.forward took 15.685052s
+(DiffusionWorker_SP1 pid=809678) INFO 09-26 04:22:10 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline.forward took 15.685996s
+(DiffusionWorker_SP3 pid=809680) INFO 09-26 04:22:10 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline.audio_vae.decode_latent took 0.121723s
+(DiffusionWorker_SP3 pid=809680) INFO 09-26 04:22:10 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline.decode took 2.855537s
+(DiffusionWorker_SP2 pid=809679) INFO 09-26 04:22:10 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline.audio_vae.decode_latent took 0.122441s
+(DiffusionWorker_SP2 pid=809679) INFO 09-26 04:22:10 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline.decode took 2.856027s
+(DiffusionWorker_SP3 pid=809680) INFO 09-26 04:22:10 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline.forward took 15.696227s
+(DiffusionWorker_SP2 pid=809679) INFO 09-26 04:22:10 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline.forward took 15.696910s
+(APIServer pid=808899) INFO 09-26 04:22:11 [stats.py:899] 
+(APIServer pid=808899) INFO 09-26 04:22:11 [stats.py:899] [Overall Summary]
+(APIServer pid=808899) INFO 09-26 04:22:11 [stats.py:899] +-----------------------------+------------+
+(APIServer pid=808899) INFO 09-26 04:22:11 [stats.py:899] | Field                       |      Value |
+(APIServer pid=808899) INFO 09-26 04:22:11 [stats.py:899] +-----------------------------+------------+
+(APIServer pid=808899) INFO 09-26 04:22:11 [stats.py:899] | e2e_requests                |          1 |
+(APIServer pid=808899) INFO 09-26 04:22:11 [stats.py:899] | e2e_wall_time_ms            | 15,890.979 |
+(APIServer pid=808899) INFO 09-26 04:22:11 [stats.py:899] | e2e_avg_time_per_request_ms | 15,890.979 |
+(APIServer pid=808899) INFO 09-26 04:22:11 [stats.py:899] | e2e_stage_0_wall_time_ms    | 15,890.864 |
+(APIServer pid=808899) INFO 09-26 04:22:11 [stats.py:899] +-----------------------------+------------+
+(APIServer pid=808899) INFO 09-26 04:22:11 [stats.py:925] 
+(APIServer pid=808899) INFO 09-26 04:22:11 [stats.py:925] [RequestE2EStats [request_id=video_sync-8e25ff4371048a2e-b739aceb]]
+(APIServer pid=808899) INFO 09-26 04:22:11 [stats.py:925] +--------------+------------+
+(APIServer pid=808899) INFO 09-26 04:22:11 [stats.py:925] | Field        |      Value |
+(APIServer pid=808899) INFO 09-26 04:22:11 [stats.py:925] +--------------+------------+
+(APIServer pid=808899) INFO 09-26 04:22:11 [stats.py:925] | e2e_total_ms | 15,890.864 |
+(APIServer pid=808899) INFO 09-26 04:22:11 [stats.py:925] +--------------+------------+
+(APIServer pid=808899) INFO 09-26 04:22:11 [stats.py:966] [OmniTiming] req=video_sync-8e25ff4371048a2e-b739aceb total=15.89s engine=15.89s stages=[0:15.89s]
+(APIServer pid=808899) INFO 09-26 04:22:11 [stats.py:1009] 
+(APIServer pid=808899) INFO 09-26 04:22:11 [stats.py:1009] [StageRequestStats [request_id=video_sync-8e25ff4371048a2e-b739aceb]]
+(APIServer pid=808899) INFO 09-26 04:22:11 [stats.py:1009] +---------------------------------+------------+
+(APIServer pid=808899) INFO 09-26 04:22:11 [stats.py:1009] | Field                           |          0 |
+(APIServer pid=808899) INFO 09-26 04:22:11 [stats.py:1009] +---------------------------------+------------+
+(APIServer pid=808899) INFO 09-26 04:22:11 [stats.py:1009] | audio_duration_s                |     10.125 |
+(APIServer pid=808899) INFO 09-26 04:22:11 [stats.py:1009] | audio_generated_frames          |    324,000 |
+(APIServer pid=808899) INFO 09-26 04:22:11 [stats.py:1009] | audio_sample_rate               |     32,000 |
+(APIServer pid=808899) INFO 09-26 04:22:11 [stats.py:1009] | batch_id                        |          3 |
+(APIServer pid=808899) INFO 09-26 04:22:11 [stats.py:1009] | batch_size                      |          1 |
+(APIServer pid=808899) INFO 09-26 04:22:11 [stats.py:1009] | diffusion_engine_exec_time_s    |     15.692 |
+(APIServer pid=808899) INFO 09-26 04:22:11 [stats.py:1009] | forward_time_s                  |     12.760 |
+(APIServer pid=808899) INFO 09-26 04:22:11 [stats.py:1009] | height                          |    768.000 |
+(APIServer pid=808899) INFO 09-26 04:22:11 [stats.py:1009] | image_num                       |      1.000 |
+(APIServer pid=808899) INFO 09-26 04:22:11 [stats.py:1009] | inter_output_latencies_ms       |            |
+(APIServer pid=808899) INFO 09-26 04:22:11 [stats.py:1009] | kv_recv_time_s                  |      0.001 |
+(APIServer pid=808899) INFO 09-26 04:22:11 [stats.py:1009] | num_inference_steps             |      8.000 |
+(APIServer pid=808899) INFO 09-26 04:22:11 [stats.py:1009] | output_ready_wait_time_s        |      0.191 |
+(APIServer pid=808899) INFO 09-26 04:22:11 [stats.py:1009] | output_unit_count               |          1 |
+(APIServer pid=808899) INFO 09-26 04:22:11 [stats.py:1009] | output_unit_type                |      video |
+(APIServer pid=808899) INFO 09-26 04:22:11 [stats.py:1009] | postprocess_time_s              |      0.000 |
+(APIServer pid=808899) INFO 09-26 04:22:11 [stats.py:1009] | resolution                      |    640.000 |
+(APIServer pid=808899) INFO 09-26 04:22:11 [stats.py:1009] | scheduler_queue_wait_s          |      0.000 |
+(APIServer pid=808899) INFO 09-26 04:22:11 [stats.py:1009] | serving_time_to_first_output_ms | 15,885.722 |
+(APIServer pid=808899) INFO 09-26 04:22:11 [stats.py:1009] | stage_gen_time_ms               | 15,889.292 |
+(APIServer pid=808899) INFO 09-26 04:22:11 [stats.py:1009] | vllm_itls_ms                    |            |
+(APIServer pid=808899) INFO 09-26 04:22:11 [stats.py:1009] | width                           |  1,344.000 |
+(APIServer pid=808899) INFO 09-26 04:22:11 [stats.py:1009] +---------------------------------+------------+
+(APIServer pid=808899) INFO 09-26 04:22:11 [video_api_utils.py:765] Video response encoding route selected: selected_path=direct_planar frames=243 frame_shape=(768, 1344, 3) dtype=uint8 fps=24.0 audio_present=True effective_audio_sample_rate=32000 effective_frame_conversion_workers=8
+(APIServer pid=808899) INFO 09-26 04:22:11 [serving_video.py:627] Video response encoding (MP4 bytes): 659.17 ms
+(APIServer pid=808899) INFO:     127.0.0.1:36122 - "POST /v1/videos/sync HTTP/1.1" 200 OK
+(APIServer pid=808899) INFO 09-26 04:22:11 [helpers.py:986] Video generation handler: OmniOpenAIServingVideo
+(APIServer pid=808899) INFO 09-26 04:22:11 [serving_video.py:430] Boundary ratio parse: request=None gen_params=None
+(APIServer pid=808899) INFO 09-26 04:22:11 [serving_video.py:472] Applied extra_params: {'task': 't2va', 'duration': 10.0, 'audio_flow_shift': 3.0}
+(APIServer pid=808899) INFO 09-26 04:22:11 [serving_video.py:476] Video sampling params: steps=8 guidance=1.0 guidance_2=None seed=1131
+(DiffusionWorker_SP1 pid=809678) INFO 09-26 04:22:12 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline.encode_prompt took 0.529849s
+(DiffusionWorker_SP3 pid=809680) INFO 09-26 04:22:12 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline.encode_prompt took 0.529802s
+(DiffusionWorker_SP2 pid=809679) INFO 09-26 04:22:12 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline.encode_prompt took 0.529790s
+(DiffusionWorker_SP0 pid=809677) INFO 09-26 04:22:12 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline.encode_prompt took 0.531530s
+(DiffusionWorker_SP0 pid=809677) INFO 09-26 04:22:12 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline._encode_local_media took 0.002290s
+(DiffusionWorker_SP1 pid=809678) INFO 09-26 04:22:12 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline._encode_local_media took 0.003809s
+(DiffusionWorker_SP3 pid=809680) INFO 09-26 04:22:12 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline._encode_local_media took 0.003836s
+(DiffusionWorker_SP2 pid=809679) INFO 09-26 04:22:12 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline._encode_local_media took 0.003829s
+(DiffusionWorker_SP0 pid=809677)   0%|          | 0/8 [00:00<?, ?it/s](DiffusionWorker_SP0 pid=809677) INFO 09-26 04:22:12 [fastvideo_h3.py:144] FASTVIDEO_VSA H3 routing: seq_len=83386, prefix_segments=(10000, 810), video_shape=(72, 24, 42), prefix_blocks=170, video_blocks=1188, topk=238, kernel_blocks=1358
+ 12%|█▎        | 1/8 [00:02<00:15,  2.24s/it] 25%|██▌       | 2/8 [00:04<00:13,  2.24s/it] 38%|███▊      | 3/8 [00:06<00:11,  2.24s/it] 50%|█████     | 4/8 [00:08<00:08,  2.24s/it] 62%|██████▎   | 5/8 [00:11<00:06,  2.24s/it] 75%|███████▌  | 6/8 [00:13<00:04,  2.24s/it] 88%|████████▊ | 7/8 [00:15<00:02,  2.23s/it]100%|██████████| 8/8 [00:17<00:00,  2.23s/it]100%|██████████| 8/8 [00:17<00:00,  2.24s/it]
+(DiffusionWorker_SP0 pid=809677) INFO 09-26 04:22:30 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline.diffuse took 17.951102s
+(DiffusionWorker_SP1 pid=809678) INFO 09-26 04:22:30 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline.diffuse took 17.950979s
+(DiffusionWorker_SP2 pid=809679) INFO 09-26 04:22:30 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline.diffuse took 17.950988s
+(DiffusionWorker_SP3 pid=809680) INFO 09-26 04:22:30 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline.diffuse took 17.951061s
+(DiffusionWorker_SP0 pid=809677) INFO 09-26 04:22:32 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline.video_vae.decode_latent took 2.711983s
+(DiffusionWorker_SP3 pid=809680) INFO 09-26 04:22:32 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline.video_vae.decode_latent took 2.708557s
+(DiffusionWorker_SP1 pid=809678) INFO 09-26 04:22:32 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline.video_vae.decode_latent took 2.708158s
+(DiffusionWorker_SP2 pid=809679) INFO 09-26 04:22:32 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline.video_vae.decode_latent took 2.708614s
+(DiffusionWorker_SP0 pid=809677) INFO 09-26 04:22:33 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline.audio_vae.decode_latent took 0.063764s
+(DiffusionWorker_SP1 pid=809678) INFO 09-26 04:22:33 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline.audio_vae.decode_latent took 0.063634s
+(DiffusionWorker_SP0 pid=809677) INFO 09-26 04:22:33 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline.decode took 2.792107s
+(DiffusionWorker_SP1 pid=809678) INFO 09-26 04:22:33 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline.decode took 2.792065s
+(DiffusionWorker_SP3 pid=809680) INFO 09-26 04:22:33 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline.audio_vae.decode_latent took 0.065698s
+(DiffusionWorker_SP3 pid=809680) INFO 09-26 04:22:33 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline.decode took 2.794213s
+(DiffusionWorker_SP2 pid=809679) INFO 09-26 04:22:33 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline.audio_vae.decode_latent took 0.067845s
+(DiffusionWorker_SP2 pid=809679) INFO 09-26 04:22:33 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline.decode took 2.796655s
+(DiffusionWorker_SP0 pid=809677) INFO 09-26 04:22:33 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline.forward took 21.287863s
+(DiffusionWorker_SP1 pid=809678) INFO 09-26 04:22:33 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline.forward took 21.288275s
+(DiffusionWorker_SP3 pid=809680) INFO 09-26 04:22:33 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline.forward took 21.297584s
+(DiffusionWorker_SP2 pid=809679) INFO 09-26 04:22:33 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline.forward took 21.299238s
+(APIServer pid=808899) INFO 09-26 04:22:33 [stats.py:899] 
+(APIServer pid=808899) INFO 09-26 04:22:33 [stats.py:899] [Overall Summary]
+(APIServer pid=808899) INFO 09-26 04:22:33 [stats.py:899] +-----------------------------+------------+
+(APIServer pid=808899) INFO 09-26 04:22:33 [stats.py:899] | Field                       |      Value |
+(APIServer pid=808899) INFO 09-26 04:22:33 [stats.py:899] +-----------------------------+------------+
+(APIServer pid=808899) INFO 09-26 04:22:33 [stats.py:899] | e2e_requests                |          1 |
+(APIServer pid=808899) INFO 09-26 04:22:33 [stats.py:899] | e2e_wall_time_ms            | 21,453.410 |
+(APIServer pid=808899) INFO 09-26 04:22:33 [stats.py:899] | e2e_avg_time_per_request_ms | 21,453.410 |
+(APIServer pid=808899) INFO 09-26 04:22:33 [stats.py:899] | e2e_stage_0_wall_time_ms    | 21,453.188 |
+(APIServer pid=808899) INFO 09-26 04:22:33 [stats.py:899] +-----------------------------+------------+
+(APIServer pid=808899) INFO 09-26 04:22:33 [stats.py:925] 
+(APIServer pid=808899) INFO 09-26 04:22:33 [stats.py:925] [RequestE2EStats [request_id=video_sync-a1aa92144bf4fd8a-952e3662]]
+(APIServer pid=808899) INFO 09-26 04:22:33 [stats.py:925] +--------------+------------+
+(APIServer pid=808899) INFO 09-26 04:22:33 [stats.py:925] | Field        |      Value |
+(APIServer pid=808899) INFO 09-26 04:22:33 [stats.py:925] +--------------+------------+
+(APIServer pid=808899) INFO 09-26 04:22:33 [stats.py:925] | e2e_total_ms | 21,453.188 |
+(APIServer pid=808899) INFO 09-26 04:22:33 [stats.py:925] +--------------+------------+
+(APIServer pid=808899) INFO 09-26 04:22:33 [stats.py:966] [OmniTiming] req=video_sync-a1aa92144bf4fd8a-952e3662 total=21.45s engine=21.45s stages=[0:21.45s]
+(APIServer pid=808899) INFO 09-26 04:22:33 [stats.py:1009] 
+(APIServer pid=808899) INFO 09-26 04:22:33 [stats.py:1009] [StageRequestStats [request_id=video_sync-a1aa92144bf4fd8a-952e3662]]
+(APIServer pid=808899) INFO 09-26 04:22:33 [stats.py:1009] +---------------------------------+------------+
+(APIServer pid=808899) INFO 09-26 04:22:33 [stats.py:1009] | Field                           |          0 |
+(APIServer pid=808899) INFO 09-26 04:22:33 [stats.py:1009] +---------------------------------+------------+
+(APIServer pid=808899) INFO 09-26 04:22:33 [stats.py:1009] | audio_duration_s                |     10.125 |
+(APIServer pid=808899) INFO 09-26 04:22:33 [stats.py:1009] | audio_generated_frames          |    324,000 |
+(APIServer pid=808899) INFO 09-26 04:22:33 [stats.py:1009] | audio_sample_rate               |     32,000 |
+(APIServer pid=808899) INFO 09-26 04:22:33 [stats.py:1009] | batch_id                        |          4 |
+(APIServer pid=808899) INFO 09-26 04:22:33 [stats.py:1009] | batch_size                      |          1 |
+(APIServer pid=808899) INFO 09-26 04:22:33 [stats.py:1009] | diffusion_engine_exec_time_s    |     21.294 |
+(APIServer pid=808899) INFO 09-26 04:22:33 [stats.py:1009] | forward_time_s                  |     17.951 |
+(APIServer pid=808899) INFO 09-26 04:22:33 [stats.py:1009] | height                          |    768.000 |
+(APIServer pid=808899) INFO 09-26 04:22:33 [stats.py:1009] | image_num                       |      1.000 |
+(APIServer pid=808899) INFO 09-26 04:22:33 [stats.py:1009] | inter_output_latencies_ms       |            |
+(APIServer pid=808899) INFO 09-26 04:22:33 [stats.py:1009] | kv_recv_time_s                  |      0.001 |
+(APIServer pid=808899) INFO 09-26 04:22:33 [stats.py:1009] | num_inference_steps             |      8.000 |
+(APIServer pid=808899) INFO 09-26 04:22:33 [stats.py:1009] | output_ready_wait_time_s        |      0.152 |
+(APIServer pid=808899) INFO 09-26 04:22:33 [stats.py:1009] | output_unit_count               |          1 |
+(APIServer pid=808899) INFO 09-26 04:22:33 [stats.py:1009] | output_unit_type                |      video |
+(APIServer pid=808899) INFO 09-26 04:22:33 [stats.py:1009] | postprocess_time_s              |      0.000 |
+(APIServer pid=808899) INFO 09-26 04:22:33 [stats.py:1009] | resolution                      |    640.000 |
+(APIServer pid=808899) INFO 09-26 04:22:33 [stats.py:1009] | scheduler_queue_wait_s          |      0.000 |
+(APIServer pid=808899) INFO 09-26 04:22:33 [stats.py:1009] | serving_time_to_first_output_ms | 21,447.785 |
+(APIServer pid=808899) INFO 09-26 04:22:33 [stats.py:1009] | stage_gen_time_ms               | 21,451.771 |
+(APIServer pid=808899) INFO 09-26 04:22:33 [stats.py:1009] | vllm_itls_ms                    |            |
+(APIServer pid=808899) INFO 09-26 04:22:33 [stats.py:1009] | width                           |  1,344.000 |
+(APIServer pid=808899) INFO 09-26 04:22:33 [stats.py:1009] +---------------------------------+------------+
+(APIServer pid=808899) INFO 09-26 04:22:33 [video_api_utils.py:765] Video response encoding route selected: selected_path=direct_planar frames=243 frame_shape=(768, 1344, 3) dtype=uint8 fps=24.0 audio_present=True effective_audio_sample_rate=32000 effective_frame_conversion_workers=8
+(APIServer pid=808899) INFO 09-26 04:22:33 [serving_video.py:627] Video response encoding (MP4 bytes): 757.21 ms
+(APIServer pid=808899) INFO:     127.0.0.1:36122 - "POST /v1/videos/sync HTTP/1.1" 200 OK
+(APIServer pid=808899) INFO 09-26 04:22:34 [helpers.py:986] Video generation handler: OmniOpenAIServingVideo
+(APIServer pid=808899) INFO 09-26 04:22:34 [serving_video.py:430] Boundary ratio parse: request=None gen_params=None
+(APIServer pid=808899) INFO 09-26 04:22:34 [serving_video.py:472] Applied extra_params: {'task': 't2va', 'duration': 15.0, 'audio_flow_shift': 3.0}
+(APIServer pid=808899) INFO 09-26 04:22:34 [serving_video.py:476] Video sampling params: steps=8 guidance=1.0 guidance_2=None seed=1125
+(DiffusionWorker_SP1 pid=809678) INFO 09-26 04:22:34 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline.encode_prompt took 0.068432s
+(DiffusionWorker_SP0 pid=809677) INFO 09-26 04:22:34 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline.encode_prompt took 0.068819s
+(DiffusionWorker_SP3 pid=809680) INFO 09-26 04:22:34 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline.encode_prompt took 0.068406s
+(DiffusionWorker_SP2 pid=809679) INFO 09-26 04:22:34 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline.encode_prompt took 0.068381s
+(DiffusionWorker_SP0 pid=809677) INFO 09-26 04:22:34 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline._encode_local_media took 0.002120s
+(DiffusionWorker_SP1 pid=809678) INFO 09-26 04:22:34 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline._encode_local_media took 0.002358s
+(DiffusionWorker_SP3 pid=809680) INFO 09-26 04:22:34 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline._encode_local_media took 0.002261s
+(DiffusionWorker_SP2 pid=809679) INFO 09-26 04:22:34 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline._encode_local_media took 0.002266s
+(DiffusionWorker_SP0 pid=809677)   0%|          | 0/8 [00:00<?, ?it/s](DiffusionWorker_SP0 pid=809677) INFO 09-26 04:22:34 [fastvideo_h3.py:144] FASTVIDEO_VSA H3 routing: seq_len=110062, prefix_segments=(1000, 1206), video_shape=(107, 24, 42), prefix_blocks=35, video_blocks=1782, topk=357, kernel_blocks=1818
+ 12%|█▎        | 1/8 [00:02<00:19,  2.79s/it] 25%|██▌       | 2/8 [00:05<00:16,  2.76s/it] 38%|███▊      | 3/8 [00:08<00:13,  2.75s/it] 50%|█████     | 4/8 [00:11<00:11,  2.76s/it] 62%|██████▎   | 5/8 [00:13<00:08,  2.76s/it] 75%|███████▌  | 6/8 [00:16<00:05,  2.76s/it] 88%|████████▊ | 7/8 [00:19<00:02,  2.76s/it]100%|██████████| 8/8 [00:22<00:00,  2.76s/it]100%|██████████| 8/8 [00:22<00:00,  2.76s/it]
+(DiffusionWorker_SP0 pid=809677) INFO 09-26 04:22:56 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline.diffuse took 22.171017s
+(DiffusionWorker_SP1 pid=809678) INFO 09-26 04:22:56 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline.diffuse took 22.171058s
+(DiffusionWorker_SP3 pid=809680) INFO 09-26 04:22:56 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline.diffuse took 22.171209s
+(DiffusionWorker_SP2 pid=809679) INFO 09-26 04:22:56 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline.diffuse took 22.171199s
+(DiffusionWorker_SP0 pid=809677) INFO 09-26 04:23:00 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline.video_vae.decode_latent took 4.019889s
+(DiffusionWorker_SP1 pid=809678) INFO 09-26 04:23:00 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline.video_vae.decode_latent took 4.020624s
+(DiffusionWorker_SP3 pid=809680) INFO 09-26 04:23:00 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline.video_vae.decode_latent took 4.020804s
+(DiffusionWorker_SP2 pid=809679) INFO 09-26 04:23:00 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline.video_vae.decode_latent took 4.021423s
+(DiffusionWorker_SP1 pid=809678) INFO 09-26 04:23:00 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline.audio_vae.decode_latent took 0.113340s
+(DiffusionWorker_SP1 pid=809678) INFO 09-26 04:23:00 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline.decode took 4.156075s
+(DiffusionWorker_SP0 pid=809677) INFO 09-26 04:23:00 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline.audio_vae.decode_latent took 0.114490s
+(DiffusionWorker_SP0 pid=809677) INFO 09-26 04:23:00 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline.decode took 4.157137s
+(DiffusionWorker_SP3 pid=809680) INFO 09-26 04:23:00 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline.audio_vae.decode_latent took 0.116707s
+(DiffusionWorker_SP3 pid=809680) INFO 09-26 04:23:00 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline.decode took 4.159676s
+(DiffusionWorker_SP2 pid=809679) INFO 09-26 04:23:00 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline.audio_vae.decode_latent took 0.117735s
+(DiffusionWorker_SP2 pid=809679) INFO 09-26 04:23:00 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline.decode took 4.160715s
+(DiffusionWorker_SP1 pid=809678) INFO 09-26 04:23:00 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline.forward took 26.410041s
+(DiffusionWorker_SP0 pid=809677) INFO 09-26 04:23:00 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline.forward took 26.411637s
+(DiffusionWorker_SP3 pid=809680) INFO 09-26 04:23:00 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline.forward took 26.414068s
+(DiffusionWorker_SP2 pid=809679) INFO 09-26 04:23:00 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline.forward took 26.414773s
+(APIServer pid=808899) INFO 09-26 04:23:00 [stats.py:899] 
+(APIServer pid=808899) INFO 09-26 04:23:00 [stats.py:899] [Overall Summary]
+(APIServer pid=808899) INFO 09-26 04:23:00 [stats.py:899] +-----------------------------+------------+
+(APIServer pid=808899) INFO 09-26 04:23:00 [stats.py:899] | Field                       |      Value |
+(APIServer pid=808899) INFO 09-26 04:23:00 [stats.py:899] +-----------------------------+------------+
+(APIServer pid=808899) INFO 09-26 04:23:00 [stats.py:899] | e2e_requests                |          1 |
+(APIServer pid=808899) INFO 09-26 04:23:00 [stats.py:899] | e2e_wall_time_ms            | 26,732.468 |
+(APIServer pid=808899) INFO 09-26 04:23:00 [stats.py:899] | e2e_avg_time_per_request_ms | 26,732.468 |
+(APIServer pid=808899) INFO 09-26 04:23:00 [stats.py:899] | e2e_stage_0_wall_time_ms    | 26,732.344 |
+(APIServer pid=808899) INFO 09-26 04:23:00 [stats.py:899] +-----------------------------+------------+
+(APIServer pid=808899) INFO 09-26 04:23:00 [stats.py:925] 
+(APIServer pid=808899) INFO 09-26 04:23:00 [stats.py:925] [RequestE2EStats [request_id=video_sync-83599a5be710abcf-84e6ea88]]
+(APIServer pid=808899) INFO 09-26 04:23:00 [stats.py:925] +--------------+------------+
+(APIServer pid=808899) INFO 09-26 04:23:00 [stats.py:925] | Field        |      Value |
+(APIServer pid=808899) INFO 09-26 04:23:00 [stats.py:925] +--------------+------------+
+(APIServer pid=808899) INFO 09-26 04:23:00 [stats.py:925] | e2e_total_ms | 26,732.344 |
+(APIServer pid=808899) INFO 09-26 04:23:00 [stats.py:925] +--------------+------------+
+(APIServer pid=808899) INFO 09-26 04:23:00 [stats.py:966] [OmniTiming] req=video_sync-83599a5be710abcf-84e6ea88 total=26.73s engine=26.73s stages=[0:26.73s]
+(APIServer pid=808899) INFO 09-26 04:23:00 [stats.py:1009] 
+(APIServer pid=808899) INFO 09-26 04:23:00 [stats.py:1009] [StageRequestStats [request_id=video_sync-83599a5be710abcf-84e6ea88]]
+(APIServer pid=808899) INFO 09-26 04:23:00 [stats.py:1009] +---------------------------------+------------+
+(APIServer pid=808899) INFO 09-26 04:23:00 [stats.py:1009] | Field                           |          0 |
+(APIServer pid=808899) INFO 09-26 04:23:00 [stats.py:1009] +---------------------------------+------------+
+(APIServer pid=808899) INFO 09-26 04:23:00 [stats.py:1009] | audio_duration_s                |     15.075 |
+(APIServer pid=808899) INFO 09-26 04:23:00 [stats.py:1009] | audio_generated_frames          |    482,400 |
+(APIServer pid=808899) INFO 09-26 04:23:00 [stats.py:1009] | audio_sample_rate               |     32,000 |
+(APIServer pid=808899) INFO 09-26 04:23:00 [stats.py:1009] | batch_id                        |          5 |
+(APIServer pid=808899) INFO 09-26 04:23:00 [stats.py:1009] | batch_size                      |          1 |
+(APIServer pid=808899) INFO 09-26 04:23:00 [stats.py:1009] | diffusion_engine_exec_time_s    |     26.418 |
+(APIServer pid=808899) INFO 09-26 04:23:00 [stats.py:1009] | forward_time_s                  |     22.171 |
+(APIServer pid=808899) INFO 09-26 04:23:00 [stats.py:1009] | height                          |    768.000 |
+(APIServer pid=808899) INFO 09-26 04:23:00 [stats.py:1009] | image_num                       |      1.000 |
+(APIServer pid=808899) INFO 09-26 04:23:00 [stats.py:1009] | inter_output_latencies_ms       |            |
+(APIServer pid=808899) INFO 09-26 04:23:00 [stats.py:1009] | kv_recv_time_s                  |      0.001 |
+(APIServer pid=808899) INFO 09-26 04:23:00 [stats.py:1009] | num_inference_steps             |      8.000 |
+(APIServer pid=808899) INFO 09-26 04:23:00 [stats.py:1009] | output_ready_wait_time_s        |      0.308 |
+(APIServer pid=808899) INFO 09-26 04:23:00 [stats.py:1009] | output_unit_count               |          1 |
+(APIServer pid=808899) INFO 09-26 04:23:00 [stats.py:1009] | output_unit_type                |      video |
+(APIServer pid=808899) INFO 09-26 04:23:00 [stats.py:1009] | postprocess_time_s              |      0.000 |
+(APIServer pid=808899) INFO 09-26 04:23:00 [stats.py:1009] | resolution                      |    640.000 |
+(APIServer pid=808899) INFO 09-26 04:23:00 [stats.py:1009] | scheduler_queue_wait_s          |      0.000 |
+(APIServer pid=808899) INFO 09-26 04:23:00 [stats.py:1009] | serving_time_to_first_output_ms | 26,727.433 |
+(APIServer pid=808899) INFO 09-26 04:23:00 [stats.py:1009] | stage_gen_time_ms               | 26,731.353 |
+(APIServer pid=808899) INFO 09-26 04:23:00 [stats.py:1009] | vllm_itls_ms                    |            |
+(APIServer pid=808899) INFO 09-26 04:23:00 [stats.py:1009] | width                           |  1,344.000 |
+(APIServer pid=808899) INFO 09-26 04:23:00 [stats.py:1009] +---------------------------------+------------+
+(APIServer pid=808899) INFO 09-26 04:23:00 [video_api_utils.py:765] Video response encoding route selected: selected_path=direct_planar frames=362 frame_shape=(768, 1344, 3) dtype=uint8 fps=24.0 audio_present=True effective_audio_sample_rate=32000 effective_frame_conversion_workers=8
+(APIServer pid=808899) INFO 09-26 04:23:01 [serving_video.py:627] Video response encoding (MP4 bytes): 825.86 ms
+(APIServer pid=808899) INFO:     127.0.0.1:36122 - "POST /v1/videos/sync HTTP/1.1" 200 OK
+(APIServer pid=808899) INFO 09-26 04:23:01 [helpers.py:986] Video generation handler: OmniOpenAIServingVideo
+(APIServer pid=808899) INFO 09-26 04:23:01 [serving_video.py:430] Boundary ratio parse: request=None gen_params=None
+(APIServer pid=808899) INFO 09-26 04:23:01 [serving_video.py:472] Applied extra_params: {'task': 't2va', 'duration': 15.0, 'audio_flow_shift': 3.0}
+(APIServer pid=808899) INFO 09-26 04:23:01 [serving_video.py:476] Video sampling params: steps=8 guidance=1.0 guidance_2=None seed=1125
+(DiffusionWorker_SP1 pid=809678) INFO 09-26 04:23:02 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline.encode_prompt took 0.537330s
+(DiffusionWorker_SP3 pid=809680) INFO 09-26 04:23:02 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline.encode_prompt took 0.537303s
+(DiffusionWorker_SP2 pid=809679) INFO 09-26 04:23:02 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline.encode_prompt took 0.537294s
+(DiffusionWorker_SP0 pid=809677) INFO 09-26 04:23:02 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline.encode_prompt took 0.538428s
+(DiffusionWorker_SP0 pid=809677) INFO 09-26 04:23:02 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline._encode_local_media took 0.002175s
+(DiffusionWorker_SP1 pid=809678) INFO 09-26 04:23:02 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline._encode_local_media took 0.003102s
+(DiffusionWorker_SP3 pid=809680) INFO 09-26 04:23:02 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline._encode_local_media took 0.003015s
+(DiffusionWorker_SP2 pid=809679) INFO 09-26 04:23:02 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline._encode_local_media took 0.003006s
+(DiffusionWorker_SP0 pid=809677)   0%|          | 0/8 [00:00<?, ?it/s](DiffusionWorker_SP0 pid=809677) INFO 09-26 04:23:02 [fastvideo_h3.py:144] FASTVIDEO_VSA H3 routing: seq_len=119062, prefix_segments=(10000, 1206), video_shape=(107, 24, 42), prefix_blocks=176, video_blocks=1782, topk=357, kernel_blocks=1958
+ 12%|█▎        | 1/8 [00:03<00:26,  3.75s/it] 25%|██▌       | 2/8 [00:07<00:22,  3.74s/it] 38%|███▊      | 3/8 [00:11<00:18,  3.73s/it] 50%|█████     | 4/8 [00:14<00:14,  3.73s/it] 62%|██████▎   | 5/8 [00:18<00:11,  3.74s/it] 75%|███████▌  | 6/8 [00:22<00:07,  3.74s/it] 88%|████████▊ | 7/8 [00:26<00:03,  3.74s/it]100%|██████████| 8/8 [00:29<00:00,  3.74s/it]100%|██████████| 8/8 [00:29<00:00,  3.74s/it]
+(DiffusionWorker_SP0 pid=809677) INFO 09-26 04:23:32 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline.diffuse took 30.006063s
+(DiffusionWorker_SP1 pid=809678) INFO 09-26 04:23:32 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline.diffuse took 30.005980s
+(DiffusionWorker_SP2 pid=809679) INFO 09-26 04:23:32 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline.diffuse took 30.006133s
+(DiffusionWorker_SP3 pid=809680) INFO 09-26 04:23:32 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline.diffuse took 30.006228s
+(DiffusionWorker_SP0 pid=809677) INFO 09-26 04:23:36 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline.video_vae.decode_latent took 3.964631s
+(DiffusionWorker_SP1 pid=809678) INFO 09-26 04:23:36 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline.video_vae.decode_latent took 3.962884s
+(DiffusionWorker_SP3 pid=809680) INFO 09-26 04:23:36 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline.video_vae.decode_latent took 3.963161s
+(DiffusionWorker_SP2 pid=809679) INFO 09-26 04:23:36 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline.video_vae.decode_latent took 3.963358s
+(DiffusionWorker_SP0 pid=809677) INFO 09-26 04:23:36 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline.audio_vae.decode_latent took 0.083848s
+(DiffusionWorker_SP0 pid=809677) INFO 09-26 04:23:36 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline.decode took 4.072960s
+(DiffusionWorker_SP1 pid=809678) INFO 09-26 04:23:36 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline.audio_vae.decode_latent took 0.084239s
+(DiffusionWorker_SP1 pid=809678) INFO 09-26 04:23:36 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline.decode took 4.073880s
+(DiffusionWorker_SP3 pid=809680) INFO 09-26 04:23:36 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline.audio_vae.decode_latent took 0.085047s
+(DiffusionWorker_SP3 pid=809680) INFO 09-26 04:23:36 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline.decode took 4.075049s
+(DiffusionWorker_SP2 pid=809679) INFO 09-26 04:23:36 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline.audio_vae.decode_latent took 0.085250s
+(DiffusionWorker_SP2 pid=809679) INFO 09-26 04:23:36 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline.decode took 4.075309s
+(DiffusionWorker_SP0 pid=809677) INFO 09-26 04:23:36 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline.forward took 34.628895s
+(DiffusionWorker_SP1 pid=809678) INFO 09-26 04:23:36 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline.forward took 34.631848s
+(DiffusionWorker_SP2 pid=809679) INFO 09-26 04:23:36 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline.forward took 34.634168s
+(DiffusionWorker_SP3 pid=809680) INFO 09-26 04:23:36 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline.forward took 34.634478s
+(APIServer pid=808899) INFO 09-26 04:23:36 [stats.py:899] 
+(APIServer pid=808899) INFO 09-26 04:23:36 [stats.py:899] [Overall Summary]
+(APIServer pid=808899) INFO 09-26 04:23:36 [stats.py:899] +-----------------------------+------------+
+(APIServer pid=808899) INFO 09-26 04:23:36 [stats.py:899] | Field                       |      Value |
+(APIServer pid=808899) INFO 09-26 04:23:36 [stats.py:899] +-----------------------------+------------+
+(APIServer pid=808899) INFO 09-26 04:23:36 [stats.py:899] | e2e_requests                |          1 |
+(APIServer pid=808899) INFO 09-26 04:23:36 [stats.py:899] | e2e_wall_time_ms            | 34,869.025 |
+(APIServer pid=808899) INFO 09-26 04:23:36 [stats.py:899] | e2e_avg_time_per_request_ms | 34,869.025 |
+(APIServer pid=808899) INFO 09-26 04:23:36 [stats.py:899] | e2e_stage_0_wall_time_ms    | 34,868.916 |
+(APIServer pid=808899) INFO 09-26 04:23:36 [stats.py:899] +-----------------------------+------------+
+(APIServer pid=808899) INFO 09-26 04:23:36 [stats.py:925] 
+(APIServer pid=808899) INFO 09-26 04:23:36 [stats.py:925] [RequestE2EStats [request_id=video_sync-81da014ccf8db9d9-be242e90]]
+(APIServer pid=808899) INFO 09-26 04:23:36 [stats.py:925] +--------------+------------+
+(APIServer pid=808899) INFO 09-26 04:23:36 [stats.py:925] | Field        |      Value |
+(APIServer pid=808899) INFO 09-26 04:23:36 [stats.py:925] +--------------+------------+
+(APIServer pid=808899) INFO 09-26 04:23:36 [stats.py:925] | e2e_total_ms | 34,868.916 |
+(APIServer pid=808899) INFO 09-26 04:23:36 [stats.py:925] +--------------+------------+
+(APIServer pid=808899) INFO 09-26 04:23:36 [stats.py:966] [OmniTiming] req=video_sync-81da014ccf8db9d9-be242e90 total=34.87s engine=34.87s stages=[0:34.87s]
+(APIServer pid=808899) INFO 09-26 04:23:36 [stats.py:1009] 
+(APIServer pid=808899) INFO 09-26 04:23:36 [stats.py:1009] [StageRequestStats [request_id=video_sync-81da014ccf8db9d9-be242e90]]
+(APIServer pid=808899) INFO 09-26 04:23:36 [stats.py:1009] +---------------------------------+------------+
+(APIServer pid=808899) INFO 09-26 04:23:36 [stats.py:1009] | Field                           |          0 |
+(APIServer pid=808899) INFO 09-26 04:23:36 [stats.py:1009] +---------------------------------+------------+
+(APIServer pid=808899) INFO 09-26 04:23:36 [stats.py:1009] | audio_duration_s                |     15.075 |
+(APIServer pid=808899) INFO 09-26 04:23:36 [stats.py:1009] | audio_generated_frames          |    482,400 |
+(APIServer pid=808899) INFO 09-26 04:23:36 [stats.py:1009] | audio_sample_rate               |     32,000 |
+(APIServer pid=808899) INFO 09-26 04:23:36 [stats.py:1009] | batch_id                        |          6 |
+(APIServer pid=808899) INFO 09-26 04:23:36 [stats.py:1009] | batch_size                      |          1 |
+(APIServer pid=808899) INFO 09-26 04:23:36 [stats.py:1009] | diffusion_engine_exec_time_s    |     34.636 |
+(APIServer pid=808899) INFO 09-26 04:23:36 [stats.py:1009] | forward_time_s                  |     30.006 |
+(APIServer pid=808899) INFO 09-26 04:23:36 [stats.py:1009] | height                          |    768.000 |
+(APIServer pid=808899) INFO 09-26 04:23:36 [stats.py:1009] | image_num                       |      1.000 |
+(APIServer pid=808899) INFO 09-26 04:23:36 [stats.py:1009] | inter_output_latencies_ms       |            |
+(APIServer pid=808899) INFO 09-26 04:23:36 [stats.py:1009] | kv_recv_time_s                  |      0.001 |
+(APIServer pid=808899) INFO 09-26 04:23:36 [stats.py:1009] | num_inference_steps             |      8.000 |
+(APIServer pid=808899) INFO 09-26 04:23:36 [stats.py:1009] | output_ready_wait_time_s        |      0.226 |
+(APIServer pid=808899) INFO 09-26 04:23:36 [stats.py:1009] | output_unit_count               |          1 |
+(APIServer pid=808899) INFO 09-26 04:23:36 [stats.py:1009] | output_unit_type                |      video |
+(APIServer pid=808899) INFO 09-26 04:23:36 [stats.py:1009] | postprocess_time_s              |      0.001 |
+(APIServer pid=808899) INFO 09-26 04:23:36 [stats.py:1009] | resolution                      |    640.000 |
+(APIServer pid=808899) INFO 09-26 04:23:36 [stats.py:1009] | scheduler_queue_wait_s          |      0.000 |
+(APIServer pid=808899) INFO 09-26 04:23:36 [stats.py:1009] | serving_time_to_first_output_ms | 34,863.251 |
+(APIServer pid=808899) INFO 09-26 04:23:36 [stats.py:1009] | stage_gen_time_ms               | 34,867.874 |
+(APIServer pid=808899) INFO 09-26 04:23:36 [stats.py:1009] | vllm_itls_ms                    |            |
+(APIServer pid=808899) INFO 09-26 04:23:36 [stats.py:1009] | width                           |  1,344.000 |
+(APIServer pid=808899) INFO 09-26 04:23:36 [stats.py:1009] +---------------------------------+------------+
+(APIServer pid=808899) INFO 09-26 04:23:36 [video_api_utils.py:765] Video response encoding route selected: selected_path=direct_planar frames=362 frame_shape=(768, 1344, 3) dtype=uint8 fps=24.0 audio_present=True effective_audio_sample_rate=32000 effective_frame_conversion_workers=8
+(APIServer pid=808899) INFO 09-26 04:23:37 [serving_video.py:627] Video response encoding (MP4 bytes): 1130.13 ms
+(APIServer pid=808899) INFO:     127.0.0.1:36122 - "POST /v1/videos/sync HTTP/1.1" 200 OK
+(APIServer pid=808899) INFO 09-26 04:23:44 [helpers.py:986] Video generation handler: OmniOpenAIServingVideo
+(APIServer pid=808899) INFO 09-26 04:23:44 [serving_video.py:430] Boundary ratio parse: request=None gen_params=None
+(APIServer pid=808899) INFO 09-26 04:23:44 [serving_video.py:472] Applied extra_params: {'task': 't2va', 'duration': 5.0, 'audio_flow_shift': 3.0}
+(APIServer pid=808899) INFO 09-26 04:23:44 [serving_video.py:476] Video sampling params: steps=8 guidance=1.0 guidance_2=None seed=1132
+(DiffusionWorker_SP1 pid=809678) INFO 09-26 04:23:44 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline.encode_prompt took 0.067847s
+(DiffusionWorker_SP0 pid=809677) INFO 09-26 04:23:44 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline.encode_prompt took 0.068223s
+(DiffusionWorker_SP2 pid=809679) INFO 09-26 04:23:44 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline.encode_prompt took 0.067759s
+(DiffusionWorker_SP3 pid=809680) INFO 09-26 04:23:44 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline.encode_prompt took 0.067760s
+(DiffusionWorker_SP0 pid=809677) INFO 09-26 04:23:44 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline._encode_local_media took 0.002473s
+(DiffusionWorker_SP2 pid=809679) INFO 09-26 04:23:44 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline._encode_local_media took 0.002883s
+(DiffusionWorker_SP3 pid=809680) INFO 09-26 04:23:44 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline._encode_local_media took 0.002456s
+(DiffusionWorker_SP1 pid=809678) INFO 09-26 04:23:44 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline._encode_local_media took 0.002995s
+(DiffusionWorker_SP0 pid=809677)   0%|          | 0/8 [00:00<?, ?it/s] 12%|█▎        | 1/8 [00:00<00:05,  1.33it/s] 25%|██▌       | 2/8 [00:01<00:04,  1.34it/s] 38%|███▊      | 3/8 [00:02<00:03,  1.35it/s] 50%|█████     | 4/8 [00:02<00:02,  1.35it/s] 62%|██████▎   | 5/8 [00:03<00:02,  1.35it/s] 75%|███████▌  | 6/8 [00:04<00:01,  1.35it/s] 88%|████████▊ | 7/8 [00:05<00:00,  1.35it/s]100%|██████████| 8/8 [00:05<00:00,  1.35it/s]100%|██████████| 8/8 [00:05<00:00,  1.35it/s]
+(DiffusionWorker_SP0 pid=809677) INFO 09-26 04:23:50 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline.diffuse took 5.973159s
+(DiffusionWorker_SP3 pid=809680) INFO 09-26 04:23:50 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline.diffuse took 5.973140s
+(DiffusionWorker_SP1 pid=809678) INFO 09-26 04:23:50 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline.diffuse took 5.973232s
+(DiffusionWorker_SP2 pid=809679) INFO 09-26 04:23:50 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline.diffuse took 5.973230s
+(DiffusionWorker_SP0 pid=809677) INFO 09-26 04:23:52 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline.video_vae.decode_latent took 1.364639s
+(DiffusionWorker_SP1 pid=809678) INFO 09-26 04:23:52 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline.video_vae.decode_latent took 1.362030s
+(DiffusionWorker_SP3 pid=809680) INFO 09-26 04:23:52 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline.video_vae.decode_latent took 1.362984s
+(DiffusionWorker_SP2 pid=809679) INFO 09-26 04:23:52 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline.video_vae.decode_latent took 1.362879s
+(DiffusionWorker_SP0 pid=809677) INFO 09-26 04:23:52 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline.audio_vae.decode_latent took 0.059941s
+(DiffusionWorker_SP0 pid=809677) INFO 09-26 04:23:52 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline.decode took 1.431919s
+(DiffusionWorker_SP1 pid=809678) INFO 09-26 04:23:52 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline.audio_vae.decode_latent took 0.060701s
+(DiffusionWorker_SP1 pid=809678) INFO 09-26 04:23:52 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline.decode took 1.432921s
+(DiffusionWorker_SP0 pid=809677) INFO 09-26 04:23:52 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline.forward took 7.482430s
+(DiffusionWorker_SP1 pid=809678) INFO 09-26 04:23:52 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline.forward took 7.483545s
+(DiffusionWorker_SP3 pid=809680) INFO 09-26 04:23:52 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline.audio_vae.decode_latent took 0.064442s
+(DiffusionWorker_SP3 pid=809680) INFO 09-26 04:23:52 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline.decode took 1.437130s
+(DiffusionWorker_SP3 pid=809680) INFO 09-26 04:23:52 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline.forward took 7.487815s
+(DiffusionWorker_SP2 pid=809679) INFO 09-26 04:23:52 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline.audio_vae.decode_latent took 0.068234s
+(DiffusionWorker_SP2 pid=809679) INFO 09-26 04:23:52 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline.decode took 1.441254s
+(DiffusionWorker_SP2 pid=809679) INFO 09-26 04:23:52 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline.forward took 7.491850s
+(APIServer pid=808899) INFO 09-26 04:23:52 [stats.py:899] 
+(APIServer pid=808899) INFO 09-26 04:23:52 [stats.py:899] [Overall Summary]
+(APIServer pid=808899) INFO 09-26 04:23:52 [stats.py:899] +-----------------------------+-----------+
+(APIServer pid=808899) INFO 09-26 04:23:52 [stats.py:899] | Field                       |     Value |
+(APIServer pid=808899) INFO 09-26 04:23:52 [stats.py:899] +-----------------------------+-----------+
+(APIServer pid=808899) INFO 09-26 04:23:52 [stats.py:899] | e2e_requests                |         1 |
+(APIServer pid=808899) INFO 09-26 04:23:52 [stats.py:899] | e2e_wall_time_ms            | 7,575.840 |
+(APIServer pid=808899) INFO 09-26 04:23:52 [stats.py:899] | e2e_avg_time_per_request_ms | 7,575.840 |
+(APIServer pid=808899) INFO 09-26 04:23:52 [stats.py:899] | e2e_stage_0_wall_time_ms    | 7,575.703 |
+(APIServer pid=808899) INFO 09-26 04:23:52 [stats.py:899] +-----------------------------+-----------+
+(APIServer pid=808899) INFO 09-26 04:23:52 [stats.py:925] 
+(APIServer pid=808899) INFO 09-26 04:23:52 [stats.py:925] [RequestE2EStats [request_id=video_sync-b6d477cdde5db300-a4abe40c]]
+(APIServer pid=808899) INFO 09-26 04:23:52 [stats.py:925] +--------------+-----------+
+(APIServer pid=808899) INFO 09-26 04:23:52 [stats.py:925] | Field        |     Value |
+(APIServer pid=808899) INFO 09-26 04:23:52 [stats.py:925] +--------------+-----------+
+(APIServer pid=808899) INFO 09-26 04:23:52 [stats.py:925] | e2e_total_ms | 7,575.703 |
+(APIServer pid=808899) INFO 09-26 04:23:52 [stats.py:925] +--------------+-----------+
+(APIServer pid=808899) INFO 09-26 04:23:52 [stats.py:966] [OmniTiming] req=video_sync-b6d477cdde5db300-a4abe40c total=7.58s engine=7.58s stages=[0:7.57s]
+(APIServer pid=808899) INFO 09-26 04:23:52 [stats.py:1009] 
+(APIServer pid=808899) INFO 09-26 04:23:52 [stats.py:1009] [StageRequestStats [request_id=video_sync-b6d477cdde5db300-a4abe40c]]
+(APIServer pid=808899) INFO 09-26 04:23:52 [stats.py:1009] +---------------------------------+-----------+
+(APIServer pid=808899) INFO 09-26 04:23:52 [stats.py:1009] | Field                           |         0 |
+(APIServer pid=808899) INFO 09-26 04:23:52 [stats.py:1009] +---------------------------------+-----------+
+(APIServer pid=808899) INFO 09-26 04:23:52 [stats.py:1009] | audio_duration_s                |     5.175 |
+(APIServer pid=808899) INFO 09-26 04:23:52 [stats.py:1009] | audio_generated_frames          |   165,600 |
+(APIServer pid=808899) INFO 09-26 04:23:52 [stats.py:1009] | audio_sample_rate               |    32,000 |
+(APIServer pid=808899) INFO 09-26 04:23:52 [stats.py:1009] | batch_id                        |         7 |
+(APIServer pid=808899) INFO 09-26 04:23:52 [stats.py:1009] | batch_size                      |         1 |
+(APIServer pid=808899) INFO 09-26 04:23:52 [stats.py:1009] | diffusion_engine_exec_time_s    |     7.489 |
+(APIServer pid=808899) INFO 09-26 04:23:52 [stats.py:1009] | forward_time_s                  |     5.973 |
+(APIServer pid=808899) INFO 09-26 04:23:52 [stats.py:1009] | height                          |   768.000 |
+(APIServer pid=808899) INFO 09-26 04:23:52 [stats.py:1009] | image_num                       |     1.000 |
+(APIServer pid=808899) INFO 09-26 04:23:52 [stats.py:1009] | inter_output_latencies_ms       |           |
+(APIServer pid=808899) INFO 09-26 04:23:52 [stats.py:1009] | kv_recv_time_s                  |     0.001 |
+(APIServer pid=808899) INFO 09-26 04:23:52 [stats.py:1009] | num_inference_steps             |     8.000 |
+(APIServer pid=808899) INFO 09-26 04:23:52 [stats.py:1009] | output_ready_wait_time_s        |     0.078 |
+(APIServer pid=808899) INFO 09-26 04:23:52 [stats.py:1009] | output_unit_count               |         1 |
+(APIServer pid=808899) INFO 09-26 04:23:52 [stats.py:1009] | output_unit_type                |     video |
+(APIServer pid=808899) INFO 09-26 04:23:52 [stats.py:1009] | postprocess_time_s              |     0.000 |
+(APIServer pid=808899) INFO 09-26 04:23:52 [stats.py:1009] | resolution                      |   640.000 |
+(APIServer pid=808899) INFO 09-26 04:23:52 [stats.py:1009] | scheduler_queue_wait_s          |     0.000 |
+(APIServer pid=808899) INFO 09-26 04:23:52 [stats.py:1009] | serving_time_to_first_output_ms | 7,569.548 |
+(APIServer pid=808899) INFO 09-26 04:23:52 [stats.py:1009] | stage_gen_time_ms               | 7,574.270 |
+(APIServer pid=808899) INFO 09-26 04:23:52 [stats.py:1009] | vllm_itls_ms                    |           |
+(APIServer pid=808899) INFO 09-26 04:23:52 [stats.py:1009] | width                           | 1,344.000 |
+(APIServer pid=808899) INFO 09-26 04:23:52 [stats.py:1009] +---------------------------------+-----------+
+(APIServer pid=808899) INFO 09-26 04:23:52 [video_api_utils.py:765] Video response encoding route selected: selected_path=direct_planar frames=124 frame_shape=(768, 1344, 3) dtype=uint8 fps=24.0 audio_present=True effective_audio_sample_rate=32000 effective_frame_conversion_workers=8
+(APIServer pid=808899) INFO 09-26 04:23:52 [serving_video.py:627] Video response encoding (MP4 bytes): 305.95 ms
+(APIServer pid=808899) INFO:     127.0.0.1:35566 - "POST /v1/videos/sync HTTP/1.1" 200 OK
+(APIServer pid=808899) INFO 09-26 04:23:52 [helpers.py:986] Video generation handler: OmniOpenAIServingVideo
+(APIServer pid=808899) INFO 09-26 04:23:52 [serving_video.py:430] Boundary ratio parse: request=None gen_params=None
+(APIServer pid=808899) INFO 09-26 04:23:52 [serving_video.py:472] Applied extra_params: {'task': 't2va', 'duration': 5.0, 'audio_flow_shift': 3.0}
+(APIServer pid=808899) INFO 09-26 04:23:52 [serving_video.py:476] Video sampling params: steps=8 guidance=1.0 guidance_2=None seed=1132
+(DiffusionWorker_SP1 pid=809678) INFO 09-26 04:23:53 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline.encode_prompt took 0.534386s
+(DiffusionWorker_SP2 pid=809679) INFO 09-26 04:23:53 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline.encode_prompt took 0.534384s
+(DiffusionWorker_SP3 pid=809680) INFO 09-26 04:23:53 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline.encode_prompt took 0.534407s
+(DiffusionWorker_SP0 pid=809677) INFO 09-26 04:23:53 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline.encode_prompt took 0.535888s
+(DiffusionWorker_SP0 pid=809677) INFO 09-26 04:23:53 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline._encode_local_media took 0.002253s
+(DiffusionWorker_SP1 pid=809678) INFO 09-26 04:23:53 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline._encode_local_media took 0.003588s
+(DiffusionWorker_SP3 pid=809680) INFO 09-26 04:23:53 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline._encode_local_media took 0.003597s
+(DiffusionWorker_SP2 pid=809679) INFO 09-26 04:23:53 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline._encode_local_media took 0.003622s
+(DiffusionWorker_SP0 pid=809677)   0%|          | 0/8 [00:00<?, ?it/s] 12%|█▎        | 1/8 [00:01<00:08,  1.17s/it] 25%|██▌       | 2/8 [00:02<00:07,  1.17s/it] 38%|███▊      | 3/8 [00:03<00:05,  1.17s/it] 50%|█████     | 4/8 [00:04<00:04,  1.17s/it] 62%|██████▎   | 5/8 [00:05<00:03,  1.17s/it] 75%|███████▌  | 6/8 [00:07<00:02,  1.17s/it] 88%|████████▊ | 7/8 [00:08<00:01,  1.17s/it]100%|██████████| 8/8 [00:09<00:00,  1.17s/it]100%|██████████| 8/8 [00:09<00:00,  1.17s/it]
+(DiffusionWorker_SP1 pid=809678) INFO 09-26 04:24:02 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline.diffuse took 9.409752s
+(DiffusionWorker_SP0 pid=809677) INFO 09-26 04:24:02 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline.diffuse took 9.410016s
+(DiffusionWorker_SP2 pid=809679) INFO 09-26 04:24:02 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline.diffuse took 9.409838s
+(DiffusionWorker_SP3 pid=809680) INFO 09-26 04:24:02 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline.diffuse took 9.409874s
+(DiffusionWorker_SP0 pid=809677) INFO 09-26 04:24:03 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline.video_vae.decode_latent took 1.321016s
+(DiffusionWorker_SP2 pid=809679) INFO 09-26 04:24:03 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline.video_vae.decode_latent took 1.319983s
+(DiffusionWorker_SP1 pid=809678) INFO 09-26 04:24:03 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline.video_vae.decode_latent took 1.318952s
+(DiffusionWorker_SP3 pid=809680) INFO 09-26 04:24:03 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline.video_vae.decode_latent took 1.318643s
+(DiffusionWorker_SP0 pid=809677) INFO 09-26 04:24:04 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline.audio_vae.decode_latent took 0.059240s
+(DiffusionWorker_SP0 pid=809677) INFO 09-26 04:24:04 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline.decode took 1.390070s
+(DiffusionWorker_SP1 pid=809678) INFO 09-26 04:24:04 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline.audio_vae.decode_latent took 0.060310s
+(DiffusionWorker_SP1 pid=809678) INFO 09-26 04:24:04 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline.decode took 1.391537s
+(DiffusionWorker_SP0 pid=809677) INFO 09-26 04:24:04 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline.forward took 11.344461s
+(DiffusionWorker_SP1 pid=809678) INFO 09-26 04:24:04 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline.forward took 11.345846s
+(DiffusionWorker_SP2 pid=809679) INFO 09-26 04:24:04 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline.audio_vae.decode_latent took 0.065578s
+(DiffusionWorker_SP3 pid=809680) INFO 09-26 04:24:04 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline.audio_vae.decode_latent took 0.065401s
+(DiffusionWorker_SP2 pid=809679) INFO 09-26 04:24:04 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline.decode took 1.396828s
+(DiffusionWorker_SP3 pid=809680) INFO 09-26 04:24:04 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline.decode took 1.396888s
+(DiffusionWorker_SP2 pid=809679) INFO 09-26 04:24:04 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline.forward took 11.351792s
+(DiffusionWorker_SP3 pid=809680) INFO 09-26 04:24:04 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline.forward took 11.352023s
+(APIServer pid=808899) INFO 09-26 04:24:04 [stats.py:899] 
+(APIServer pid=808899) INFO 09-26 04:24:04 [stats.py:899] [Overall Summary]
+(APIServer pid=808899) INFO 09-26 04:24:04 [stats.py:899] +-----------------------------+------------+
+(APIServer pid=808899) INFO 09-26 04:24:04 [stats.py:899] | Field                       |      Value |
+(APIServer pid=808899) INFO 09-26 04:24:04 [stats.py:899] +-----------------------------+------------+
+(APIServer pid=808899) INFO 09-26 04:24:04 [stats.py:899] | e2e_requests                |          1 |
+(APIServer pid=808899) INFO 09-26 04:24:04 [stats.py:899] | e2e_wall_time_ms            | 11,433.295 |
+(APIServer pid=808899) INFO 09-26 04:24:04 [stats.py:899] | e2e_avg_time_per_request_ms | 11,433.295 |
+(APIServer pid=808899) INFO 09-26 04:24:04 [stats.py:899] | e2e_stage_0_wall_time_ms    | 11,433.196 |
+(APIServer pid=808899) INFO 09-26 04:24:04 [stats.py:899] +-----------------------------+------------+
+(APIServer pid=808899) INFO 09-26 04:24:04 [stats.py:925] 
+(APIServer pid=808899) INFO 09-26 04:24:04 [stats.py:925] [RequestE2EStats [request_id=video_sync-98428532e694be49-babe013e]]
+(APIServer pid=808899) INFO 09-26 04:24:04 [stats.py:925] +--------------+------------+
+(APIServer pid=808899) INFO 09-26 04:24:04 [stats.py:925] | Field        |      Value |
+(APIServer pid=808899) INFO 09-26 04:24:04 [stats.py:925] +--------------+------------+
+(APIServer pid=808899) INFO 09-26 04:24:04 [stats.py:925] | e2e_total_ms | 11,433.196 |
+(APIServer pid=808899) INFO 09-26 04:24:04 [stats.py:925] +--------------+------------+
+(APIServer pid=808899) INFO 09-26 04:24:04 [stats.py:966] [OmniTiming] req=video_sync-98428532e694be49-babe013e total=11.43s engine=11.43s stages=[0:11.43s]
+(APIServer pid=808899) INFO 09-26 04:24:04 [stats.py:1009] 
+(APIServer pid=808899) INFO 09-26 04:24:04 [stats.py:1009] [StageRequestStats [request_id=video_sync-98428532e694be49-babe013e]]
+(APIServer pid=808899) INFO 09-26 04:24:04 [stats.py:1009] +---------------------------------+------------+
+(APIServer pid=808899) INFO 09-26 04:24:04 [stats.py:1009] | Field                           |          0 |
+(APIServer pid=808899) INFO 09-26 04:24:04 [stats.py:1009] +---------------------------------+------------+
+(APIServer pid=808899) INFO 09-26 04:24:04 [stats.py:1009] | audio_duration_s                |      5.175 |
+(APIServer pid=808899) INFO 09-26 04:24:04 [stats.py:1009] | audio_generated_frames          |    165,600 |
+(APIServer pid=808899) INFO 09-26 04:24:04 [stats.py:1009] | audio_sample_rate               |     32,000 |
+(APIServer pid=808899) INFO 09-26 04:24:04 [stats.py:1009] | batch_id                        |          8 |
+(APIServer pid=808899) INFO 09-26 04:24:04 [stats.py:1009] | batch_size                      |          1 |
+(APIServer pid=808899) INFO 09-26 04:24:04 [stats.py:1009] | diffusion_engine_exec_time_s    |     11.350 |
+(APIServer pid=808899) INFO 09-26 04:24:04 [stats.py:1009] | forward_time_s                  |      9.410 |
+(APIServer pid=808899) INFO 09-26 04:24:04 [stats.py:1009] | height                          |    768.000 |
+(APIServer pid=808899) INFO 09-26 04:24:04 [stats.py:1009] | image_num                       |      1.000 |
+(APIServer pid=808899) INFO 09-26 04:24:04 [stats.py:1009] | inter_output_latencies_ms       |            |
+(APIServer pid=808899) INFO 09-26 04:24:04 [stats.py:1009] | kv_recv_time_s                  |      0.001 |
+(APIServer pid=808899) INFO 09-26 04:24:04 [stats.py:1009] | num_inference_steps             |      8.000 |
+(APIServer pid=808899) INFO 09-26 04:24:04 [stats.py:1009] | output_ready_wait_time_s        |      0.080 |
+(APIServer pid=808899) INFO 09-26 04:24:04 [stats.py:1009] | output_unit_count               |          1 |
+(APIServer pid=808899) INFO 09-26 04:24:04 [stats.py:1009] | output_unit_type                |      video |
+(APIServer pid=808899) INFO 09-26 04:24:04 [stats.py:1009] | postprocess_time_s              |      0.000 |
+(APIServer pid=808899) INFO 09-26 04:24:04 [stats.py:1009] | resolution                      |    640.000 |
+(APIServer pid=808899) INFO 09-26 04:24:04 [stats.py:1009] | scheduler_queue_wait_s          |      0.000 |
+(APIServer pid=808899) INFO 09-26 04:24:04 [stats.py:1009] | serving_time_to_first_output_ms | 11,431.245 |
+(APIServer pid=808899) INFO 09-26 04:24:04 [stats.py:1009] | stage_gen_time_ms               | 11,432.270 |
+(APIServer pid=808899) INFO 09-26 04:24:04 [stats.py:1009] | vllm_itls_ms                    |            |
+(APIServer pid=808899) INFO 09-26 04:24:04 [stats.py:1009] | width                           |  1,344.000 |
+(APIServer pid=808899) INFO 09-26 04:24:04 [stats.py:1009] +---------------------------------+------------+
+(APIServer pid=808899) INFO 09-26 04:24:04 [video_api_utils.py:765] Video response encoding route selected: selected_path=direct_planar frames=124 frame_shape=(768, 1344, 3) dtype=uint8 fps=24.0 audio_present=True effective_audio_sample_rate=32000 effective_frame_conversion_workers=8
+(APIServer pid=808899) INFO 09-26 04:24:04 [serving_video.py:627] Video response encoding (MP4 bytes): 378.43 ms
+(APIServer pid=808899) INFO:     127.0.0.1:35566 - "POST /v1/videos/sync HTTP/1.1" 200 OK
+(APIServer pid=808899) INFO 09-26 04:24:04 [helpers.py:986] Video generation handler: OmniOpenAIServingVideo
+(APIServer pid=808899) INFO 09-26 04:24:04 [serving_video.py:430] Boundary ratio parse: request=None gen_params=None
+(APIServer pid=808899) INFO 09-26 04:24:04 [serving_video.py:472] Applied extra_params: {'task': 't2va', 'duration': 10.0, 'audio_flow_shift': 3.0}
+(APIServer pid=808899) INFO 09-26 04:24:04 [serving_video.py:476] Video sampling params: steps=8 guidance=1.0 guidance_2=None seed=1132
+(DiffusionWorker_SP1 pid=809678) INFO 09-26 04:24:04 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline.encode_prompt took 0.068047s
+(DiffusionWorker_SP0 pid=809677) INFO 09-26 04:24:04 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline.encode_prompt took 0.068456s
+(DiffusionWorker_SP2 pid=809679) INFO 09-26 04:24:04 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline.encode_prompt took 0.068015s
+(DiffusionWorker_SP3 pid=809680) INFO 09-26 04:24:04 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline.encode_prompt took 0.068023s
+(DiffusionWorker_SP0 pid=809677) INFO 09-26 04:24:04 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline._encode_local_media took 0.002437s
+(DiffusionWorker_SP1 pid=809678) INFO 09-26 04:24:04 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline._encode_local_media took 0.002660s
+(DiffusionWorker_SP2 pid=809679) INFO 09-26 04:24:04 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline._encode_local_media took 0.002571s
+(DiffusionWorker_SP3 pid=809680) INFO 09-26 04:24:04 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline._encode_local_media took 0.002946s
+(DiffusionWorker_SP0 pid=809677)   0%|          | 0/8 [00:00<?, ?it/s] 12%|█▎        | 1/8 [00:01<00:11,  1.59s/it] 25%|██▌       | 2/8 [00:03<00:09,  1.59s/it] 38%|███▊      | 3/8 [00:04<00:07,  1.59s/it] 50%|█████     | 4/8 [00:06<00:06,  1.59s/it] 62%|██████▎   | 5/8 [00:07<00:04,  1.59s/it] 75%|███████▌  | 6/8 [00:09<00:03,  1.59s/it] 88%|████████▊ | 7/8 [00:11<00:01,  1.59s/it]100%|██████████| 8/8 [00:12<00:00,  1.59s/it]100%|██████████| 8/8 [00:12<00:00,  1.59s/it]
+(DiffusionWorker_SP0 pid=809677) INFO 09-26 04:24:17 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline.diffuse took 12.769479s
+(DiffusionWorker_SP1 pid=809678) INFO 09-26 04:24:17 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline.diffuse took 12.769372s
+(DiffusionWorker_SP3 pid=809680) INFO 09-26 04:24:17 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline.diffuse took 12.769579s
+(DiffusionWorker_SP2 pid=809679) INFO 09-26 04:24:17 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline.diffuse took 12.769552s
+(DiffusionWorker_SP0 pid=809677) INFO 09-26 04:24:20 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline.video_vae.decode_latent took 2.654850s
+(DiffusionWorker_SP1 pid=809678) INFO 09-26 04:24:20 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline.video_vae.decode_latent took 2.657015s
+(DiffusionWorker_SP2 pid=809679) INFO 09-26 04:24:20 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline.video_vae.decode_latent took 2.658015s
+(DiffusionWorker_SP3 pid=809680) INFO 09-26 04:24:20 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline.video_vae.decode_latent took 2.656652s
+(DiffusionWorker_SP0 pid=809677) INFO 09-26 04:24:20 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline.audio_vae.decode_latent took 0.062951s
+(DiffusionWorker_SP0 pid=809677) INFO 09-26 04:24:20 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline.decode took 2.734275s
+(DiffusionWorker_SP1 pid=809678) INFO 09-26 04:24:20 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline.audio_vae.decode_latent took 0.063068s
+(DiffusionWorker_SP1 pid=809678) INFO 09-26 04:24:20 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline.decode took 2.734340s
+(DiffusionWorker_SP1 pid=809678) INFO 09-26 04:24:20 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline.forward took 15.583102s
+(DiffusionWorker_SP0 pid=809677) INFO 09-26 04:24:20 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline.forward took 15.583910s
+(DiffusionWorker_SP3 pid=809680) INFO 09-26 04:24:20 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline.audio_vae.decode_latent took 0.067570s
+(DiffusionWorker_SP3 pid=809680) INFO 09-26 04:24:20 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline.decode took 2.739496s
+(DiffusionWorker_SP2 pid=809679) INFO 09-26 04:24:20 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline.audio_vae.decode_latent took 0.068772s
+(DiffusionWorker_SP2 pid=809679) INFO 09-26 04:24:20 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline.decode took 2.740838s
+(DiffusionWorker_SP3 pid=809680) INFO 09-26 04:24:20 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline.forward took 15.588858s
+(DiffusionWorker_SP2 pid=809679) INFO 09-26 04:24:20 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline.forward took 15.589962s
+(APIServer pid=808899) INFO 09-26 04:24:20 [stats.py:899] 
+(APIServer pid=808899) INFO 09-26 04:24:20 [stats.py:899] [Overall Summary]
+(APIServer pid=808899) INFO 09-26 04:24:20 [stats.py:899] +-----------------------------+------------+
+(APIServer pid=808899) INFO 09-26 04:24:20 [stats.py:899] | Field                       |      Value |
+(APIServer pid=808899) INFO 09-26 04:24:20 [stats.py:899] +-----------------------------+------------+
+(APIServer pid=808899) INFO 09-26 04:24:20 [stats.py:899] | e2e_requests                |          1 |
+(APIServer pid=808899) INFO 09-26 04:24:20 [stats.py:899] | e2e_wall_time_ms            | 15,747.821 |
+(APIServer pid=808899) INFO 09-26 04:24:20 [stats.py:899] | e2e_avg_time_per_request_ms | 15,747.821 |
+(APIServer pid=808899) INFO 09-26 04:24:20 [stats.py:899] | e2e_stage_0_wall_time_ms    | 15,747.682 |
+(APIServer pid=808899) INFO 09-26 04:24:20 [stats.py:899] +-----------------------------+------------+
+(APIServer pid=808899) INFO 09-26 04:24:20 [stats.py:925] 
+(APIServer pid=808899) INFO 09-26 04:24:20 [stats.py:925] [RequestE2EStats [request_id=video_sync-be174a9942572630-a39cee47]]
+(APIServer pid=808899) INFO 09-26 04:24:20 [stats.py:925] +--------------+------------+
+(APIServer pid=808899) INFO 09-26 04:24:20 [stats.py:925] | Field        |      Value |
+(APIServer pid=808899) INFO 09-26 04:24:20 [stats.py:925] +--------------+------------+
+(APIServer pid=808899) INFO 09-26 04:24:20 [stats.py:925] | e2e_total_ms | 15,747.682 |
+(APIServer pid=808899) INFO 09-26 04:24:20 [stats.py:925] +--------------+------------+
+(APIServer pid=808899) INFO 09-26 04:24:20 [stats.py:966] [OmniTiming] req=video_sync-be174a9942572630-a39cee47 total=15.75s engine=15.75s stages=[0:15.75s]
+(APIServer pid=808899) INFO 09-26 04:24:20 [stats.py:1009] 
+(APIServer pid=808899) INFO 09-26 04:24:20 [stats.py:1009] [StageRequestStats [request_id=video_sync-be174a9942572630-a39cee47]]
+(APIServer pid=808899) INFO 09-26 04:24:20 [stats.py:1009] +---------------------------------+------------+
+(APIServer pid=808899) INFO 09-26 04:24:20 [stats.py:1009] | Field                           |          0 |
+(APIServer pid=808899) INFO 09-26 04:24:20 [stats.py:1009] +---------------------------------+------------+
+(APIServer pid=808899) INFO 09-26 04:24:20 [stats.py:1009] | audio_duration_s                |     10.125 |
+(APIServer pid=808899) INFO 09-26 04:24:20 [stats.py:1009] | audio_generated_frames          |    324,000 |
+(APIServer pid=808899) INFO 09-26 04:24:20 [stats.py:1009] | audio_sample_rate               |     32,000 |
+(APIServer pid=808899) INFO 09-26 04:24:20 [stats.py:1009] | batch_id                        |          9 |
+(APIServer pid=808899) INFO 09-26 04:24:20 [stats.py:1009] | batch_size                      |          1 |
+(APIServer pid=808899) INFO 09-26 04:24:20 [stats.py:1009] | diffusion_engine_exec_time_s    |     15.590 |
+(APIServer pid=808899) INFO 09-26 04:24:20 [stats.py:1009] | forward_time_s                  |     12.769 |
+(APIServer pid=808899) INFO 09-26 04:24:20 [stats.py:1009] | height                          |    768.000 |
+(APIServer pid=808899) INFO 09-26 04:24:20 [stats.py:1009] | image_num                       |      1.000 |
+(APIServer pid=808899) INFO 09-26 04:24:20 [stats.py:1009] | inter_output_latencies_ms       |            |
+(APIServer pid=808899) INFO 09-26 04:24:20 [stats.py:1009] | kv_recv_time_s                  |      0.001 |
+(APIServer pid=808899) INFO 09-26 04:24:20 [stats.py:1009] | num_inference_steps             |      8.000 |
+(APIServer pid=808899) INFO 09-26 04:24:20 [stats.py:1009] | output_ready_wait_time_s        |      0.153 |
+(APIServer pid=808899) INFO 09-26 04:24:20 [stats.py:1009] | output_unit_count               |          1 |
+(APIServer pid=808899) INFO 09-26 04:24:20 [stats.py:1009] | output_unit_type                |      video |
+(APIServer pid=808899) INFO 09-26 04:24:20 [stats.py:1009] | postprocess_time_s              |      0.001 |
+(APIServer pid=808899) INFO 09-26 04:24:20 [stats.py:1009] | resolution                      |    640.000 |
+(APIServer pid=808899) INFO 09-26 04:24:20 [stats.py:1009] | scheduler_queue_wait_s          |      0.000 |
+(APIServer pid=808899) INFO 09-26 04:24:20 [stats.py:1009] | serving_time_to_first_output_ms | 15,744.879 |
+(APIServer pid=808899) INFO 09-26 04:24:20 [stats.py:1009] | stage_gen_time_ms               | 15,747.058 |
+(APIServer pid=808899) INFO 09-26 04:24:20 [stats.py:1009] | vllm_itls_ms                    |            |
+(APIServer pid=808899) INFO 09-26 04:24:20 [stats.py:1009] | width                           |  1,344.000 |
+(APIServer pid=808899) INFO 09-26 04:24:20 [stats.py:1009] +---------------------------------+------------+
+(APIServer pid=808899) INFO 09-26 04:24:20 [video_api_utils.py:765] Video response encoding route selected: selected_path=direct_planar frames=243 frame_shape=(768, 1344, 3) dtype=uint8 fps=24.0 audio_present=True effective_audio_sample_rate=32000 effective_frame_conversion_workers=8
+(APIServer pid=808899) INFO 09-26 04:24:20 [serving_video.py:627] Video response encoding (MP4 bytes): 628.13 ms
+(APIServer pid=808899) INFO:     127.0.0.1:35566 - "POST /v1/videos/sync HTTP/1.1" 200 OK
+(APIServer pid=808899) INFO 09-26 04:24:20 [helpers.py:986] Video generation handler: OmniOpenAIServingVideo
+(APIServer pid=808899) INFO 09-26 04:24:20 [serving_video.py:430] Boundary ratio parse: request=None gen_params=None
+(APIServer pid=808899) INFO 09-26 04:24:20 [serving_video.py:472] Applied extra_params: {'task': 't2va', 'duration': 10.0, 'audio_flow_shift': 3.0}
+(APIServer pid=808899) INFO 09-26 04:24:20 [serving_video.py:476] Video sampling params: steps=8 guidance=1.0 guidance_2=None seed=1132
+(DiffusionWorker_SP1 pid=809678) INFO 09-26 04:24:21 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline.encode_prompt took 0.533636s
+(DiffusionWorker_SP2 pid=809679) INFO 09-26 04:24:21 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline.encode_prompt took 0.533622s
+(DiffusionWorker_SP3 pid=809680) INFO 09-26 04:24:21 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline.encode_prompt took 0.533675s
+(DiffusionWorker_SP0 pid=809677) INFO 09-26 04:24:21 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline.encode_prompt took 0.535397s
+(DiffusionWorker_SP0 pid=809677) INFO 09-26 04:24:21 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline._encode_local_media took 0.002286s
+(DiffusionWorker_SP1 pid=809678) INFO 09-26 04:24:21 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline._encode_local_media took 0.003859s
+(DiffusionWorker_SP3 pid=809680) INFO 09-26 04:24:21 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline._encode_local_media took 0.003821s
+(DiffusionWorker_SP2 pid=809679) INFO 09-26 04:24:21 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline._encode_local_media took 0.003880s
+(DiffusionWorker_SP0 pid=809677)   0%|          | 0/8 [00:00<?, ?it/s] 12%|█▎        | 1/8 [00:02<00:15,  2.23s/it] 25%|██▌       | 2/8 [00:04<00:13,  2.24s/it] 38%|███▊      | 3/8 [00:06<00:11,  2.24s/it] 50%|█████     | 4/8 [00:08<00:08,  2.24s/it] 62%|██████▎   | 5/8 [00:11<00:06,  2.24s/it] 75%|███████▌  | 6/8 [00:13<00:04,  2.24s/it] 88%|████████▊ | 7/8 [00:15<00:02,  2.24s/it]100%|██████████| 8/8 [00:17<00:00,  2.24s/it]100%|██████████| 8/8 [00:17<00:00,  2.24s/it]
+(DiffusionWorker_SP0 pid=809677) INFO 09-26 04:24:39 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline.diffuse took 18.004615s
+(DiffusionWorker_SP1 pid=809678) INFO 09-26 04:24:39 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline.diffuse took 18.004639s
+(DiffusionWorker_SP3 pid=809680) INFO 09-26 04:24:39 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline.diffuse took 18.004829s
+(DiffusionWorker_SP2 pid=809679) INFO 09-26 04:24:39 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline.diffuse took 18.005124s
+(DiffusionWorker_SP0 pid=809677) INFO 09-26 04:24:42 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline.video_vae.decode_latent took 2.632514s
+(DiffusionWorker_SP1 pid=809678) INFO 09-26 04:24:42 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline.video_vae.decode_latent took 2.634083s
+(DiffusionWorker_SP3 pid=809680) INFO 09-26 04:24:42 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline.video_vae.decode_latent took 2.631341s
+(DiffusionWorker_SP2 pid=809679) INFO 09-26 04:24:42 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline.video_vae.decode_latent took 2.632590s
+(DiffusionWorker_SP0 pid=809677) INFO 09-26 04:24:42 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline.audio_vae.decode_latent took 0.060584s
+(DiffusionWorker_SP0 pid=809677) INFO 09-26 04:24:42 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline.decode took 2.712022s
+(DiffusionWorker_SP1 pid=809678) INFO 09-26 04:24:42 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline.audio_vae.decode_latent took 0.063633s
+(DiffusionWorker_SP0 pid=809677) INFO 09-26 04:24:42 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline.forward took 21.263426s
+(DiffusionWorker_SP1 pid=809678) INFO 09-26 04:24:42 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline.decode took 2.716176s
+(DiffusionWorker_SP2 pid=809679) INFO 09-26 04:24:42 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline.audio_vae.decode_latent took 0.066468s
+(DiffusionWorker_SP2 pid=809679) INFO 09-26 04:24:42 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline.decode took 2.718558s
+(DiffusionWorker_SP3 pid=809680) INFO 09-26 04:24:42 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline.audio_vae.decode_latent took 0.066974s
+(DiffusionWorker_SP3 pid=809680) INFO 09-26 04:24:42 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline.decode took 2.718560s
+(DiffusionWorker_SP1 pid=809678) INFO 09-26 04:24:42 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline.forward took 21.268031s
+(DiffusionWorker_SP2 pid=809679) INFO 09-26 04:24:42 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline.forward took 21.271881s
+(DiffusionWorker_SP3 pid=809680) INFO 09-26 04:24:42 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline.forward took 21.272501s
+(APIServer pid=808899) INFO 09-26 04:24:42 [stats.py:899] 
+(APIServer pid=808899) INFO 09-26 04:24:42 [stats.py:899] [Overall Summary]
+(APIServer pid=808899) INFO 09-26 04:24:42 [stats.py:899] +-----------------------------+------------+
+(APIServer pid=808899) INFO 09-26 04:24:42 [stats.py:899] | Field                       |      Value |
+(APIServer pid=808899) INFO 09-26 04:24:42 [stats.py:899] +-----------------------------+------------+
+(APIServer pid=808899) INFO 09-26 04:24:42 [stats.py:899] | e2e_requests                |          1 |
+(APIServer pid=808899) INFO 09-26 04:24:42 [stats.py:899] | e2e_wall_time_ms            | 21,430.061 |
+(APIServer pid=808899) INFO 09-26 04:24:42 [stats.py:899] | e2e_avg_time_per_request_ms | 21,430.061 |
+(APIServer pid=808899) INFO 09-26 04:24:42 [stats.py:899] | e2e_stage_0_wall_time_ms    | 21,429.929 |
+(APIServer pid=808899) INFO 09-26 04:24:42 [stats.py:899] +-----------------------------+------------+
+(APIServer pid=808899) INFO 09-26 04:24:42 [stats.py:925] 
+(APIServer pid=808899) INFO 09-26 04:24:42 [stats.py:925] [RequestE2EStats [request_id=video_sync-8594809b81048416-8ca0a29c]]
+(APIServer pid=808899) INFO 09-26 04:24:42 [stats.py:925] +--------------+------------+
+(APIServer pid=808899) INFO 09-26 04:24:42 [stats.py:925] | Field        |      Value |
+(APIServer pid=808899) INFO 09-26 04:24:42 [stats.py:925] +--------------+------------+
+(APIServer pid=808899) INFO 09-26 04:24:42 [stats.py:925] | e2e_total_ms | 21,429.929 |
+(APIServer pid=808899) INFO 09-26 04:24:42 [stats.py:925] +--------------+------------+
+(APIServer pid=808899) INFO 09-26 04:24:42 [stats.py:966] [OmniTiming] req=video_sync-8594809b81048416-8ca0a29c total=21.43s engine=21.43s stages=[0:21.43s]
+(APIServer pid=808899) INFO 09-26 04:24:42 [stats.py:1009] 
+(APIServer pid=808899) INFO 09-26 04:24:42 [stats.py:1009] [StageRequestStats [request_id=video_sync-8594809b81048416-8ca0a29c]]
+(APIServer pid=808899) INFO 09-26 04:24:42 [stats.py:1009] +---------------------------------+------------+
+(APIServer pid=808899) INFO 09-26 04:24:42 [stats.py:1009] | Field                           |          0 |
+(APIServer pid=808899) INFO 09-26 04:24:42 [stats.py:1009] +---------------------------------+------------+
+(APIServer pid=808899) INFO 09-26 04:24:42 [stats.py:1009] | audio_duration_s                |     10.125 |
+(APIServer pid=808899) INFO 09-26 04:24:42 [stats.py:1009] | audio_generated_frames          |    324,000 |
+(APIServer pid=808899) INFO 09-26 04:24:42 [stats.py:1009] | audio_sample_rate               |     32,000 |
+(APIServer pid=808899) INFO 09-26 04:24:42 [stats.py:1009] | batch_id                        |         10 |
+(APIServer pid=808899) INFO 09-26 04:24:42 [stats.py:1009] | batch_size                      |          1 |
+(APIServer pid=808899) INFO 09-26 04:24:42 [stats.py:1009] | diffusion_engine_exec_time_s    |     21.270 |
+(APIServer pid=808899) INFO 09-26 04:24:42 [stats.py:1009] | forward_time_s                  |     18.005 |
+(APIServer pid=808899) INFO 09-26 04:24:42 [stats.py:1009] | height                          |    768.000 |
+(APIServer pid=808899) INFO 09-26 04:24:42 [stats.py:1009] | image_num                       |      1.000 |
+(APIServer pid=808899) INFO 09-26 04:24:42 [stats.py:1009] | inter_output_latencies_ms       |            |
+(APIServer pid=808899) INFO 09-26 04:24:42 [stats.py:1009] | kv_recv_time_s                  |      0.001 |
+(APIServer pid=808899) INFO 09-26 04:24:42 [stats.py:1009] | num_inference_steps             |      8.000 |
+(APIServer pid=808899) INFO 09-26 04:24:42 [stats.py:1009] | output_ready_wait_time_s        |      0.153 |
+(APIServer pid=808899) INFO 09-26 04:24:42 [stats.py:1009] | output_unit_count               |          1 |
+(APIServer pid=808899) INFO 09-26 04:24:42 [stats.py:1009] | output_unit_type                |      video |
+(APIServer pid=808899) INFO 09-26 04:24:42 [stats.py:1009] | postprocess_time_s              |      0.001 |
+(APIServer pid=808899) INFO 09-26 04:24:42 [stats.py:1009] | resolution                      |    640.000 |
+(APIServer pid=808899) INFO 09-26 04:24:42 [stats.py:1009] | scheduler_queue_wait_s          |      0.000 |
+(APIServer pid=808899) INFO 09-26 04:24:42 [stats.py:1009] | serving_time_to_first_output_ms | 21,424.822 |
+(APIServer pid=808899) INFO 09-26 04:24:42 [stats.py:1009] | stage_gen_time_ms               | 21,428.191 |
+(APIServer pid=808899) INFO 09-26 04:24:42 [stats.py:1009] | vllm_itls_ms                    |            |
+(APIServer pid=808899) INFO 09-26 04:24:42 [stats.py:1009] | width                           |  1,344.000 |
+(APIServer pid=808899) INFO 09-26 04:24:42 [stats.py:1009] +---------------------------------+------------+
+(APIServer pid=808899) INFO 09-26 04:24:42 [video_api_utils.py:765] Video response encoding route selected: selected_path=direct_planar frames=243 frame_shape=(768, 1344, 3) dtype=uint8 fps=24.0 audio_present=True effective_audio_sample_rate=32000 effective_frame_conversion_workers=8
+(APIServer pid=808899) INFO 09-26 04:24:43 [serving_video.py:627] Video response encoding (MP4 bytes): 661.14 ms
+(APIServer pid=808899) INFO:     127.0.0.1:35566 - "POST /v1/videos/sync HTTP/1.1" 200 OK
+(APIServer pid=808899) INFO 09-26 04:24:43 [helpers.py:986] Video generation handler: OmniOpenAIServingVideo
+(APIServer pid=808899) INFO 09-26 04:24:43 [serving_video.py:430] Boundary ratio parse: request=None gen_params=None
+(APIServer pid=808899) INFO 09-26 04:24:43 [serving_video.py:472] Applied extra_params: {'task': 't2va', 'duration': 15.0, 'audio_flow_shift': 3.0}
+(APIServer pid=808899) INFO 09-26 04:24:43 [serving_video.py:476] Video sampling params: steps=8 guidance=1.0 guidance_2=None seed=1126
+(DiffusionWorker_SP1 pid=809678) INFO 09-26 04:24:43 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline.encode_prompt took 0.068134s
+(DiffusionWorker_SP0 pid=809677) INFO 09-26 04:24:43 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline.encode_prompt took 0.068536s
+(DiffusionWorker_SP2 pid=809679) INFO 09-26 04:24:43 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline.encode_prompt took 0.068099s
+(DiffusionWorker_SP3 pid=809680) INFO 09-26 04:24:43 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline.encode_prompt took 0.068101s
+(DiffusionWorker_SP0 pid=809677) INFO 09-26 04:24:43 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline._encode_local_media took 0.002096s
+(DiffusionWorker_SP1 pid=809678) INFO 09-26 04:24:43 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline._encode_local_media took 0.002337s
+(DiffusionWorker_SP3 pid=809680) INFO 09-26 04:24:43 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline._encode_local_media took 0.002225s
+(DiffusionWorker_SP2 pid=809679) INFO 09-26 04:24:43 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline._encode_local_media took 0.002245s
+(DiffusionWorker_SP0 pid=809677)   0%|          | 0/8 [00:00<?, ?it/s] 12%|█▎        | 1/8 [00:02<00:19,  2.80s/it] 25%|██▌       | 2/8 [00:05<00:16,  2.78s/it] 38%|███▊      | 3/8 [00:08<00:13,  2.77s/it] 50%|█████     | 4/8 [00:11<00:11,  2.77s/it] 62%|██████▎   | 5/8 [00:13<00:08,  2.76s/it] 75%|███████▌  | 6/8 [00:16<00:05,  2.76s/it] 88%|████████▊ | 7/8 [00:19<00:02,  2.76s/it]100%|██████████| 8/8 [00:22<00:00,  2.77s/it]100%|██████████| 8/8 [00:22<00:00,  2.77s/it]
+(DiffusionWorker_SP0 pid=809677) INFO 09-26 04:25:05 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline.diffuse took 22.251348s
+(DiffusionWorker_SP1 pid=809678) INFO 09-26 04:25:05 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline.diffuse took 22.251214s
+(DiffusionWorker_SP3 pid=809680) INFO 09-26 04:25:05 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline.diffuse took 22.251453s
+(DiffusionWorker_SP2 pid=809679) INFO 09-26 04:25:05 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline.diffuse took 22.251835s
+(DiffusionWorker_SP0 pid=809677) INFO 09-26 04:25:09 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline.video_vae.decode_latent took 4.050109s
+(DiffusionWorker_SP1 pid=809678) INFO 09-26 04:25:09 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline.video_vae.decode_latent took 4.051781s
+(DiffusionWorker_SP3 pid=809680) INFO 09-26 04:25:09 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline.video_vae.decode_latent took 4.051593s
+(DiffusionWorker_SP2 pid=809679) INFO 09-26 04:25:09 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline.video_vae.decode_latent took 4.052637s
+(DiffusionWorker_SP1 pid=809678) INFO 09-26 04:25:09 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline.audio_vae.decode_latent took 0.084059s
+(DiffusionWorker_SP1 pid=809678) INFO 09-26 04:25:09 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline.decode took 4.156617s
+(DiffusionWorker_SP0 pid=809677) INFO 09-26 04:25:09 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline.audio_vae.decode_latent took 0.084313s
+(DiffusionWorker_SP0 pid=809677) INFO 09-26 04:25:09 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline.decode took 4.156974s
+(DiffusionWorker_SP3 pid=809680) INFO 09-26 04:25:09 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline.audio_vae.decode_latent took 0.085004s
+(DiffusionWorker_SP3 pid=809680) INFO 09-26 04:25:09 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline.decode took 4.158049s
+(DiffusionWorker_SP2 pid=809679) INFO 09-26 04:25:09 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline.audio_vae.decode_latent took 0.085133s
+(DiffusionWorker_SP2 pid=809679) INFO 09-26 04:25:09 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline.decode took 4.158160s
+(DiffusionWorker_SP1 pid=809678) INFO 09-26 04:25:09 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline.forward took 26.491407s
+(DiffusionWorker_SP0 pid=809677) INFO 09-26 04:25:09 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline.forward took 26.492851s
+(DiffusionWorker_SP3 pid=809680) INFO 09-26 04:25:09 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline.forward took 26.494759s
+(DiffusionWorker_SP2 pid=809679) INFO 09-26 04:25:09 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline.forward took 26.495066s
+(APIServer pid=808899) INFO 09-26 04:25:09 [stats.py:899] 
+(APIServer pid=808899) INFO 09-26 04:25:09 [stats.py:899] [Overall Summary]
+(APIServer pid=808899) INFO 09-26 04:25:09 [stats.py:899] +-----------------------------+------------+
+(APIServer pid=808899) INFO 09-26 04:25:09 [stats.py:899] | Field                       |      Value |
+(APIServer pid=808899) INFO 09-26 04:25:09 [stats.py:899] +-----------------------------+------------+
+(APIServer pid=808899) INFO 09-26 04:25:09 [stats.py:899] | e2e_requests                |          1 |
+(APIServer pid=808899) INFO 09-26 04:25:09 [stats.py:899] | e2e_wall_time_ms            | 26,731.866 |
+(APIServer pid=808899) INFO 09-26 04:25:09 [stats.py:899] | e2e_avg_time_per_request_ms | 26,731.866 |
+(APIServer pid=808899) INFO 09-26 04:25:09 [stats.py:899] | e2e_stage_0_wall_time_ms    | 26,731.763 |
+(APIServer pid=808899) INFO 09-26 04:25:09 [stats.py:899] +-----------------------------+------------+
+(APIServer pid=808899) INFO 09-26 04:25:09 [stats.py:925] 
+(APIServer pid=808899) INFO 09-26 04:25:09 [stats.py:925] [RequestE2EStats [request_id=video_sync-86aab04d5994f334-b7bf4d1e]]
+(APIServer pid=808899) INFO 09-26 04:25:09 [stats.py:925] +--------------+------------+
+(APIServer pid=808899) INFO 09-26 04:25:09 [stats.py:925] | Field        |      Value |
+(APIServer pid=808899) INFO 09-26 04:25:09 [stats.py:925] +--------------+------------+
+(APIServer pid=808899) INFO 09-26 04:25:09 [stats.py:925] | e2e_total_ms | 26,731.763 |
+(APIServer pid=808899) INFO 09-26 04:25:09 [stats.py:925] +--------------+------------+
+(APIServer pid=808899) INFO 09-26 04:25:09 [stats.py:966] [OmniTiming] req=video_sync-86aab04d5994f334-b7bf4d1e total=26.73s engine=26.73s stages=[0:26.73s]
+(APIServer pid=808899) INFO 09-26 04:25:09 [stats.py:1009] 
+(APIServer pid=808899) INFO 09-26 04:25:09 [stats.py:1009] [StageRequestStats [request_id=video_sync-86aab04d5994f334-b7bf4d1e]]
+(APIServer pid=808899) INFO 09-26 04:25:09 [stats.py:1009] +---------------------------------+------------+
+(APIServer pid=808899) INFO 09-26 04:25:09 [stats.py:1009] | Field                           |          0 |
+(APIServer pid=808899) INFO 09-26 04:25:09 [stats.py:1009] +---------------------------------+------------+
+(APIServer pid=808899) INFO 09-26 04:25:09 [stats.py:1009] | audio_duration_s                |     15.075 |
+(APIServer pid=808899) INFO 09-26 04:25:09 [stats.py:1009] | audio_generated_frames          |    482,400 |
+(APIServer pid=808899) INFO 09-26 04:25:09 [stats.py:1009] | audio_sample_rate               |     32,000 |
+(APIServer pid=808899) INFO 09-26 04:25:09 [stats.py:1009] | batch_id                        |         11 |
+(APIServer pid=808899) INFO 09-26 04:25:09 [stats.py:1009] | batch_size                      |          1 |
+(APIServer pid=808899) INFO 09-26 04:25:09 [stats.py:1009] | diffusion_engine_exec_time_s    |     26.499 |
+(APIServer pid=808899) INFO 09-26 04:25:09 [stats.py:1009] | forward_time_s                  |     22.251 |
+(APIServer pid=808899) INFO 09-26 04:25:09 [stats.py:1009] | height                          |    768.000 |
+(APIServer pid=808899) INFO 09-26 04:25:09 [stats.py:1009] | image_num                       |      1.000 |
+(APIServer pid=808899) INFO 09-26 04:25:09 [stats.py:1009] | inter_output_latencies_ms       |            |
+(APIServer pid=808899) INFO 09-26 04:25:09 [stats.py:1009] | kv_recv_time_s                  |      0.001 |
+(APIServer pid=808899) INFO 09-26 04:25:09 [stats.py:1009] | num_inference_steps             |      8.000 |
+(APIServer pid=808899) INFO 09-26 04:25:09 [stats.py:1009] | output_ready_wait_time_s        |      0.229 |
+(APIServer pid=808899) INFO 09-26 04:25:09 [stats.py:1009] | output_unit_count               |          1 |
+(APIServer pid=808899) INFO 09-26 04:25:09 [stats.py:1009] | output_unit_type                |      video |
+(APIServer pid=808899) INFO 09-26 04:25:09 [stats.py:1009] | postprocess_time_s              |      0.000 |
+(APIServer pid=808899) INFO 09-26 04:25:09 [stats.py:1009] | resolution                      |    640.000 |
+(APIServer pid=808899) INFO 09-26 04:25:09 [stats.py:1009] | scheduler_queue_wait_s          |      0.000 |
+(APIServer pid=808899) INFO 09-26 04:25:09 [stats.py:1009] | serving_time_to_first_output_ms | 26,729.093 |
+(APIServer pid=808899) INFO 09-26 04:25:09 [stats.py:1009] | stage_gen_time_ms               | 26,731.058 |
+(APIServer pid=808899) INFO 09-26 04:25:09 [stats.py:1009] | vllm_itls_ms                    |            |
+(APIServer pid=808899) INFO 09-26 04:25:09 [stats.py:1009] | width                           |  1,344.000 |
+(APIServer pid=808899) INFO 09-26 04:25:09 [stats.py:1009] +---------------------------------+------------+
+(APIServer pid=808899) INFO 09-26 04:25:09 [video_api_utils.py:765] Video response encoding route selected: selected_path=direct_planar frames=362 frame_shape=(768, 1344, 3) dtype=uint8 fps=24.0 audio_present=True effective_audio_sample_rate=32000 effective_frame_conversion_workers=8
+(APIServer pid=808899) INFO 09-26 04:25:10 [serving_video.py:627] Video response encoding (MP4 bytes): 890.99 ms
+(APIServer pid=808899) INFO:     127.0.0.1:35566 - "POST /v1/videos/sync HTTP/1.1" 200 OK
+(APIServer pid=808899) INFO 09-26 04:25:10 [helpers.py:986] Video generation handler: OmniOpenAIServingVideo
+(APIServer pid=808899) INFO 09-26 04:25:10 [serving_video.py:430] Boundary ratio parse: request=None gen_params=None
+(APIServer pid=808899) INFO 09-26 04:25:10 [serving_video.py:472] Applied extra_params: {'task': 't2va', 'duration': 15.0, 'audio_flow_shift': 3.0}
+(APIServer pid=808899) INFO 09-26 04:25:10 [serving_video.py:476] Video sampling params: steps=8 guidance=1.0 guidance_2=None seed=1126
+(DiffusionWorker_SP1 pid=809678) INFO 09-26 04:25:11 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline.encode_prompt took 0.541388s
+(DiffusionWorker_SP3 pid=809680) INFO 09-26 04:25:11 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline.encode_prompt took 0.541338s
+(DiffusionWorker_SP2 pid=809679) INFO 09-26 04:25:11 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline.encode_prompt took 0.541350s
+(DiffusionWorker_SP0 pid=809677) INFO 09-26 04:25:11 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline.encode_prompt took 0.542652s
+(DiffusionWorker_SP0 pid=809677) INFO 09-26 04:25:11 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline._encode_local_media took 0.002430s
+(DiffusionWorker_SP1 pid=809678) INFO 09-26 04:25:11 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline._encode_local_media took 0.003501s
+(DiffusionWorker_SP3 pid=809680) INFO 09-26 04:25:11 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline._encode_local_media took 0.003431s
+(DiffusionWorker_SP2 pid=809679) INFO 09-26 04:25:11 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline._encode_local_media took 0.003417s
+(DiffusionWorker_SP0 pid=809677)   0%|          | 0/8 [00:00<?, ?it/s] 12%|█▎        | 1/8 [00:03<00:26,  3.76s/it] 25%|██▌       | 2/8 [00:07<00:22,  3.75s/it] 38%|███▊      | 3/8 [00:11<00:18,  3.76s/it] 50%|█████     | 4/8 [00:15<00:15,  3.76s/it] 62%|██████▎   | 5/8 [00:18<00:11,  3.75s/it] 75%|███████▌  | 6/8 [00:22<00:07,  3.75s/it] 88%|████████▊ | 7/8 [00:26<00:03,  3.75s/it]100%|██████████| 8/8 [00:29<00:00,  3.74s/it]100%|██████████| 8/8 [00:29<00:00,  3.75s/it]
+(DiffusionWorker_SP0 pid=809677) INFO 09-26 04:25:41 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline.diffuse took 30.090307s
+(DiffusionWorker_SP1 pid=809678) INFO 09-26 04:25:41 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline.diffuse took 30.090183s
+(DiffusionWorker_SP3 pid=809680) INFO 09-26 04:25:41 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline.diffuse took 30.090295s
+(DiffusionWorker_SP2 pid=809679) INFO 09-26 04:25:41 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline.diffuse took 30.090329s
+(DiffusionWorker_SP1 pid=809678) INFO 09-26 04:25:45 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline.video_vae.decode_latent took 4.021146s
+(DiffusionWorker_SP0 pid=809677) INFO 09-26 04:25:45 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline.video_vae.decode_latent took 4.024657s
+(DiffusionWorker_SP3 pid=809680) INFO 09-26 04:25:45 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline.video_vae.decode_latent took 4.020701s
+(DiffusionWorker_SP2 pid=809679) INFO 09-26 04:25:45 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline.video_vae.decode_latent took 4.022762s
+(DiffusionWorker_SP0 pid=809677) INFO 09-26 04:25:45 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline.audio_vae.decode_latent took 0.083994s
+(DiffusionWorker_SP0 pid=809677) INFO 09-26 04:25:45 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline.decode took 4.135174s
+(DiffusionWorker_SP1 pid=809678) INFO 09-26 04:25:45 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline.audio_vae.decode_latent took 0.084245s
+(DiffusionWorker_SP1 pid=809678) INFO 09-26 04:25:45 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline.decode took 4.135260s
+(DiffusionWorker_SP3 pid=809680) INFO 09-26 04:25:45 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline.audio_vae.decode_latent took 0.084891s
+(DiffusionWorker_SP3 pid=809680) INFO 09-26 04:25:45 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline.decode took 4.136126s
+(DiffusionWorker_SP2 pid=809679) INFO 09-26 04:25:45 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline.audio_vae.decode_latent took 0.085112s
+(DiffusionWorker_SP2 pid=809679) INFO 09-26 04:25:45 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline.decode took 4.136405s
+(DiffusionWorker_SP1 pid=809678) INFO 09-26 04:25:45 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline.forward took 34.783491s
+(DiffusionWorker_SP0 pid=809677) INFO 09-26 04:25:45 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline.forward took 34.785303s
+(DiffusionWorker_SP3 pid=809680) INFO 09-26 04:25:45 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline.forward took 34.786228s
+(DiffusionWorker_SP2 pid=809679) INFO 09-26 04:25:45 [diffusion_pipeline_profiler.py:32] [DiffusionPipelineProfiler] MiniMaxH3Pipeline.forward took 34.786560s
+(APIServer pid=808899) INFO 09-26 04:25:45 [stats.py:899] 
+(APIServer pid=808899) INFO 09-26 04:25:45 [stats.py:899] [Overall Summary]
+(APIServer pid=808899) INFO 09-26 04:25:45 [stats.py:899] +-----------------------------+------------+
+(APIServer pid=808899) INFO 09-26 04:25:45 [stats.py:899] | Field                       |      Value |
+(APIServer pid=808899) INFO 09-26 04:25:45 [stats.py:899] +-----------------------------+------------+
+(APIServer pid=808899) INFO 09-26 04:25:45 [stats.py:899] | e2e_requests                |          1 |
+(APIServer pid=808899) INFO 09-26 04:25:45 [stats.py:899] | e2e_wall_time_ms            | 35,026.761 |
+(APIServer pid=808899) INFO 09-26 04:25:45 [stats.py:899] | e2e_avg_time_per_request_ms | 35,026.761 |
+(APIServer pid=808899) INFO 09-26 04:25:45 [stats.py:899] | e2e_stage_0_wall_time_ms    | 35,026.685 |
+(APIServer pid=808899) INFO 09-26 04:25:45 [stats.py:899] +-----------------------------+------------+
+(APIServer pid=808899) INFO 09-26 04:25:45 [stats.py:925] 
+(APIServer pid=808899) INFO 09-26 04:25:45 [stats.py:925] [RequestE2EStats [request_id=video_sync-b5e1624042a921ac-97d7f815]]
+(APIServer pid=808899) INFO 09-26 04:25:45 [stats.py:925] +--------------+------------+
+(APIServer pid=808899) INFO 09-26 04:25:45 [stats.py:925] | Field        |      Value |
+(APIServer pid=808899) INFO 09-26 04:25:45 [stats.py:925] +--------------+------------+
+(APIServer pid=808899) INFO 09-26 04:25:45 [stats.py:925] | e2e_total_ms | 35,026.685 |
+(APIServer pid=808899) INFO 09-26 04:25:45 [stats.py:925] +--------------+------------+
+(APIServer pid=808899) INFO 09-26 04:25:45 [stats.py:966] [OmniTiming] req=video_sync-b5e1624042a921ac-97d7f815 total=35.03s engine=35.03s stages=[0:35.03s]
+(APIServer pid=808899) INFO 09-26 04:25:45 [stats.py:1009] 
+(APIServer pid=808899) INFO 09-26 04:25:45 [stats.py:1009] [StageRequestStats [request_id=video_sync-b5e1624042a921ac-97d7f815]]
+(APIServer pid=808899) INFO 09-26 04:25:45 [stats.py:1009] +---------------------------------+------------+
+(APIServer pid=808899) INFO 09-26 04:25:45 [stats.py:1009] | Field                           |          0 |
+(APIServer pid=808899) INFO 09-26 04:25:45 [stats.py:1009] +---------------------------------+------------+
+(APIServer pid=808899) INFO 09-26 04:25:45 [stats.py:1009] | audio_duration_s                |     15.075 |
+(APIServer pid=808899) INFO 09-26 04:25:45 [stats.py:1009] | audio_generated_frames          |    482,400 |
+(APIServer pid=808899) INFO 09-26 04:25:45 [stats.py:1009] | audio_sample_rate               |     32,000 |
+(APIServer pid=808899) INFO 09-26 04:25:45 [stats.py:1009] | batch_id                        |         12 |
+(APIServer pid=808899) INFO 09-26 04:25:45 [stats.py:1009] | batch_size                      |          1 |
+(APIServer pid=808899) INFO 09-26 04:25:45 [stats.py:1009] | diffusion_engine_exec_time_s    |     34.791 |
+(APIServer pid=808899) INFO 09-26 04:25:45 [stats.py:1009] | forward_time_s                  |     30.090 |
+(APIServer pid=808899) INFO 09-26 04:25:45 [stats.py:1009] | height                          |    768.000 |
+(APIServer pid=808899) INFO 09-26 04:25:45 [stats.py:1009] | image_num                       |      1.000 |
+(APIServer pid=808899) INFO 09-26 04:25:45 [stats.py:1009] | inter_output_latencies_ms       |            |
+(APIServer pid=808899) INFO 09-26 04:25:45 [stats.py:1009] | kv_recv_time_s                  |      0.001 |
+(APIServer pid=808899) INFO 09-26 04:25:45 [stats.py:1009] | num_inference_steps             |      8.000 |
+(APIServer pid=808899) INFO 09-26 04:25:45 [stats.py:1009] | output_ready_wait_time_s        |      0.226 |
+(APIServer pid=808899) INFO 09-26 04:25:45 [stats.py:1009] | output_unit_count               |          1 |
+(APIServer pid=808899) INFO 09-26 04:25:45 [stats.py:1009] | output_unit_type                |      video |
+(APIServer pid=808899) INFO 09-26 04:25:45 [stats.py:1009] | postprocess_time_s              |      0.000 |
+(APIServer pid=808899) INFO 09-26 04:25:45 [stats.py:1009] | resolution                      |    640.000 |
+(APIServer pid=808899) INFO 09-26 04:25:45 [stats.py:1009] | scheduler_queue_wait_s          |      0.000 |
+(APIServer pid=808899) INFO 09-26 04:25:45 [stats.py:1009] | serving_time_to_first_output_ms | 35,018.921 |
+(APIServer pid=808899) INFO 09-26 04:25:45 [stats.py:1009] | stage_gen_time_ms               | 35,025.222 |
+(APIServer pid=808899) INFO 09-26 04:25:45 [stats.py:1009] | vllm_itls_ms                    |            |
+(APIServer pid=808899) INFO 09-26 04:25:45 [stats.py:1009] | width                           |  1,344.000 |
+(APIServer pid=808899) INFO 09-26 04:25:45 [stats.py:1009] +---------------------------------+------------+
+(APIServer pid=808899) INFO 09-26 04:25:45 [video_api_utils.py:765] Video response encoding route selected: selected_path=direct_planar frames=362 frame_shape=(768, 1344, 3) dtype=uint8 fps=24.0 audio_present=True effective_audio_sample_rate=32000 effective_frame_conversion_workers=8
+(APIServer pid=808899) INFO 09-26 04:25:46 [serving_video.py:627] Video response encoding (MP4 bytes): 892.81 ms
+(APIServer pid=808899) INFO:     127.0.0.1:35566 - "POST /v1/videos/sync HTTP/1.1" 200 OK
+(APIServer pid=808899) INFO:     127.0.0.1:37210 - "GET /version HTTP/1.1" 200 OK
+(DiffusionWorker_SP1 pid=809678) INFO 09-26 04:25:53 [diffusion_worker.py:1651] Worker 1: Shutdown signal received, starting cleanup.
+(DiffusionWorker_SP0 pid=809677) INFO 09-26 04:25:53 [diffusion_worker.py:1651] Worker 0: Shutdown signal received, starting cleanup.
+(APIServer pid=808899) INFO 09-26 04:25:53 [launcher.py:129] [shutdown] API server: shutdown triggered
+(APIServer pid=808899) INFO 09-26 04:25:53 [launcher.py:145] [shutdown] API server: stopping engine client mode=abort timeout=0.0s
+(DiffusionWorker_SP3 pid=809680) INFO 09-26 04:25:53 [diffusion_worker.py:1651] Worker 3: Shutdown signal received, starting cleanup.
+(DiffusionWorker_SP2 pid=809679) INFO 09-26 04:25:53 [diffusion_worker.py:1651] Worker 2: Shutdown signal received, starting cleanup.
+(APIServer pid=808899) INFO 09-26 04:25:53 [omni_base.py:771] [AsyncOmni] Shutting down
+(APIServer pid=808899) INFO 09-26 04:25:53 [omni_engine_base.py:1151] [OmniEngine] Shutting down Orchestrator
+(APIServer pid=808899) INFO 09-26 04:25:53 [orchestrator.py:524] [Orchestrator] Received shutdown signal
+(APIServer pid=808899) INFO 09-26 04:25:53 [orchestrator.py:2775] [Orchestrator] Shutting down all 1 client(s)
+(APIServer pid=808899) INFO 09-26 04:26:00 [stage_pool.py:1373] [StagePool] Stage 0 replica 0 shut down
+(APIServer pid=808899) INFO 09-26 04:26:00 [launcher.py:154] [shutdown] API server: engine client stopped
+(APIServer pid=808899) INFO 09-26 04:26:00 [launcher.py:157] [shutdown] API server: signalling HTTP server shutdown
+(APIServer pid=808899) INFO 09-26 04:26:00 [launcher.py:179] [shutdown] API server: shutting down FastAPI HTTP server
+(APIServer pid=808899) INFO:     Shutting down
+(APIServer pid=808899) INFO:     Waiting for application shutdown.
+(APIServer pid=808899) INFO:     Application shutdown complete.
+(APIServer pid=808899) INFO 09-26 04:26:00 [omni_base.py:771] [AsyncOmni] Shutting down

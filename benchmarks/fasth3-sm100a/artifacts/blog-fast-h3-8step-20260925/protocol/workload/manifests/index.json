@@ -1,0 +1,110 @@
+{
+  "seed": 20260925,
+  "manifests": {
+    "latency": {
+      "path": "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/protocol/workload/manifests/latency.jsonl",
+      "count": 72,
+      "sha256": "deae1615d520ac328b7490420efec5b2841c123580994bad5efee2aa3f57b804"
+    },
+    "throughput-r1": {
+      "path": "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/protocol/workload/manifests/throughput-r1.jsonl",
+      "count": 32,
+      "sha256": "5564840d2f63a37b839622273dabec972d43cc15f648899d6def51adc9c4c847"
+    },
+    "throughput-r2": {
+      "path": "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/protocol/workload/manifests/throughput-r2.jsonl",
+      "count": 32,
+      "sha256": "914eba7eee48405343b6efc085fee0f25797898a88b31a33041a12c0bd8ba79a"
+    },
+    "throughput-r3": {
+      "path": "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/protocol/workload/manifests/throughput-r3.jsonl",
+      "count": 32,
+      "sha256": "58f39293a9414812c162a54a647c861260d63a1793cfc2c2c5cc6a1734655f73"
+    },
+    "warmup": {
+      "path": "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/protocol/workload/manifests/warmup.jsonl",
+      "count": 6,
+      "sha256": "21eee880076ab4d40c559a8926d676a6488f2b8f52d52c49c1cc6b4dff748f64"
+    },
+    "qualification": {
+      "path": "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/protocol/workload/manifests/qualification.jsonl",
+      "count": 6,
+      "sha256": "cdc40bbb2c43228ee9d9216e60543f31387ff7fff9c79c2a5dc5e40a63439604"
+    },
+    "priming-c1-r1": {
+      "path": "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/protocol/workload/manifests/priming-c1-r1.jsonl",
+      "count": 2,
+      "sha256": "bce15fb368fe497416c57ef10e08c158235522ea94ba3aa28ff9beed9ff79cf1"
+    },
+    "priming-c1-r2": {
+      "path": "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/protocol/workload/manifests/priming-c1-r2.jsonl",
+      "count": 2,
+      "sha256": "65d0ed28b9fd5297e08b9f08eee8a22df6b836ee577c7522502c9b1c8fb278ec"
+    },
+    "priming-c1-r3": {
+      "path": "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/protocol/workload/manifests/priming-c1-r3.jsonl",
+      "count": 2,
+      "sha256": "3a841bdb1616f5f7dd63353a9c6c6a151760164b091e865fc8803cb9d8c83240"
+    },
+    "priming-c2-r1": {
+      "path": "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/protocol/workload/manifests/priming-c2-r1.jsonl",
+      "count": 4,
+      "sha256": "7422908c6c603a899627dbf568ec1342bddc81b5e453ef6ffeab9c0944e15020"
+    },
+    "priming-c2-r2": {
+      "path": "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/protocol/workload/manifests/priming-c2-r2.jsonl",
+      "count": 4,
+      "sha256": "480dd19c08d08339962c3773c0cff85f50c5a0173944a149815461cadb43f29a"
+    },
+    "priming-c2-r3": {
+      "path": "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/protocol/workload/manifests/priming-c2-r3.jsonl",
+      "count": 4,
+      "sha256": "6918964d68dad38adc8840387825a0806791ec62fc796e318abb6a53221e2087"
+    },
+    "priming-c4-r1": {
+      "path": "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/protocol/workload/manifests/priming-c4-r1.jsonl",
+      "count": 8,
+      "sha256": "eac6bcfbca508d73f8a8a31b4942e4654f4e66766b8423d5970db43ef15d4e23"
+    },
+    "priming-c4-r2": {
+      "path": "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/protocol/workload/manifests/priming-c4-r2.jsonl",
+      "count": 8,
+      "sha256": "384bc999c143e3c04dfb7f1a74034c6e271da3b7f8f79cd479e2a2a28a59a5d8"
+    },
+    "priming-c4-r3": {
+      "path": "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/protocol/workload/manifests/priming-c4-r3.jsonl",
+      "count": 8,
+      "sha256": "60523e50bb10d0d66b3d24c4f69504b5ce4c33face27f15e311cff6c40b05b09"
+    },
+    "priming-c8-r1": {
+      "path": "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/protocol/workload/manifests/priming-c8-r1.jsonl",
+      "count": 16,
+      "sha256": "5a05a1b1515af3d044bf46cbdf6ad52f1e756e3ac6dfe43f26f8bdb714c545ef"
+    },
+    "priming-c8-r2": {
+      "path": "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/protocol/workload/manifests/priming-c8-r2.jsonl",
+      "count": 16,
+      "sha256": "46655f5ce64d5a2e22b66a7e512c0b92f725d9f2b100892791eb425a3a86317f"
+    },
+    "priming-c8-r3": {
+      "path": "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/protocol/workload/manifests/priming-c8-r3.jsonl",
+      "count": 16,
+      "sha256": "93446977934124db5cba70c0b72e550ea74f73ad4cf84f5e7b2cf0505add7611"
+    },
+    "priming-c16-r1": {
+      "path": "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/protocol/workload/manifests/priming-c16-r1.jsonl",
+      "count": 32,
+      "sha256": "8018f92dc1285d65ffccb163c20efc433b1c7f4e6a540ac9bac6b7d3a3666d2f"
+    },
+    "priming-c16-r2": {
+      "path": "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/protocol/workload/manifests/priming-c16-r2.jsonl",
+      "count": 32,
+      "sha256": "a89f74a2c8b8f1400d6c27fbffcaefed3d5a2b22a32c87e530b19e7a4445f6e7"
+    },
+    "priming-c16-r3": {
+      "path": "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/protocol/workload/manifests/priming-c16-r3.jsonl",
+      "count": 32,
+      "sha256": "ac83f2ef66a5a7cbdc421fa8c4f995c4f3539aa4981eb6d542c203d348670558"
+    }
+  }
+}

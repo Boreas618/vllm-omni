@@ -1,0 +1,7 @@
+{
+  "uniserve_commit": "9458bca425a96d5bc45f5e97da9d2986449fad3e",
+  "sglang_upstream": "8772916e06e631f3834fc7ba86f36d9c88a23082",
+  "vllm_omni_upstream": "bcb4ae288f77dbee431c0649b72ef43a4722bb2b",
+  "checkpoint_bf16": "3da2ddfe1954d9cda4c05b643dc0f26007a655c5",
+  "fastvideo_kernel_wheel_sha256": "d23d6646e3775632e1dddf44b5545b68eaf4d67227d8cdd57805908ee51542c2"
+}

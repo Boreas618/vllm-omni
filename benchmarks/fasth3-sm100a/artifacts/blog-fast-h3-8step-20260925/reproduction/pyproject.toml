@@ -1,0 +1,151 @@
+[build-system]
+requires = ["setuptools>=70", "wheel", "setuptools-rust>=1.7"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "uniserve"
+version = "0.2.0"
+description = "UniServe computation library, numerical models, and Python worker runtime."
+readme = "README.md"
+requires-python = ">=3.11"
+# Keep the CUDA-13 PyTorch and torchvision release lines aligned. The locked
+# Linux wheels bring their matching NCCL and NVSHMEM runtime dependencies.
+dependencies = [
+    "torch>=2.13,<2.14",
+    "torchvision>=0.28,<0.29",
+    "transformers>=4.57.1",
+    "safetensors",
+    "numpy",
+    "pillow",
+    "packaging<=25.0",
+    "huggingface_hub",
+    "diffusers>=0.40",
+    "av>=14",
+    # UniServe's own Triton and CuTe device kernels. Native extensions and
+    # their build tools are selected through the kernel package's extras.
+    "uniserve-kernels",
+]
+
+[project.optional-dependencies]
+test = [
+    "pytest>=8.1",
+    "pytest-timeout>=2.3",
+]
+dev = [
+    "build>=1.2",
+    "markdown-it-py<4.0",
+    "mypy>=1.11",
+    "pyright>=1.1",
+    "ruff>=0.6",
+]
+bench = [
+    "uniserve-eval[datasets]",
+]
+# Optional accelerator kernels for GPU serving. Model bindings require their
+# declared native capabilities at startup. The extras of the `uniserve-kernels`
+# pack add its native extensions and FlashAttention-4 runtime. The dense,
+# sparse, and quantized providers these packages back are shared runtime
+# capabilities, so they are selected by hardware rather than by model; native
+# builds require a CUDA 13 toolkit.
+gpu = [
+    "flashinfer-python==0.6.18",
+    "ninja>=1.13",
+    "requests[socks]>=2",
+    "uniserve-kernels[peer_storage,sparse_attention,flash_attn_4]",
+]
+
+[tool.uv.sources]
+uniserve-kernels = { path = "uniserve_kernels", editable = true }
+uniserve-eval = { path = "uniserve_eval", editable = true }
+
+[project.scripts]
+uniserve-worker = "uniserve_worker.main:main"
+
+[tool.setuptools.packages.find]
+# UniServe kernels and the benchmark driver are packaged independently
+# (`uniserve_kernels/pyproject.toml`, `uniserve_eval/pyproject.toml`) so the
+# root serving distribution cannot mask a missing kernel install and does not
+# ship a console script whose dependencies it never declares.
+include = ["uniserve", "uniserve.*", "uniserve_models*", "uniserve_worker*"]
+
+# Native worker IPC extension (PyO3).
+[[tool.setuptools-rust.ext-modules]]
+target = "uniserve_worker._uniserve_ipc"
+path = "crates/worker-ipc-py/Cargo.toml"
+binding = "PyO3"
+
+# Server/scheduler binary, installed onto PATH as `uniserve`.
+[[tool.setuptools-rust.bins]]
+target = "uniserve"
+path = "crates/bin/uniserve/Cargo.toml"
+
+[tool.pytest.ini_options]
+testpaths = ["tests/python"]
+addopts = "-ra"
+pythonpath = ["."]
+markers = [
+    "unit: pure local tests without server or external model files",
+    "architecture: build-time dependency direction and package layout checks",
+    "integration: multi-component tests using fake/simulated backends",
+    "e2e: black-box server or worker tests",
+    "gpu: requires a CUDA device; orthogonal to the unit, integration and e2e layers",
+    "slow: excluded from the fast local and presubmit suites",
+    "model(name): selects a concrete model backend such as sensenova or bagel",
+    "sensenova: SenseNova-U1-specific test",
+]
+
+[tool.ruff]
+# Enforces the Google Python Style Guide
+# (https://google.github.io/styleguide/pyguide.html) on all project Python
+# modules: 80-column line limit (guide section 3.4), Google docstring
+# convention, and PEP 8 naming. Where the guide and the previous project
+# configuration disagreed, the guide wins; resolutions are recorded in
+# specs/python-style.md. The `refs/` reference checkouts keep their own
+# per-repository style enforcement (see refs/TensorRT-LLM/pyproject.toml).
+line-length = 80
+target-version = "py311"
+extend-exclude = [
+    "refs",
+    "target",
+    ".venv",
+]
+
+[tool.ruff.lint]
+select = ["E", "W", "F", "I", "D", "N", "C4", "UP"]
+ignore = [
+    # Docstring presence is not retroactively enforced (the same resolution
+    # TensorRT-LLM uses); the format of every existing docstring is checked.
+    "D100", "D101", "D102", "D103", "D104", "D105", "D106", "D107", "D417",
+    # Rules incompatible with the Google docstring convention; mirrors the set
+    # ruff disables when only `convention = "google"` drives the selection.
+    "D203", "D204", "D213", "D215", "D400", "D401", "D404", "D406", "D407",
+    "D408", "D409", "D413",
+    # `import torch.nn.functional as F` is the established PyTorch alias
+    # convention; the Google guide does not prohibit it. pep8-naming's blanket
+    # ban on uppercase aliases conflicts with it, so the alias case is waived.
+    "N812",
+]
+
+[tool.ruff.lint.pydocstyle]
+convention = "google"
+
+[tool.mypy]
+# Use the invoking Python version so installed dependency stubs match CI's runtime.
+# Source of truth for the type-check scope. Must match the explicit paths
+# passed by CI (.github/workflows/ci.yml) and the justfile `lint` target
+# (`mypy uniserve uniserve_models uniserve_worker uniserve_eval`) so bare/editor invocations agree with CI.
+files = ["uniserve", "uniserve_models", "uniserve_worker", "uniserve_eval"]
+warn_unused_configs = true
+warn_redundant_casts = true
+warn_unused_ignores = true
+no_implicit_optional = true
+check_untyped_defs = true
+ignore_missing_imports = true
+
+[tool.pyright]
+pythonVersion = "3.11"
+typeCheckingMode = "basic"
+# Keep aligned with [tool.mypy].files and the CI/justfile type-check scope.
+include = ["uniserve", "uniserve_models", "uniserve_worker", "uniserve_eval"]
+exclude = ["refs", "target", ".venv"]
+reportMissingImports = "warning"

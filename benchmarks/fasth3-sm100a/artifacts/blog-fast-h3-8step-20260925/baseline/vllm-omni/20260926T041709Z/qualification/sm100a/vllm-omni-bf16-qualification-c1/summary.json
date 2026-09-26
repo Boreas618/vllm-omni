@@ -1,0 +1,277 @@
+{
+  "base_url": "http://127.0.0.1:18083",
+  "benchmark": "vllm-omni-bf16-qualification-c1",
+  "classifiers": {
+    "ok": 6
+  },
+  "client": {
+    "peak_rss_bytes": 956497920,
+    "retained_body_bytes": 275133950
+  },
+  "dataset": "jsonl",
+  "elapsed_s": 121.89094210509211,
+  "endpoint": "/v1/videos/sync",
+  "failed_count": 0,
+  "gpu_memory": {
+    "interval_s": 0.5,
+    "mean_total_utilization_gpu_pct": 331.6778947368421,
+    "peak_per_gpu_mib": [
+      137955,
+      88851,
+      88851,
+      88851
+    ],
+    "peak_single_gpu_mib": 137955,
+    "peak_total_mib": 404508,
+    "peak_utilization_gpu_pct": [
+      100,
+      100,
+      100,
+      100
+    ],
+    "samples": 475
+  },
+  "launch": {
+    "command": [
+      "/workspace/UniServe/.venv-vllm-omni/bin/vllm",
+      "serve",
+      "/workspace/models/FastVideo-FastH3-8-Step-V2",
+      "--omni",
+      "--served-model-name",
+      "FastH3",
+      "--host",
+      "127.0.0.1",
+      "--port",
+      "18083",
+      "--trust-remote-code",
+      "--task-type",
+      "fl2va",
+      "--num-gpus",
+      "4",
+      "--usp",
+      "4",
+      "--ring",
+      "1",
+      "--vae-patch-parallel-size",
+      "4",
+      "--vae-parallel-mode",
+      "tile",
+      "--vae-use-tiling",
+      "--diffusion-attention-backend",
+      "FASTVIDEO_VSA",
+      "--enable-diffusion-pipeline-profiler"
+    ],
+    "dirty": true,
+    "environment": {
+      "CUDA_VISIBLE_DEVICES": "0,1,2,3",
+      "FASTVIDEO_VSA_SM100A": "1",
+      "VLLM_OMNI_VIDEO_SYNC_TIMEOUT": "21600",
+      "VLLM_WORKER_MULTIPROC_METHOD": "spawn"
+    },
+    "git_head": "9458bca425a96d5bc45f5e97da9d2986449fad3e",
+    "gpu": {
+      "driver_version": "580.82.07",
+      "name": "NVIDIA GB200"
+    },
+    "working_directory": "/workspace/UniServe"
+  },
+  "metric_definitions": [
+    {
+      "direction": "higher",
+      "path": "videos_per_second"
+    },
+    {
+      "direction": "lower",
+      "path": "video_latency_ms.p95"
+    }
+  ],
+  "metrics": {
+    "completed": 6,
+    "completed_requests": 6,
+    "completed_videos": 6,
+    "concurrency": 0.99999439917981,
+    "e2e_latency_ms": {
+      "count": 6,
+      "max": 35963.95068522543,
+      "mean": 20315.043235973764,
+      "min": 7903.2459277659655,
+      "p50": 19268.741814419627,
+      "p90": 31809.284075628966,
+      "p95": 33886.6173804272,
+      "p99": 35548.48402426578,
+      "std": 9516.116850487142
+    },
+    "input_throughput": 270.73381688647555,
+    "itl_ms": {
+      "count": 0,
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "p50": 0.0,
+      "p90": 0.0,
+      "p95": 0.0,
+      "p99": 0.0,
+      "std": 0.0
+    },
+    "max_concurrent_requests": 0,
+    "max_itl_ms": null,
+    "max_output_tokens_per_s": 0.0,
+    "mean_e2e_latency_ms": 20315.043235973764,
+    "mean_itl_ms": null,
+    "mean_tpot_ms": null,
+    "mean_ttft_ms": null,
+    "media_bytes_per_second": 1151745.9671364308,
+    "output_throughput": 0.0,
+    "request_throughput": 0.04922433034299555,
+    "token_timing_available": false,
+    "token_timing_request_count": 0,
+    "total_input_tokens": 33000,
+    "total_output_tokens": 0,
+    "total_throughput": 270.73381688647555,
+    "tpot_ms": {
+      "count": 0,
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "p50": 0.0,
+      "p90": 0.0,
+      "p95": 0.0,
+      "p99": 0.0,
+      "std": 0.0
+    },
+    "ttft_ms": {
+      "count": 0,
+      "max": 0.0,
+      "mean": 0.0,
+      "min": 0.0,
+      "p50": 0.0,
+      "p90": 0.0,
+      "p95": 0.0,
+      "p99": 0.0,
+      "std": 0.0
+    },
+    "video_latency_ms": {
+      "count": 6,
+      "max": 35963.95068522543,
+      "mean": 20315.043235973764,
+      "min": 7903.2459277659655,
+      "p50": 19268.741814419627,
+      "p90": 31809.284075628966,
+      "p95": 33886.6173804272,
+      "p99": 35548.48402426578,
+      "std": 9516.116850487142
+    },
+    "videos_per_second": 0.04922433034299555
+  },
+  "model": "FastH3",
+  "ok_count": 6,
+  "request_count": 6,
+  "selected_rows": {
+    "count": 6,
+    "sha256": "2e90a1c87d0d75e2bb0bd755f1ffa7a364b90bf61d157aa848c3bebdac3dce28"
+  },
+  "server_version": {
+    "version": "0.30.0"
+  },
+  "status": "completed",
+  "task": "video",
+  "validation": {
+    "checks": {
+      "aac_stereo_32khz_audio": true,
+      "all_requests_succeeded": true,
+      "audio_spans_video": true,
+      "declared_request_count": true,
+      "decoded_video": true,
+      "fixed_video_geometry": true,
+      "h264_video": true,
+      "metric:video_latency_ms.p95": true,
+      "metric:videos_per_second": true,
+      "nonzero_audio_rms": true,
+      "nonzero_video_variance": true
+    },
+    "statistics": {
+      "completed_videos": 6,
+      "media_bytes": 140387401,
+      "request_count": 6,
+      "successful_requests": 6
+    },
+    "valid": true,
+    "warnings": []
+  },
+  "warnings": [
+    "dirty_workspace"
+  ],
+  "workload": {
+    "dataset": "jsonl",
+    "dataset_path": "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/protocol/workload/manifests/qualification.jsonl",
+    "dataset_revision": null,
+    "endpoint": "/v1/videos/sync",
+    "image": {
+      "cfg_interval": null,
+      "cfg_norm": null,
+      "guidance_scale": null,
+      "height": null,
+      "image_count": null,
+      "image_guidance_scale": null,
+      "steps": null,
+      "timestep_shift": null,
+      "width": null
+    },
+    "load": {
+      "max_concurrency": 1,
+      "num_prompts": 6,
+      "priming_manifest": null,
+      "request_rate": "inf",
+      "request_timeout_s": 21600,
+      "seed": 20260925,
+      "warmup_manifest": "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/protocol/workload/manifests/warmup.jsonl",
+      "warmup_requests": 0
+    },
+    "metrics": [
+      {
+        "direction": "higher",
+        "path": "videos_per_second"
+      },
+      {
+        "direction": "lower",
+        "path": "video_latency_ms.p95"
+      }
+    ],
+    "model": "FastH3",
+    "name": "vllm-omni-bf16-qualification-c1",
+    "provenance": {
+      "candidate": "sm100a-sp4-te1",
+      "checkpoint": "/workspace/models/FastVideo-FastH3-8-Step-V2",
+      "checkpoint_revision": "3da2ddfe1954d9cda4c05b643dc0f26007a655c5",
+      "hardware": "gb200-4",
+      "purpose": "six-shape eligibility and stage profiling",
+      "source_lock": "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/baseline/vllm-omni/20260926T041709Z/source-lock.json",
+      "system_revision": "bcb4ae288f77dbee431c0649b72ef43a4722bb2b"
+    },
+    "question": null,
+    "sampling": {
+      "extra_body": {},
+      "frequency_penalty": null,
+      "ignore_eos": true,
+      "max_tokens": null,
+      "min_p": null,
+      "presence_penalty": null,
+      "repetition_penalty": null,
+      "sampling_seed": null,
+      "stream": false,
+      "temperature": 0.0,
+      "top_k": null,
+      "top_p": 1.0
+    },
+    "server": "vllm-omni-bf16",
+    "task": "video",
+    "tokenizer": null,
+    "video": {
+      "backend": "vllm-omni",
+      "media_dir": null,
+      "poll_interval_s": 0.1,
+      "prompt_tokens": 1000,
+      "seconds": 5.0
+    }
+  }
+}

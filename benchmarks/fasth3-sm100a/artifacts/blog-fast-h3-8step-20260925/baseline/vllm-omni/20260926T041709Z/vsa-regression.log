@@ -1,0 +1,53 @@
+INFO 09-26 04:16:54 [patch.py:253] NVFP4 W4A4 weight_scale NaN-clamp: skipped — upstream serves ModelOpt linears through the generic ModelOptLinearMethod and rejects any NaN weight_scale (unloaded-scale sentinel), so a load-time error replaces the `!!!!` decode-time collapse.
+INFO 09-26 04:16:56 [quack_fp8.py:115] Quack FP8 fused-bias GEMM enabled (CuteDSL).
+INFO 09-26 04:16:56 [quack_fp8.py:221] Patched FlashInfer FP8 ScaledMM to use quack fused-bias GEMM.
+INFO 09-26 04:16:56 [patch.py:565] inductor factorable-divisibility patch: installed.
+INFO 09-26 04:16:56 [patch.py:630] [cumem-cuda] CuMemAllocator._python_free_callback patched: asleep guard extended to all platforms.
+INFO 09-26 04:16:57 [fa.py:105] Using CuTe FlashAttention-4 on Blackwell
+INFO 09-26 04:17:00 [scheduler.py:288] Chunked prefill is enabled with max_num_batched_tokens=2048.
+INFO 09-26 04:17:00 [kernel.py:416] Final IR op priority after setting platform defaults: IrOpPriorityConfig(rms_norm=['native'], fused_add_rms_norm=['native'], gelu_and_mul_sparse=['triton', 'native'])
+--- Running test: test_trained_sparsity_preserves_prefix_and_selects_video_fraction[5-1-0]
+INFO 09-26 04:17:00 [fastvideo_h3.py:144] FASTVIDEO_VSA H3 routing: seq_len=321, prefix_segments=(1,), video_shape=(20, 4, 4), prefix_blocks=1, video_blocks=5, topk=1, kernel_blocks=6
+INFO 09-26 04:17:00 [block_sparse.py:77] FASTVIDEO_VSA block-sparse provider: triton
+.--- Running test: test_trained_sparsity_preserves_prefix_and_selects_video_fraction[5-1-1]
+INFO 09-26 04:17:00 [block_sparse.py:53] FASTVIDEO_VSA block-sparse provider: sm100a
+.--- Running test: test_trained_sparsity_preserves_prefix_and_selects_video_fraction[6-2-0]
+INFO 09-26 04:17:00 [fastvideo_h3.py:144] FASTVIDEO_VSA H3 routing: seq_len=385, prefix_segments=(1,), video_shape=(24, 4, 4), prefix_blocks=1, video_blocks=6, topk=2, kernel_blocks=8
+.--- Running test: test_trained_sparsity_preserves_prefix_and_selects_video_fraction[6-2-1]
+.--- Running test: test_trained_sparsity_preserves_prefix_and_selects_video_fraction[10-2-0]
+INFO 09-26 04:17:00 [fastvideo_h3.py:144] FASTVIDEO_VSA H3 routing: seq_len=641, prefix_segments=(1,), video_shape=(40, 4, 4), prefix_blocks=1, video_blocks=10, topk=2, kernel_blocks=12
+.--- Running test: test_trained_sparsity_preserves_prefix_and_selects_video_fraction[10-2-1]
+.--- Running test: test_trained_sparsity_rejects_missing_or_inconsistent_geometry[False]
+.--- Running test: test_trained_sparsity_rejects_missing_or_inconsistent_geometry[True]
+.
+=============================== warnings summary ===============================
+../../.venv-vllm-omni/lib/python3.12/site-packages/torch/jit/_script.py:365: 14 warnings
+  /workspace/UniServe/.venv-vllm-omni/lib/python3.12/site-packages/torch/jit/_script.py:365: DeprecationWarning: `torch.jit.script_method` is deprecated. Please switch to `torch.compile` or `torch.export`.
+    warnings.warn(
+
+vllm_omni/version.py:55
+  /workspace/UniServe/refs/vllm-omni/vllm_omni/version.py:55: RuntimeWarning: vLLM and vLLM-Omni appear to have mismatched major/minor versions:
+   --> vLLM-Omni version 0.29.0rc2.dev348+gbcb4ae288
+   --> vLLM version 0.30.0
+  This will likely cause compatibility issues.
+    warn_if_misaligned_vllm_version()
+
+../../.venv-vllm-omni/lib/python3.12/site-packages/flash_attn/cute/flash_fwd.py:20
+  /workspace/UniServe/.venv-vllm-omni/lib/python3.12/site-packages/flash_attn/cute/flash_fwd.py:20: DeprecationWarning: Arch from arch.py is deprecated. Use Arch from enums.py instead.
+    from cutlass.base_dsl.arch import Arch
+
+../../.venv-vllm-omni/lib/python3.12/site-packages/flash_attn/cute/flash_fwd_sm90.py:18
+  /workspace/UniServe/.venv-vllm-omni/lib/python3.12/site-packages/flash_attn/cute/flash_fwd_sm90.py:18: DeprecationWarning: Arch from arch.py is deprecated. Use Arch from enums.py instead.
+    from cutlass.base_dsl.arch import Arch
+
+../../.venv-vllm-omni/lib/python3.12/site-packages/flash_attn/cute/flash_fwd_sm100.py:31
+  /workspace/UniServe/.venv-vllm-omni/lib/python3.12/site-packages/flash_attn/cute/flash_fwd_sm100.py:31: DeprecationWarning: Arch from arch.py is deprecated. Use Arch from enums.py instead.
+    from cutlass.base_dsl.arch import Arch
+
+../../.venv-vllm-omni/lib/python3.12/site-packages/flashinfer/cute_dsl/availability.py:135
+  /workspace/UniServe/.venv-vllm-omni/lib/python3.12/site-packages/flashinfer/cute_dsl/availability.py:135: DeprecationWarning: Arch from arch.py is deprecated. Use Arch from enums.py instead.
+    from cutlass.base_dsl.arch import Arch
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+--- Running Summary
+8 passed, 19 warnings in 3.87s

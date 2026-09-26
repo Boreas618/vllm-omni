@@ -1,0 +1,2 @@
+# Frozen evidence must retain the exact bytes covered by FILES.sha256.
+artifacts/** -text

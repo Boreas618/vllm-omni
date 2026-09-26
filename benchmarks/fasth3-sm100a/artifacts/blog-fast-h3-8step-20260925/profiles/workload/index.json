@@ -1,0 +1,17 @@
+{
+  "gb200-4.toml": {
+    "points": 70,
+    "sha256": "2350fae427003d0af215a45e9db2a879895b4bd76ae8ebbaee9c8216d0e06ae4",
+    "resolved_plan_sha256": "c85405b7b22c48422ba39dccb413ce83060bc4103de5f0d19ef293d0d611c6ea"
+  },
+  "gb200-8.toml": {
+    "points": 68,
+    "sha256": "5c50db3267b1232be2efd49edffc8d389b585447e5ab4da6ca9f4b3ecf90820d",
+    "resolved_plan_sha256": "b08a9b7111d154da23886c052e7cf4e3e5ec1a21b05255fe6dd4a7c7c9dc5252"
+  },
+  "rtxpro6000-8.toml": {
+    "points": 85,
+    "sha256": "d96cb0087ae2a3a48275f5c0a5ba3d99d994d2ffdf24dcd43da9ecd401eb57b7",
+    "resolved_plan_sha256": "ab95df71f398f46a5acb49589e28310033a186908a5357b6a1a99a116345648d"
+  }
+}

@@ -1,0 +1,20 @@
+{
+  "version": "0.3.4",
+  "sdist_sha256": "e6c3fb2d4e9615d07ac81de3bc821e3c9224bc21e9d83be734e0cefcb379ef5c",
+  "library_sha256": "bbdb129f92f1cff8c91728c4bb3205d458064730e9080e5610efe7e5b7566733",
+  "cuda": "13.0",
+  "torch": "2.13.0+cu130",
+  "arch": "10.0a",
+  "direct_calls": [
+    {
+      "heads": 1,
+      "tiles": 6,
+      "status": "passed constant-output numerical check"
+    },
+    {
+      "heads": 14,
+      "tiles": 684,
+      "status": "passed constant-output numerical check"
+    }
+  ]
+}

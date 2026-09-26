@@ -1,0 +1,7 @@
+{
+  "requests": 366,
+  "token_ids_verified": true,
+  "unique_prompts": 366,
+  "authored_corpus_sha256": "54e8f4697f6e4db54c96042d89ac0ba190952cb8361e3a903ac350bcf687103b",
+  "manifest_index_sha256": "fc75dc4a9c0d168439c18bd6839b72c3c7c961c451de425cb8547c573ac4e529"
+}

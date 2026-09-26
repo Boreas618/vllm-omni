@@ -1,0 +1,2198 @@
+root = "/workspace/UniServe"
+artifact_root = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/qualification/gb200-8"
+
+[servers.uniserve-bf16]
+host = "127.0.0.1"
+port = 18083
+command = [".venv/bin/python","/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/protocol/serve_two_hosts.py","target/release/uniserve","serve","/workspace/models/FastVideo-FastH3-8-Step-V2","--served-model-name","FastH3","--host","127.0.0.1","--port","18083","--worker-python",".venv/bin/python","--workers","configs/minimax-h3-eight-devices.json","--max-batch","2","--max-running-requests","2","--max-num-batched-tokens","2","--chunked-prefill-size","1","--max-model-len","16384","--max-video-seconds","15","--mem-fraction-static","0.70","--dtype","bfloat16","--host-identity","rank-0"]
+
+[servers.uniserve-nvfp4]
+host = "127.0.0.1"
+port = 18083
+command = [".venv/bin/python","/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/protocol/serve_two_hosts.py","target/release/uniserve","serve","/workspace/models/FastVideo-FastH3-8-Step-V2-NVFP4","--served-model-name","FastH3","--host","127.0.0.1","--port","18083","--worker-python",".venv/bin/python","--workers","configs/minimax-h3-eight-devices.json","--max-batch","2","--max-running-requests","2","--max-num-batched-tokens","2","--chunked-prefill-size","1","--max-model-len","16384","--max-video-seconds","15","--mem-fraction-static","0.70","--dtype","bfloat16","--host-identity","rank-0"]
+
+[servers.fastvideo-bf16]
+host = "127.0.0.1"
+port = 18083
+command = [".venv-fastvideo/bin/fastvideo","serve","--config","/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/profiles/workload/fastvideo-gb200-8.yaml"]
+[servers.fastvideo-bf16.environment]
+FASTVIDEO_ATTENTION_BACKEND = "VIDEO_SPARSE_ATTN_H3"
+FASTVIDEO_VSA_SM100A = "1"
+FASTVIDEO_FA4 = "1"
+FASTVIDEO_MINIMAX_H3_FUSIONS = "all"
+
+[servers.vllm-omni-bf16]
+host = "127.0.0.1"
+port = 18083
+command = [".venv-vllm-omni/bin/vllm", "serve", "/workspace/models/FastVideo-FastH3-8-Step-V2", "--served-model-name", "FastH3", "--omni", "--task-type", "fl2va", "--trust-remote-code", "--host", "127.0.0.1", "--port", "18083", "--num-gpus", "8", "--usp", "8", "--ring", "1", "--vae-patch-parallel-size", "8", "--vae-parallel-mode", "tile", "--vae-use-tiling", "--worker-backend", "ray", "--ray-address", "auto", "--diffusion-attention-backend", "FASTVIDEO_VSA"]
+[servers.vllm-omni-bf16.environment]
+FASTVIDEO_VSA_SM100A = "1"
+VLLM_WORKER_MULTIPROC_METHOD = "spawn"
+VLLM_OMNI_VIDEO_SYNC_TIMEOUT = "21600"
+
+[benchmarks.uniserve-bf16-qualification-c1]
+server = "uniserve-bf16"
+task = "video"
+model = "FastH3"
+dataset = "jsonl"
+dataset_path = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/protocol/workload/manifests/qualification.jsonl"
+endpoint = "/v1/videos/sync"
+[benchmarks.uniserve-bf16-qualification-c1.load]
+num_prompts = 6
+request_rate = inf
+max_concurrency = 1
+warmup_requests = 0
+request_timeout_s = 21600
+seed = 20260925
+warmup_manifest = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/protocol/workload/manifests/warmup.jsonl"
+[benchmarks.uniserve-bf16-qualification-c1.video]
+backend = "uniserve"
+poll_interval_s = 0.1
+[benchmarks.uniserve-bf16-qualification-c1.metrics]
+videos_per_second = "higher"
+"video_latency_ms.p95" = "lower"
+
+[benchmarks.uniserve-bf16-qualification-c1.provenance]
+hardware = "gb200-8"
+checkpoint_revision = "3da2ddfe1954d9cda4c05b643dc0f26007a655c5"
+checkpoint = "/workspace/models/FastVideo-FastH3-8-Step-V2"
+system_revision = "9458bca425a96d5bc45f5e97da9d2986449fad3e"
+source_lock = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/baseline/vllm-omni/20260926T041709Z/source-lock.json"
+deployment = "configs/minimax-h3-eight-devices.json"
+
+[benchmarks.uniserve-bf16-latency-c1]
+server = "uniserve-bf16"
+task = "video"
+model = "FastH3"
+dataset = "jsonl"
+dataset_path = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/protocol/workload/manifests/latency.jsonl"
+endpoint = "/v1/videos/sync"
+[benchmarks.uniserve-bf16-latency-c1.load]
+num_prompts = 72
+request_rate = inf
+max_concurrency = 1
+warmup_requests = 0
+request_timeout_s = 21600
+seed = 20260925
+warmup_manifest = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/protocol/workload/manifests/warmup.jsonl"
+[benchmarks.uniserve-bf16-latency-c1.video]
+backend = "uniserve"
+poll_interval_s = 0.1
+media_dir = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/media/gb200-8/bf16/uniserve/latency/uniserve-bf16-latency-c1"
+[benchmarks.uniserve-bf16-latency-c1.metrics]
+videos_per_second = "higher"
+"video_latency_ms.p95" = "lower"
+
+[benchmarks.uniserve-bf16-latency-c1.provenance]
+hardware = "gb200-8"
+checkpoint_revision = "3da2ddfe1954d9cda4c05b643dc0f26007a655c5"
+checkpoint = "/workspace/models/FastVideo-FastH3-8-Step-V2"
+system_revision = "9458bca425a96d5bc45f5e97da9d2986449fad3e"
+source_lock = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/baseline/vllm-omni/20260926T041709Z/source-lock.json"
+deployment = "configs/minimax-h3-eight-devices.json"
+
+[benchmarks.uniserve-bf16-throughput-c1-r1]
+server = "uniserve-bf16"
+task = "video"
+model = "FastH3"
+dataset = "jsonl"
+dataset_path = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/protocol/workload/manifests/throughput-r1.jsonl"
+endpoint = "/v1/videos/sync"
+[benchmarks.uniserve-bf16-throughput-c1-r1.load]
+num_prompts = 32
+request_rate = inf
+max_concurrency = 1
+warmup_requests = 0
+request_timeout_s = 21600
+seed = 20260925
+warmup_manifest = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/protocol/workload/manifests/warmup.jsonl"
+priming_manifest = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/protocol/workload/manifests/priming-c1-r1.jsonl"
+[benchmarks.uniserve-bf16-throughput-c1-r1.video]
+backend = "uniserve"
+poll_interval_s = 0.1
+media_dir = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/media/gb200-8/bf16/uniserve/throughput/uniserve-bf16-throughput-c1-r1"
+[benchmarks.uniserve-bf16-throughput-c1-r1.metrics]
+videos_per_second = "higher"
+"video_latency_ms.p95" = "lower"
+
+[benchmarks.uniserve-bf16-throughput-c1-r1.provenance]
+hardware = "gb200-8"
+checkpoint_revision = "3da2ddfe1954d9cda4c05b643dc0f26007a655c5"
+checkpoint = "/workspace/models/FastVideo-FastH3-8-Step-V2"
+system_revision = "9458bca425a96d5bc45f5e97da9d2986449fad3e"
+source_lock = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/baseline/vllm-omni/20260926T041709Z/source-lock.json"
+deployment = "configs/minimax-h3-eight-devices.json"
+
+[benchmarks.uniserve-bf16-throughput-c1-r2]
+server = "uniserve-bf16"
+task = "video"
+model = "FastH3"
+dataset = "jsonl"
+dataset_path = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/protocol/workload/manifests/throughput-r2.jsonl"
+endpoint = "/v1/videos/sync"
+[benchmarks.uniserve-bf16-throughput-c1-r2.load]
+num_prompts = 32
+request_rate = inf
+max_concurrency = 1
+warmup_requests = 0
+request_timeout_s = 21600
+seed = 20260925
+warmup_manifest = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/protocol/workload/manifests/warmup.jsonl"
+priming_manifest = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/protocol/workload/manifests/priming-c1-r2.jsonl"
+[benchmarks.uniserve-bf16-throughput-c1-r2.video]
+backend = "uniserve"
+poll_interval_s = 0.1
+media_dir = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/media/gb200-8/bf16/uniserve/throughput/uniserve-bf16-throughput-c1-r2"
+[benchmarks.uniserve-bf16-throughput-c1-r2.metrics]
+videos_per_second = "higher"
+"video_latency_ms.p95" = "lower"
+
+[benchmarks.uniserve-bf16-throughput-c1-r2.provenance]
+hardware = "gb200-8"
+checkpoint_revision = "3da2ddfe1954d9cda4c05b643dc0f26007a655c5"
+checkpoint = "/workspace/models/FastVideo-FastH3-8-Step-V2"
+system_revision = "9458bca425a96d5bc45f5e97da9d2986449fad3e"
+source_lock = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/baseline/vllm-omni/20260926T041709Z/source-lock.json"
+deployment = "configs/minimax-h3-eight-devices.json"
+
+[benchmarks.uniserve-bf16-throughput-c1-r3]
+server = "uniserve-bf16"
+task = "video"
+model = "FastH3"
+dataset = "jsonl"
+dataset_path = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/protocol/workload/manifests/throughput-r3.jsonl"
+endpoint = "/v1/videos/sync"
+[benchmarks.uniserve-bf16-throughput-c1-r3.load]
+num_prompts = 32
+request_rate = inf
+max_concurrency = 1
+warmup_requests = 0
+request_timeout_s = 21600
+seed = 20260925
+warmup_manifest = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/protocol/workload/manifests/warmup.jsonl"
+priming_manifest = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/protocol/workload/manifests/priming-c1-r3.jsonl"
+[benchmarks.uniserve-bf16-throughput-c1-r3.video]
+backend = "uniserve"
+poll_interval_s = 0.1
+media_dir = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/media/gb200-8/bf16/uniserve/throughput/uniserve-bf16-throughput-c1-r3"
+[benchmarks.uniserve-bf16-throughput-c1-r3.metrics]
+videos_per_second = "higher"
+"video_latency_ms.p95" = "lower"
+
+[benchmarks.uniserve-bf16-throughput-c1-r3.provenance]
+hardware = "gb200-8"
+checkpoint_revision = "3da2ddfe1954d9cda4c05b643dc0f26007a655c5"
+checkpoint = "/workspace/models/FastVideo-FastH3-8-Step-V2"
+system_revision = "9458bca425a96d5bc45f5e97da9d2986449fad3e"
+source_lock = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/baseline/vllm-omni/20260926T041709Z/source-lock.json"
+deployment = "configs/minimax-h3-eight-devices.json"
+
+[benchmarks.uniserve-bf16-throughput-c2-r1]
+server = "uniserve-bf16"
+task = "video"
+model = "FastH3"
+dataset = "jsonl"
+dataset_path = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/protocol/workload/manifests/throughput-r1.jsonl"
+endpoint = "/v1/videos/sync"
+[benchmarks.uniserve-bf16-throughput-c2-r1.load]
+num_prompts = 32
+request_rate = inf
+max_concurrency = 2
+warmup_requests = 0
+request_timeout_s = 21600
+seed = 20260925
+warmup_manifest = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/protocol/workload/manifests/warmup.jsonl"
+priming_manifest = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/protocol/workload/manifests/priming-c2-r1.jsonl"
+[benchmarks.uniserve-bf16-throughput-c2-r1.video]
+backend = "uniserve"
+poll_interval_s = 0.1
+media_dir = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/media/gb200-8/bf16/uniserve/throughput/uniserve-bf16-throughput-c2-r1"
+[benchmarks.uniserve-bf16-throughput-c2-r1.metrics]
+videos_per_second = "higher"
+"video_latency_ms.p95" = "lower"
+
+[benchmarks.uniserve-bf16-throughput-c2-r1.provenance]
+hardware = "gb200-8"
+checkpoint_revision = "3da2ddfe1954d9cda4c05b643dc0f26007a655c5"
+checkpoint = "/workspace/models/FastVideo-FastH3-8-Step-V2"
+system_revision = "9458bca425a96d5bc45f5e97da9d2986449fad3e"
+source_lock = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/baseline/vllm-omni/20260926T041709Z/source-lock.json"
+deployment = "configs/minimax-h3-eight-devices.json"
+
+[benchmarks.uniserve-bf16-throughput-c2-r2]
+server = "uniserve-bf16"
+task = "video"
+model = "FastH3"
+dataset = "jsonl"
+dataset_path = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/protocol/workload/manifests/throughput-r2.jsonl"
+endpoint = "/v1/videos/sync"
+[benchmarks.uniserve-bf16-throughput-c2-r2.load]
+num_prompts = 32
+request_rate = inf
+max_concurrency = 2
+warmup_requests = 0
+request_timeout_s = 21600
+seed = 20260925
+warmup_manifest = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/protocol/workload/manifests/warmup.jsonl"
+priming_manifest = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/protocol/workload/manifests/priming-c2-r2.jsonl"
+[benchmarks.uniserve-bf16-throughput-c2-r2.video]
+backend = "uniserve"
+poll_interval_s = 0.1
+media_dir = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/media/gb200-8/bf16/uniserve/throughput/uniserve-bf16-throughput-c2-r2"
+[benchmarks.uniserve-bf16-throughput-c2-r2.metrics]
+videos_per_second = "higher"
+"video_latency_ms.p95" = "lower"
+
+[benchmarks.uniserve-bf16-throughput-c2-r2.provenance]
+hardware = "gb200-8"
+checkpoint_revision = "3da2ddfe1954d9cda4c05b643dc0f26007a655c5"
+checkpoint = "/workspace/models/FastVideo-FastH3-8-Step-V2"
+system_revision = "9458bca425a96d5bc45f5e97da9d2986449fad3e"
+source_lock = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/baseline/vllm-omni/20260926T041709Z/source-lock.json"
+deployment = "configs/minimax-h3-eight-devices.json"
+
+[benchmarks.uniserve-bf16-throughput-c2-r3]
+server = "uniserve-bf16"
+task = "video"
+model = "FastH3"
+dataset = "jsonl"
+dataset_path = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/protocol/workload/manifests/throughput-r3.jsonl"
+endpoint = "/v1/videos/sync"
+[benchmarks.uniserve-bf16-throughput-c2-r3.load]
+num_prompts = 32
+request_rate = inf
+max_concurrency = 2
+warmup_requests = 0
+request_timeout_s = 21600
+seed = 20260925
+warmup_manifest = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/protocol/workload/manifests/warmup.jsonl"
+priming_manifest = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/protocol/workload/manifests/priming-c2-r3.jsonl"
+[benchmarks.uniserve-bf16-throughput-c2-r3.video]
+backend = "uniserve"
+poll_interval_s = 0.1
+media_dir = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/media/gb200-8/bf16/uniserve/throughput/uniserve-bf16-throughput-c2-r3"
+[benchmarks.uniserve-bf16-throughput-c2-r3.metrics]
+videos_per_second = "higher"
+"video_latency_ms.p95" = "lower"
+
+[benchmarks.uniserve-bf16-throughput-c2-r3.provenance]
+hardware = "gb200-8"
+checkpoint_revision = "3da2ddfe1954d9cda4c05b643dc0f26007a655c5"
+checkpoint = "/workspace/models/FastVideo-FastH3-8-Step-V2"
+system_revision = "9458bca425a96d5bc45f5e97da9d2986449fad3e"
+source_lock = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/baseline/vllm-omni/20260926T041709Z/source-lock.json"
+deployment = "configs/minimax-h3-eight-devices.json"
+
+[benchmarks.uniserve-bf16-throughput-c4-r1]
+server = "uniserve-bf16"
+task = "video"
+model = "FastH3"
+dataset = "jsonl"
+dataset_path = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/protocol/workload/manifests/throughput-r1.jsonl"
+endpoint = "/v1/videos/sync"
+[benchmarks.uniserve-bf16-throughput-c4-r1.load]
+num_prompts = 32
+request_rate = inf
+max_concurrency = 4
+warmup_requests = 0
+request_timeout_s = 21600
+seed = 20260925
+warmup_manifest = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/protocol/workload/manifests/warmup.jsonl"
+priming_manifest = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/protocol/workload/manifests/priming-c4-r1.jsonl"
+[benchmarks.uniserve-bf16-throughput-c4-r1.video]
+backend = "uniserve"
+poll_interval_s = 0.1
+media_dir = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/media/gb200-8/bf16/uniserve/throughput/uniserve-bf16-throughput-c4-r1"
+[benchmarks.uniserve-bf16-throughput-c4-r1.metrics]
+videos_per_second = "higher"
+"video_latency_ms.p95" = "lower"
+
+[benchmarks.uniserve-bf16-throughput-c4-r1.provenance]
+hardware = "gb200-8"
+checkpoint_revision = "3da2ddfe1954d9cda4c05b643dc0f26007a655c5"
+checkpoint = "/workspace/models/FastVideo-FastH3-8-Step-V2"
+system_revision = "9458bca425a96d5bc45f5e97da9d2986449fad3e"
+source_lock = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/baseline/vllm-omni/20260926T041709Z/source-lock.json"
+deployment = "configs/minimax-h3-eight-devices.json"
+
+[benchmarks.uniserve-bf16-throughput-c4-r2]
+server = "uniserve-bf16"
+task = "video"
+model = "FastH3"
+dataset = "jsonl"
+dataset_path = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/protocol/workload/manifests/throughput-r2.jsonl"
+endpoint = "/v1/videos/sync"
+[benchmarks.uniserve-bf16-throughput-c4-r2.load]
+num_prompts = 32
+request_rate = inf
+max_concurrency = 4
+warmup_requests = 0
+request_timeout_s = 21600
+seed = 20260925
+warmup_manifest = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/protocol/workload/manifests/warmup.jsonl"
+priming_manifest = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/protocol/workload/manifests/priming-c4-r2.jsonl"
+[benchmarks.uniserve-bf16-throughput-c4-r2.video]
+backend = "uniserve"
+poll_interval_s = 0.1
+media_dir = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/media/gb200-8/bf16/uniserve/throughput/uniserve-bf16-throughput-c4-r2"
+[benchmarks.uniserve-bf16-throughput-c4-r2.metrics]
+videos_per_second = "higher"
+"video_latency_ms.p95" = "lower"
+
+[benchmarks.uniserve-bf16-throughput-c4-r2.provenance]
+hardware = "gb200-8"
+checkpoint_revision = "3da2ddfe1954d9cda4c05b643dc0f26007a655c5"
+checkpoint = "/workspace/models/FastVideo-FastH3-8-Step-V2"
+system_revision = "9458bca425a96d5bc45f5e97da9d2986449fad3e"
+source_lock = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/baseline/vllm-omni/20260926T041709Z/source-lock.json"
+deployment = "configs/minimax-h3-eight-devices.json"
+
+[benchmarks.uniserve-bf16-throughput-c4-r3]
+server = "uniserve-bf16"
+task = "video"
+model = "FastH3"
+dataset = "jsonl"
+dataset_path = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/protocol/workload/manifests/throughput-r3.jsonl"
+endpoint = "/v1/videos/sync"
+[benchmarks.uniserve-bf16-throughput-c4-r3.load]
+num_prompts = 32
+request_rate = inf
+max_concurrency = 4
+warmup_requests = 0
+request_timeout_s = 21600
+seed = 20260925
+warmup_manifest = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/protocol/workload/manifests/warmup.jsonl"
+priming_manifest = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/protocol/workload/manifests/priming-c4-r3.jsonl"
+[benchmarks.uniserve-bf16-throughput-c4-r3.video]
+backend = "uniserve"
+poll_interval_s = 0.1
+media_dir = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/media/gb200-8/bf16/uniserve/throughput/uniserve-bf16-throughput-c4-r3"
+[benchmarks.uniserve-bf16-throughput-c4-r3.metrics]
+videos_per_second = "higher"
+"video_latency_ms.p95" = "lower"
+
+[benchmarks.uniserve-bf16-throughput-c4-r3.provenance]
+hardware = "gb200-8"
+checkpoint_revision = "3da2ddfe1954d9cda4c05b643dc0f26007a655c5"
+checkpoint = "/workspace/models/FastVideo-FastH3-8-Step-V2"
+system_revision = "9458bca425a96d5bc45f5e97da9d2986449fad3e"
+source_lock = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/baseline/vllm-omni/20260926T041709Z/source-lock.json"
+deployment = "configs/minimax-h3-eight-devices.json"
+
+[benchmarks.uniserve-bf16-throughput-c8-r1]
+server = "uniserve-bf16"
+task = "video"
+model = "FastH3"
+dataset = "jsonl"
+dataset_path = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/protocol/workload/manifests/throughput-r1.jsonl"
+endpoint = "/v1/videos/sync"
+[benchmarks.uniserve-bf16-throughput-c8-r1.load]
+num_prompts = 32
+request_rate = inf
+max_concurrency = 8
+warmup_requests = 0
+request_timeout_s = 21600
+seed = 20260925
+warmup_manifest = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/protocol/workload/manifests/warmup.jsonl"
+priming_manifest = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/protocol/workload/manifests/priming-c8-r1.jsonl"
+[benchmarks.uniserve-bf16-throughput-c8-r1.video]
+backend = "uniserve"
+poll_interval_s = 0.1
+media_dir = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/media/gb200-8/bf16/uniserve/throughput/uniserve-bf16-throughput-c8-r1"
+[benchmarks.uniserve-bf16-throughput-c8-r1.metrics]
+videos_per_second = "higher"
+"video_latency_ms.p95" = "lower"
+
+[benchmarks.uniserve-bf16-throughput-c8-r1.provenance]
+hardware = "gb200-8"
+checkpoint_revision = "3da2ddfe1954d9cda4c05b643dc0f26007a655c5"
+checkpoint = "/workspace/models/FastVideo-FastH3-8-Step-V2"
+system_revision = "9458bca425a96d5bc45f5e97da9d2986449fad3e"
+source_lock = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/baseline/vllm-omni/20260926T041709Z/source-lock.json"
+deployment = "configs/minimax-h3-eight-devices.json"
+
+[benchmarks.uniserve-bf16-throughput-c8-r2]
+server = "uniserve-bf16"
+task = "video"
+model = "FastH3"
+dataset = "jsonl"
+dataset_path = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/protocol/workload/manifests/throughput-r2.jsonl"
+endpoint = "/v1/videos/sync"
+[benchmarks.uniserve-bf16-throughput-c8-r2.load]
+num_prompts = 32
+request_rate = inf
+max_concurrency = 8
+warmup_requests = 0
+request_timeout_s = 21600
+seed = 20260925
+warmup_manifest = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/protocol/workload/manifests/warmup.jsonl"
+priming_manifest = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/protocol/workload/manifests/priming-c8-r2.jsonl"
+[benchmarks.uniserve-bf16-throughput-c8-r2.video]
+backend = "uniserve"
+poll_interval_s = 0.1
+media_dir = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/media/gb200-8/bf16/uniserve/throughput/uniserve-bf16-throughput-c8-r2"
+[benchmarks.uniserve-bf16-throughput-c8-r2.metrics]
+videos_per_second = "higher"
+"video_latency_ms.p95" = "lower"
+
+[benchmarks.uniserve-bf16-throughput-c8-r2.provenance]
+hardware = "gb200-8"
+checkpoint_revision = "3da2ddfe1954d9cda4c05b643dc0f26007a655c5"
+checkpoint = "/workspace/models/FastVideo-FastH3-8-Step-V2"
+system_revision = "9458bca425a96d5bc45f5e97da9d2986449fad3e"
+source_lock = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/baseline/vllm-omni/20260926T041709Z/source-lock.json"
+deployment = "configs/minimax-h3-eight-devices.json"
+
+[benchmarks.uniserve-bf16-throughput-c8-r3]
+server = "uniserve-bf16"
+task = "video"
+model = "FastH3"
+dataset = "jsonl"
+dataset_path = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/protocol/workload/manifests/throughput-r3.jsonl"
+endpoint = "/v1/videos/sync"
+[benchmarks.uniserve-bf16-throughput-c8-r3.load]
+num_prompts = 32
+request_rate = inf
+max_concurrency = 8
+warmup_requests = 0
+request_timeout_s = 21600
+seed = 20260925
+warmup_manifest = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/protocol/workload/manifests/warmup.jsonl"
+priming_manifest = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/protocol/workload/manifests/priming-c8-r3.jsonl"
+[benchmarks.uniserve-bf16-throughput-c8-r3.video]
+backend = "uniserve"
+poll_interval_s = 0.1
+media_dir = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/media/gb200-8/bf16/uniserve/throughput/uniserve-bf16-throughput-c8-r3"
+[benchmarks.uniserve-bf16-throughput-c8-r3.metrics]
+videos_per_second = "higher"
+"video_latency_ms.p95" = "lower"
+
+[benchmarks.uniserve-bf16-throughput-c8-r3.provenance]
+hardware = "gb200-8"
+checkpoint_revision = "3da2ddfe1954d9cda4c05b643dc0f26007a655c5"
+checkpoint = "/workspace/models/FastVideo-FastH3-8-Step-V2"
+system_revision = "9458bca425a96d5bc45f5e97da9d2986449fad3e"
+source_lock = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/baseline/vllm-omni/20260926T041709Z/source-lock.json"
+deployment = "configs/minimax-h3-eight-devices.json"
+
+[benchmarks.uniserve-bf16-throughput-c16-r1]
+server = "uniserve-bf16"
+task = "video"
+model = "FastH3"
+dataset = "jsonl"
+dataset_path = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/protocol/workload/manifests/throughput-r1.jsonl"
+endpoint = "/v1/videos/sync"
+[benchmarks.uniserve-bf16-throughput-c16-r1.load]
+num_prompts = 32
+request_rate = inf
+max_concurrency = 16
+warmup_requests = 0
+request_timeout_s = 21600
+seed = 20260925
+warmup_manifest = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/protocol/workload/manifests/warmup.jsonl"
+priming_manifest = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/protocol/workload/manifests/priming-c16-r1.jsonl"
+[benchmarks.uniserve-bf16-throughput-c16-r1.video]
+backend = "uniserve"
+poll_interval_s = 0.1
+media_dir = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/media/gb200-8/bf16/uniserve/throughput/uniserve-bf16-throughput-c16-r1"
+[benchmarks.uniserve-bf16-throughput-c16-r1.metrics]
+videos_per_second = "higher"
+"video_latency_ms.p95" = "lower"
+
+[benchmarks.uniserve-bf16-throughput-c16-r1.provenance]
+hardware = "gb200-8"
+checkpoint_revision = "3da2ddfe1954d9cda4c05b643dc0f26007a655c5"
+checkpoint = "/workspace/models/FastVideo-FastH3-8-Step-V2"
+system_revision = "9458bca425a96d5bc45f5e97da9d2986449fad3e"
+source_lock = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/baseline/vllm-omni/20260926T041709Z/source-lock.json"
+deployment = "configs/minimax-h3-eight-devices.json"
+
+[benchmarks.uniserve-bf16-throughput-c16-r2]
+server = "uniserve-bf16"
+task = "video"
+model = "FastH3"
+dataset = "jsonl"
+dataset_path = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/protocol/workload/manifests/throughput-r2.jsonl"
+endpoint = "/v1/videos/sync"
+[benchmarks.uniserve-bf16-throughput-c16-r2.load]
+num_prompts = 32
+request_rate = inf
+max_concurrency = 16
+warmup_requests = 0
+request_timeout_s = 21600
+seed = 20260925
+warmup_manifest = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/protocol/workload/manifests/warmup.jsonl"
+priming_manifest = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/protocol/workload/manifests/priming-c16-r2.jsonl"
+[benchmarks.uniserve-bf16-throughput-c16-r2.video]
+backend = "uniserve"
+poll_interval_s = 0.1
+media_dir = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/media/gb200-8/bf16/uniserve/throughput/uniserve-bf16-throughput-c16-r2"
+[benchmarks.uniserve-bf16-throughput-c16-r2.metrics]
+videos_per_second = "higher"
+"video_latency_ms.p95" = "lower"
+
+[benchmarks.uniserve-bf16-throughput-c16-r2.provenance]
+hardware = "gb200-8"
+checkpoint_revision = "3da2ddfe1954d9cda4c05b643dc0f26007a655c5"
+checkpoint = "/workspace/models/FastVideo-FastH3-8-Step-V2"
+system_revision = "9458bca425a96d5bc45f5e97da9d2986449fad3e"
+source_lock = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/baseline/vllm-omni/20260926T041709Z/source-lock.json"
+deployment = "configs/minimax-h3-eight-devices.json"
+
+[benchmarks.uniserve-bf16-throughput-c16-r3]
+server = "uniserve-bf16"
+task = "video"
+model = "FastH3"
+dataset = "jsonl"
+dataset_path = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/protocol/workload/manifests/throughput-r3.jsonl"
+endpoint = "/v1/videos/sync"
+[benchmarks.uniserve-bf16-throughput-c16-r3.load]
+num_prompts = 32
+request_rate = inf
+max_concurrency = 16
+warmup_requests = 0
+request_timeout_s = 21600
+seed = 20260925
+warmup_manifest = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/protocol/workload/manifests/warmup.jsonl"
+priming_manifest = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/protocol/workload/manifests/priming-c16-r3.jsonl"
+[benchmarks.uniserve-bf16-throughput-c16-r3.video]
+backend = "uniserve"
+poll_interval_s = 0.1
+media_dir = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/media/gb200-8/bf16/uniserve/throughput/uniserve-bf16-throughput-c16-r3"
+[benchmarks.uniserve-bf16-throughput-c16-r3.metrics]
+videos_per_second = "higher"
+"video_latency_ms.p95" = "lower"
+
+[benchmarks.uniserve-bf16-throughput-c16-r3.provenance]
+hardware = "gb200-8"
+checkpoint_revision = "3da2ddfe1954d9cda4c05b643dc0f26007a655c5"
+checkpoint = "/workspace/models/FastVideo-FastH3-8-Step-V2"
+system_revision = "9458bca425a96d5bc45f5e97da9d2986449fad3e"
+source_lock = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/baseline/vllm-omni/20260926T041709Z/source-lock.json"
+deployment = "configs/minimax-h3-eight-devices.json"
+
+[benchmarks.uniserve-nvfp4-qualification-c1]
+server = "uniserve-nvfp4"
+task = "video"
+model = "FastH3"
+dataset = "jsonl"
+dataset_path = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/protocol/workload/manifests/qualification.jsonl"
+endpoint = "/v1/videos/sync"
+[benchmarks.uniserve-nvfp4-qualification-c1.load]
+num_prompts = 6
+request_rate = inf
+max_concurrency = 1
+warmup_requests = 0
+request_timeout_s = 21600
+seed = 20260925
+warmup_manifest = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/protocol/workload/manifests/warmup.jsonl"
+[benchmarks.uniserve-nvfp4-qualification-c1.video]
+backend = "uniserve"
+poll_interval_s = 0.1
+[benchmarks.uniserve-nvfp4-qualification-c1.metrics]
+videos_per_second = "higher"
+"video_latency_ms.p95" = "lower"
+
+[benchmarks.uniserve-nvfp4-qualification-c1.provenance]
+hardware = "gb200-8"
+checkpoint_revision = "2f4bc740f17532a620e31ced09ce82f8970ddf28"
+checkpoint = "/workspace/models/FastVideo-FastH3-8-Step-V2-NVFP4"
+system_revision = "9458bca425a96d5bc45f5e97da9d2986449fad3e"
+source_lock = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/baseline/vllm-omni/20260926T041709Z/source-lock.json"
+deployment = "configs/minimax-h3-eight-devices.json"
+
+[benchmarks.uniserve-nvfp4-latency-c1]
+server = "uniserve-nvfp4"
+task = "video"
+model = "FastH3"
+dataset = "jsonl"
+dataset_path = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/protocol/workload/manifests/latency.jsonl"
+endpoint = "/v1/videos/sync"
+[benchmarks.uniserve-nvfp4-latency-c1.load]
+num_prompts = 72
+request_rate = inf
+max_concurrency = 1
+warmup_requests = 0
+request_timeout_s = 21600
+seed = 20260925
+warmup_manifest = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/protocol/workload/manifests/warmup.jsonl"
+[benchmarks.uniserve-nvfp4-latency-c1.video]
+backend = "uniserve"
+poll_interval_s = 0.1
+media_dir = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/media/gb200-8/nvfp4/uniserve/latency/uniserve-nvfp4-latency-c1"
+[benchmarks.uniserve-nvfp4-latency-c1.metrics]
+videos_per_second = "higher"
+"video_latency_ms.p95" = "lower"
+
+[benchmarks.uniserve-nvfp4-latency-c1.provenance]
+hardware = "gb200-8"
+checkpoint_revision = "2f4bc740f17532a620e31ced09ce82f8970ddf28"
+checkpoint = "/workspace/models/FastVideo-FastH3-8-Step-V2-NVFP4"
+system_revision = "9458bca425a96d5bc45f5e97da9d2986449fad3e"
+source_lock = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/baseline/vllm-omni/20260926T041709Z/source-lock.json"
+deployment = "configs/minimax-h3-eight-devices.json"
+
+[benchmarks.uniserve-nvfp4-throughput-c1-r1]
+server = "uniserve-nvfp4"
+task = "video"
+model = "FastH3"
+dataset = "jsonl"
+dataset_path = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/protocol/workload/manifests/throughput-r1.jsonl"
+endpoint = "/v1/videos/sync"
+[benchmarks.uniserve-nvfp4-throughput-c1-r1.load]
+num_prompts = 32
+request_rate = inf
+max_concurrency = 1
+warmup_requests = 0
+request_timeout_s = 21600
+seed = 20260925
+warmup_manifest = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/protocol/workload/manifests/warmup.jsonl"
+priming_manifest = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/protocol/workload/manifests/priming-c1-r1.jsonl"
+[benchmarks.uniserve-nvfp4-throughput-c1-r1.video]
+backend = "uniserve"
+poll_interval_s = 0.1
+media_dir = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/media/gb200-8/nvfp4/uniserve/throughput/uniserve-nvfp4-throughput-c1-r1"
+[benchmarks.uniserve-nvfp4-throughput-c1-r1.metrics]
+videos_per_second = "higher"
+"video_latency_ms.p95" = "lower"
+
+[benchmarks.uniserve-nvfp4-throughput-c1-r1.provenance]
+hardware = "gb200-8"
+checkpoint_revision = "2f4bc740f17532a620e31ced09ce82f8970ddf28"
+checkpoint = "/workspace/models/FastVideo-FastH3-8-Step-V2-NVFP4"
+system_revision = "9458bca425a96d5bc45f5e97da9d2986449fad3e"
+source_lock = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/baseline/vllm-omni/20260926T041709Z/source-lock.json"
+deployment = "configs/minimax-h3-eight-devices.json"
+
+[benchmarks.uniserve-nvfp4-throughput-c1-r2]
+server = "uniserve-nvfp4"
+task = "video"
+model = "FastH3"
+dataset = "jsonl"
+dataset_path = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/protocol/workload/manifests/throughput-r2.jsonl"
+endpoint = "/v1/videos/sync"
+[benchmarks.uniserve-nvfp4-throughput-c1-r2.load]
+num_prompts = 32
+request_rate = inf
+max_concurrency = 1
+warmup_requests = 0
+request_timeout_s = 21600
+seed = 20260925
+warmup_manifest = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/protocol/workload/manifests/warmup.jsonl"
+priming_manifest = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/protocol/workload/manifests/priming-c1-r2.jsonl"
+[benchmarks.uniserve-nvfp4-throughput-c1-r2.video]
+backend = "uniserve"
+poll_interval_s = 0.1
+media_dir = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/media/gb200-8/nvfp4/uniserve/throughput/uniserve-nvfp4-throughput-c1-r2"
+[benchmarks.uniserve-nvfp4-throughput-c1-r2.metrics]
+videos_per_second = "higher"
+"video_latency_ms.p95" = "lower"
+
+[benchmarks.uniserve-nvfp4-throughput-c1-r2.provenance]
+hardware = "gb200-8"
+checkpoint_revision = "2f4bc740f17532a620e31ced09ce82f8970ddf28"
+checkpoint = "/workspace/models/FastVideo-FastH3-8-Step-V2-NVFP4"
+system_revision = "9458bca425a96d5bc45f5e97da9d2986449fad3e"
+source_lock = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/baseline/vllm-omni/20260926T041709Z/source-lock.json"
+deployment = "configs/minimax-h3-eight-devices.json"
+
+[benchmarks.uniserve-nvfp4-throughput-c1-r3]
+server = "uniserve-nvfp4"
+task = "video"
+model = "FastH3"
+dataset = "jsonl"
+dataset_path = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/protocol/workload/manifests/throughput-r3.jsonl"
+endpoint = "/v1/videos/sync"
+[benchmarks.uniserve-nvfp4-throughput-c1-r3.load]
+num_prompts = 32
+request_rate = inf
+max_concurrency = 1
+warmup_requests = 0
+request_timeout_s = 21600
+seed = 20260925
+warmup_manifest = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/protocol/workload/manifests/warmup.jsonl"
+priming_manifest = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/protocol/workload/manifests/priming-c1-r3.jsonl"
+[benchmarks.uniserve-nvfp4-throughput-c1-r3.video]
+backend = "uniserve"
+poll_interval_s = 0.1
+media_dir = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/media/gb200-8/nvfp4/uniserve/throughput/uniserve-nvfp4-throughput-c1-r3"
+[benchmarks.uniserve-nvfp4-throughput-c1-r3.metrics]
+videos_per_second = "higher"
+"video_latency_ms.p95" = "lower"
+
+[benchmarks.uniserve-nvfp4-throughput-c1-r3.provenance]
+hardware = "gb200-8"
+checkpoint_revision = "2f4bc740f17532a620e31ced09ce82f8970ddf28"
+checkpoint = "/workspace/models/FastVideo-FastH3-8-Step-V2-NVFP4"
+system_revision = "9458bca425a96d5bc45f5e97da9d2986449fad3e"
+source_lock = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/baseline/vllm-omni/20260926T041709Z/source-lock.json"
+deployment = "configs/minimax-h3-eight-devices.json"
+
+[benchmarks.uniserve-nvfp4-throughput-c2-r1]
+server = "uniserve-nvfp4"
+task = "video"
+model = "FastH3"
+dataset = "jsonl"
+dataset_path = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/protocol/workload/manifests/throughput-r1.jsonl"
+endpoint = "/v1/videos/sync"
+[benchmarks.uniserve-nvfp4-throughput-c2-r1.load]
+num_prompts = 32
+request_rate = inf
+max_concurrency = 2
+warmup_requests = 0
+request_timeout_s = 21600
+seed = 20260925
+warmup_manifest = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/protocol/workload/manifests/warmup.jsonl"
+priming_manifest = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/protocol/workload/manifests/priming-c2-r1.jsonl"
+[benchmarks.uniserve-nvfp4-throughput-c2-r1.video]
+backend = "uniserve"
+poll_interval_s = 0.1
+media_dir = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/media/gb200-8/nvfp4/uniserve/throughput/uniserve-nvfp4-throughput-c2-r1"
+[benchmarks.uniserve-nvfp4-throughput-c2-r1.metrics]
+videos_per_second = "higher"
+"video_latency_ms.p95" = "lower"
+
+[benchmarks.uniserve-nvfp4-throughput-c2-r1.provenance]
+hardware = "gb200-8"
+checkpoint_revision = "2f4bc740f17532a620e31ced09ce82f8970ddf28"
+checkpoint = "/workspace/models/FastVideo-FastH3-8-Step-V2-NVFP4"
+system_revision = "9458bca425a96d5bc45f5e97da9d2986449fad3e"
+source_lock = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/baseline/vllm-omni/20260926T041709Z/source-lock.json"
+deployment = "configs/minimax-h3-eight-devices.json"
+
+[benchmarks.uniserve-nvfp4-throughput-c2-r2]
+server = "uniserve-nvfp4"
+task = "video"
+model = "FastH3"
+dataset = "jsonl"
+dataset_path = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/protocol/workload/manifests/throughput-r2.jsonl"
+endpoint = "/v1/videos/sync"
+[benchmarks.uniserve-nvfp4-throughput-c2-r2.load]
+num_prompts = 32
+request_rate = inf
+max_concurrency = 2
+warmup_requests = 0
+request_timeout_s = 21600
+seed = 20260925
+warmup_manifest = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/protocol/workload/manifests/warmup.jsonl"
+priming_manifest = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/protocol/workload/manifests/priming-c2-r2.jsonl"
+[benchmarks.uniserve-nvfp4-throughput-c2-r2.video]
+backend = "uniserve"
+poll_interval_s = 0.1
+media_dir = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/media/gb200-8/nvfp4/uniserve/throughput/uniserve-nvfp4-throughput-c2-r2"
+[benchmarks.uniserve-nvfp4-throughput-c2-r2.metrics]
+videos_per_second = "higher"
+"video_latency_ms.p95" = "lower"
+
+[benchmarks.uniserve-nvfp4-throughput-c2-r2.provenance]
+hardware = "gb200-8"
+checkpoint_revision = "2f4bc740f17532a620e31ced09ce82f8970ddf28"
+checkpoint = "/workspace/models/FastVideo-FastH3-8-Step-V2-NVFP4"
+system_revision = "9458bca425a96d5bc45f5e97da9d2986449fad3e"
+source_lock = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/baseline/vllm-omni/20260926T041709Z/source-lock.json"
+deployment = "configs/minimax-h3-eight-devices.json"
+
+[benchmarks.uniserve-nvfp4-throughput-c2-r3]
+server = "uniserve-nvfp4"
+task = "video"
+model = "FastH3"
+dataset = "jsonl"
+dataset_path = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/protocol/workload/manifests/throughput-r3.jsonl"
+endpoint = "/v1/videos/sync"
+[benchmarks.uniserve-nvfp4-throughput-c2-r3.load]
+num_prompts = 32
+request_rate = inf
+max_concurrency = 2
+warmup_requests = 0
+request_timeout_s = 21600
+seed = 20260925
+warmup_manifest = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/protocol/workload/manifests/warmup.jsonl"
+priming_manifest = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/protocol/workload/manifests/priming-c2-r3.jsonl"
+[benchmarks.uniserve-nvfp4-throughput-c2-r3.video]
+backend = "uniserve"
+poll_interval_s = 0.1
+media_dir = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/media/gb200-8/nvfp4/uniserve/throughput/uniserve-nvfp4-throughput-c2-r3"
+[benchmarks.uniserve-nvfp4-throughput-c2-r3.metrics]
+videos_per_second = "higher"
+"video_latency_ms.p95" = "lower"
+
+[benchmarks.uniserve-nvfp4-throughput-c2-r3.provenance]
+hardware = "gb200-8"
+checkpoint_revision = "2f4bc740f17532a620e31ced09ce82f8970ddf28"
+checkpoint = "/workspace/models/FastVideo-FastH3-8-Step-V2-NVFP4"
+system_revision = "9458bca425a96d5bc45f5e97da9d2986449fad3e"
+source_lock = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/baseline/vllm-omni/20260926T041709Z/source-lock.json"
+deployment = "configs/minimax-h3-eight-devices.json"
+
+[benchmarks.uniserve-nvfp4-throughput-c4-r1]
+server = "uniserve-nvfp4"
+task = "video"
+model = "FastH3"
+dataset = "jsonl"
+dataset_path = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/protocol/workload/manifests/throughput-r1.jsonl"
+endpoint = "/v1/videos/sync"
+[benchmarks.uniserve-nvfp4-throughput-c4-r1.load]
+num_prompts = 32
+request_rate = inf
+max_concurrency = 4
+warmup_requests = 0
+request_timeout_s = 21600
+seed = 20260925
+warmup_manifest = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/protocol/workload/manifests/warmup.jsonl"
+priming_manifest = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/protocol/workload/manifests/priming-c4-r1.jsonl"
+[benchmarks.uniserve-nvfp4-throughput-c4-r1.video]
+backend = "uniserve"
+poll_interval_s = 0.1
+media_dir = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/media/gb200-8/nvfp4/uniserve/throughput/uniserve-nvfp4-throughput-c4-r1"
+[benchmarks.uniserve-nvfp4-throughput-c4-r1.metrics]
+videos_per_second = "higher"
+"video_latency_ms.p95" = "lower"
+
+[benchmarks.uniserve-nvfp4-throughput-c4-r1.provenance]
+hardware = "gb200-8"
+checkpoint_revision = "2f4bc740f17532a620e31ced09ce82f8970ddf28"
+checkpoint = "/workspace/models/FastVideo-FastH3-8-Step-V2-NVFP4"
+system_revision = "9458bca425a96d5bc45f5e97da9d2986449fad3e"
+source_lock = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/baseline/vllm-omni/20260926T041709Z/source-lock.json"
+deployment = "configs/minimax-h3-eight-devices.json"
+
+[benchmarks.uniserve-nvfp4-throughput-c4-r2]
+server = "uniserve-nvfp4"
+task = "video"
+model = "FastH3"
+dataset = "jsonl"
+dataset_path = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/protocol/workload/manifests/throughput-r2.jsonl"
+endpoint = "/v1/videos/sync"
+[benchmarks.uniserve-nvfp4-throughput-c4-r2.load]
+num_prompts = 32
+request_rate = inf
+max_concurrency = 4
+warmup_requests = 0
+request_timeout_s = 21600
+seed = 20260925
+warmup_manifest = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/protocol/workload/manifests/warmup.jsonl"
+priming_manifest = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/protocol/workload/manifests/priming-c4-r2.jsonl"
+[benchmarks.uniserve-nvfp4-throughput-c4-r2.video]
+backend = "uniserve"
+poll_interval_s = 0.1
+media_dir = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/media/gb200-8/nvfp4/uniserve/throughput/uniserve-nvfp4-throughput-c4-r2"
+[benchmarks.uniserve-nvfp4-throughput-c4-r2.metrics]
+videos_per_second = "higher"
+"video_latency_ms.p95" = "lower"
+
+[benchmarks.uniserve-nvfp4-throughput-c4-r2.provenance]
+hardware = "gb200-8"
+checkpoint_revision = "2f4bc740f17532a620e31ced09ce82f8970ddf28"
+checkpoint = "/workspace/models/FastVideo-FastH3-8-Step-V2-NVFP4"
+system_revision = "9458bca425a96d5bc45f5e97da9d2986449fad3e"
+source_lock = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/baseline/vllm-omni/20260926T041709Z/source-lock.json"
+deployment = "configs/minimax-h3-eight-devices.json"
+
+[benchmarks.uniserve-nvfp4-throughput-c4-r3]
+server = "uniserve-nvfp4"
+task = "video"
+model = "FastH3"
+dataset = "jsonl"
+dataset_path = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/protocol/workload/manifests/throughput-r3.jsonl"
+endpoint = "/v1/videos/sync"
+[benchmarks.uniserve-nvfp4-throughput-c4-r3.load]
+num_prompts = 32
+request_rate = inf
+max_concurrency = 4
+warmup_requests = 0
+request_timeout_s = 21600
+seed = 20260925
+warmup_manifest = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/protocol/workload/manifests/warmup.jsonl"
+priming_manifest = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/protocol/workload/manifests/priming-c4-r3.jsonl"
+[benchmarks.uniserve-nvfp4-throughput-c4-r3.video]
+backend = "uniserve"
+poll_interval_s = 0.1
+media_dir = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/media/gb200-8/nvfp4/uniserve/throughput/uniserve-nvfp4-throughput-c4-r3"
+[benchmarks.uniserve-nvfp4-throughput-c4-r3.metrics]
+videos_per_second = "higher"
+"video_latency_ms.p95" = "lower"
+
+[benchmarks.uniserve-nvfp4-throughput-c4-r3.provenance]
+hardware = "gb200-8"
+checkpoint_revision = "2f4bc740f17532a620e31ced09ce82f8970ddf28"
+checkpoint = "/workspace/models/FastVideo-FastH3-8-Step-V2-NVFP4"
+system_revision = "9458bca425a96d5bc45f5e97da9d2986449fad3e"
+source_lock = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/baseline/vllm-omni/20260926T041709Z/source-lock.json"
+deployment = "configs/minimax-h3-eight-devices.json"
+
+[benchmarks.uniserve-nvfp4-throughput-c8-r1]
+server = "uniserve-nvfp4"
+task = "video"
+model = "FastH3"
+dataset = "jsonl"
+dataset_path = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/protocol/workload/manifests/throughput-r1.jsonl"
+endpoint = "/v1/videos/sync"
+[benchmarks.uniserve-nvfp4-throughput-c8-r1.load]
+num_prompts = 32
+request_rate = inf
+max_concurrency = 8
+warmup_requests = 0
+request_timeout_s = 21600
+seed = 20260925
+warmup_manifest = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/protocol/workload/manifests/warmup.jsonl"
+priming_manifest = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/protocol/workload/manifests/priming-c8-r1.jsonl"
+[benchmarks.uniserve-nvfp4-throughput-c8-r1.video]
+backend = "uniserve"
+poll_interval_s = 0.1
+media_dir = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/media/gb200-8/nvfp4/uniserve/throughput/uniserve-nvfp4-throughput-c8-r1"
+[benchmarks.uniserve-nvfp4-throughput-c8-r1.metrics]
+videos_per_second = "higher"
+"video_latency_ms.p95" = "lower"
+
+[benchmarks.uniserve-nvfp4-throughput-c8-r1.provenance]
+hardware = "gb200-8"
+checkpoint_revision = "2f4bc740f17532a620e31ced09ce82f8970ddf28"
+checkpoint = "/workspace/models/FastVideo-FastH3-8-Step-V2-NVFP4"
+system_revision = "9458bca425a96d5bc45f5e97da9d2986449fad3e"
+source_lock = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/baseline/vllm-omni/20260926T041709Z/source-lock.json"
+deployment = "configs/minimax-h3-eight-devices.json"
+
+[benchmarks.uniserve-nvfp4-throughput-c8-r2]
+server = "uniserve-nvfp4"
+task = "video"
+model = "FastH3"
+dataset = "jsonl"
+dataset_path = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/protocol/workload/manifests/throughput-r2.jsonl"
+endpoint = "/v1/videos/sync"
+[benchmarks.uniserve-nvfp4-throughput-c8-r2.load]
+num_prompts = 32
+request_rate = inf
+max_concurrency = 8
+warmup_requests = 0
+request_timeout_s = 21600
+seed = 20260925
+warmup_manifest = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/protocol/workload/manifests/warmup.jsonl"
+priming_manifest = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/protocol/workload/manifests/priming-c8-r2.jsonl"
+[benchmarks.uniserve-nvfp4-throughput-c8-r2.video]
+backend = "uniserve"
+poll_interval_s = 0.1
+media_dir = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/media/gb200-8/nvfp4/uniserve/throughput/uniserve-nvfp4-throughput-c8-r2"
+[benchmarks.uniserve-nvfp4-throughput-c8-r2.metrics]
+videos_per_second = "higher"
+"video_latency_ms.p95" = "lower"
+
+[benchmarks.uniserve-nvfp4-throughput-c8-r2.provenance]
+hardware = "gb200-8"
+checkpoint_revision = "2f4bc740f17532a620e31ced09ce82f8970ddf28"
+checkpoint = "/workspace/models/FastVideo-FastH3-8-Step-V2-NVFP4"
+system_revision = "9458bca425a96d5bc45f5e97da9d2986449fad3e"
+source_lock = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/baseline/vllm-omni/20260926T041709Z/source-lock.json"
+deployment = "configs/minimax-h3-eight-devices.json"
+
+[benchmarks.uniserve-nvfp4-throughput-c8-r3]
+server = "uniserve-nvfp4"
+task = "video"
+model = "FastH3"
+dataset = "jsonl"
+dataset_path = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/protocol/workload/manifests/throughput-r3.jsonl"
+endpoint = "/v1/videos/sync"
+[benchmarks.uniserve-nvfp4-throughput-c8-r3.load]
+num_prompts = 32
+request_rate = inf
+max_concurrency = 8
+warmup_requests = 0
+request_timeout_s = 21600
+seed = 20260925
+warmup_manifest = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/protocol/workload/manifests/warmup.jsonl"
+priming_manifest = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/protocol/workload/manifests/priming-c8-r3.jsonl"
+[benchmarks.uniserve-nvfp4-throughput-c8-r3.video]
+backend = "uniserve"
+poll_interval_s = 0.1
+media_dir = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/media/gb200-8/nvfp4/uniserve/throughput/uniserve-nvfp4-throughput-c8-r3"
+[benchmarks.uniserve-nvfp4-throughput-c8-r3.metrics]
+videos_per_second = "higher"
+"video_latency_ms.p95" = "lower"
+
+[benchmarks.uniserve-nvfp4-throughput-c8-r3.provenance]
+hardware = "gb200-8"
+checkpoint_revision = "2f4bc740f17532a620e31ced09ce82f8970ddf28"
+checkpoint = "/workspace/models/FastVideo-FastH3-8-Step-V2-NVFP4"
+system_revision = "9458bca425a96d5bc45f5e97da9d2986449fad3e"
+source_lock = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/baseline/vllm-omni/20260926T041709Z/source-lock.json"
+deployment = "configs/minimax-h3-eight-devices.json"
+
+[benchmarks.uniserve-nvfp4-throughput-c16-r1]
+server = "uniserve-nvfp4"
+task = "video"
+model = "FastH3"
+dataset = "jsonl"
+dataset_path = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/protocol/workload/manifests/throughput-r1.jsonl"
+endpoint = "/v1/videos/sync"
+[benchmarks.uniserve-nvfp4-throughput-c16-r1.load]
+num_prompts = 32
+request_rate = inf
+max_concurrency = 16
+warmup_requests = 0
+request_timeout_s = 21600
+seed = 20260925
+warmup_manifest = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/protocol/workload/manifests/warmup.jsonl"
+priming_manifest = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/protocol/workload/manifests/priming-c16-r1.jsonl"
+[benchmarks.uniserve-nvfp4-throughput-c16-r1.video]
+backend = "uniserve"
+poll_interval_s = 0.1
+media_dir = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/media/gb200-8/nvfp4/uniserve/throughput/uniserve-nvfp4-throughput-c16-r1"
+[benchmarks.uniserve-nvfp4-throughput-c16-r1.metrics]
+videos_per_second = "higher"
+"video_latency_ms.p95" = "lower"
+
+[benchmarks.uniserve-nvfp4-throughput-c16-r1.provenance]
+hardware = "gb200-8"
+checkpoint_revision = "2f4bc740f17532a620e31ced09ce82f8970ddf28"
+checkpoint = "/workspace/models/FastVideo-FastH3-8-Step-V2-NVFP4"
+system_revision = "9458bca425a96d5bc45f5e97da9d2986449fad3e"
+source_lock = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/baseline/vllm-omni/20260926T041709Z/source-lock.json"
+deployment = "configs/minimax-h3-eight-devices.json"
+
+[benchmarks.uniserve-nvfp4-throughput-c16-r2]
+server = "uniserve-nvfp4"
+task = "video"
+model = "FastH3"
+dataset = "jsonl"
+dataset_path = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/protocol/workload/manifests/throughput-r2.jsonl"
+endpoint = "/v1/videos/sync"
+[benchmarks.uniserve-nvfp4-throughput-c16-r2.load]
+num_prompts = 32
+request_rate = inf
+max_concurrency = 16
+warmup_requests = 0
+request_timeout_s = 21600
+seed = 20260925
+warmup_manifest = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/protocol/workload/manifests/warmup.jsonl"
+priming_manifest = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/protocol/workload/manifests/priming-c16-r2.jsonl"
+[benchmarks.uniserve-nvfp4-throughput-c16-r2.video]
+backend = "uniserve"
+poll_interval_s = 0.1
+media_dir = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/media/gb200-8/nvfp4/uniserve/throughput/uniserve-nvfp4-throughput-c16-r2"
+[benchmarks.uniserve-nvfp4-throughput-c16-r2.metrics]
+videos_per_second = "higher"
+"video_latency_ms.p95" = "lower"
+
+[benchmarks.uniserve-nvfp4-throughput-c16-r2.provenance]
+hardware = "gb200-8"
+checkpoint_revision = "2f4bc740f17532a620e31ced09ce82f8970ddf28"
+checkpoint = "/workspace/models/FastVideo-FastH3-8-Step-V2-NVFP4"
+system_revision = "9458bca425a96d5bc45f5e97da9d2986449fad3e"
+source_lock = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/baseline/vllm-omni/20260926T041709Z/source-lock.json"
+deployment = "configs/minimax-h3-eight-devices.json"
+
+[benchmarks.uniserve-nvfp4-throughput-c16-r3]
+server = "uniserve-nvfp4"
+task = "video"
+model = "FastH3"
+dataset = "jsonl"
+dataset_path = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/protocol/workload/manifests/throughput-r3.jsonl"
+endpoint = "/v1/videos/sync"
+[benchmarks.uniserve-nvfp4-throughput-c16-r3.load]
+num_prompts = 32
+request_rate = inf
+max_concurrency = 16
+warmup_requests = 0
+request_timeout_s = 21600
+seed = 20260925
+warmup_manifest = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/protocol/workload/manifests/warmup.jsonl"
+priming_manifest = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/protocol/workload/manifests/priming-c16-r3.jsonl"
+[benchmarks.uniserve-nvfp4-throughput-c16-r3.video]
+backend = "uniserve"
+poll_interval_s = 0.1
+media_dir = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/media/gb200-8/nvfp4/uniserve/throughput/uniserve-nvfp4-throughput-c16-r3"
+[benchmarks.uniserve-nvfp4-throughput-c16-r3.metrics]
+videos_per_second = "higher"
+"video_latency_ms.p95" = "lower"
+
+[benchmarks.uniserve-nvfp4-throughput-c16-r3.provenance]
+hardware = "gb200-8"
+checkpoint_revision = "2f4bc740f17532a620e31ced09ce82f8970ddf28"
+checkpoint = "/workspace/models/FastVideo-FastH3-8-Step-V2-NVFP4"
+system_revision = "9458bca425a96d5bc45f5e97da9d2986449fad3e"
+source_lock = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/baseline/vllm-omni/20260926T041709Z/source-lock.json"
+deployment = "configs/minimax-h3-eight-devices.json"
+
+[benchmarks.fastvideo-bf16-qualification-c1]
+server = "fastvideo-bf16"
+task = "video"
+model = "FastH3"
+dataset = "jsonl"
+dataset_path = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/protocol/workload/manifests/qualification.jsonl"
+endpoint = "/v1/videos/sync"
+[benchmarks.fastvideo-bf16-qualification-c1.load]
+num_prompts = 6
+request_rate = inf
+max_concurrency = 1
+warmup_requests = 0
+request_timeout_s = 21600
+seed = 20260925
+warmup_manifest = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/protocol/workload/manifests/warmup.jsonl"
+[benchmarks.fastvideo-bf16-qualification-c1.video]
+backend = "fastvideo"
+poll_interval_s = 0.1
+[benchmarks.fastvideo-bf16-qualification-c1.metrics]
+videos_per_second = "higher"
+"video_latency_ms.p95" = "lower"
+
+[benchmarks.fastvideo-bf16-qualification-c1.provenance]
+hardware = "gb200-8"
+checkpoint_revision = "3da2ddfe1954d9cda4c05b643dc0f26007a655c5"
+checkpoint = "/workspace/models/FastVideo-FastH3-8-Step-V2"
+system_revision = "9b0e57fe4b3a8c112ff24cc22f752eb0608ccfab"
+source_lock = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/baseline/vllm-omni/20260926T041709Z/source-lock.json"
+deployment = "fastvideo-bf16"
+
+[benchmarks.fastvideo-bf16-latency-c1]
+server = "fastvideo-bf16"
+task = "video"
+model = "FastH3"
+dataset = "jsonl"
+dataset_path = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/protocol/workload/manifests/latency.jsonl"
+endpoint = "/v1/videos/sync"
+[benchmarks.fastvideo-bf16-latency-c1.load]
+num_prompts = 72
+request_rate = inf
+max_concurrency = 1
+warmup_requests = 0
+request_timeout_s = 21600
+seed = 20260925
+warmup_manifest = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/protocol/workload/manifests/warmup.jsonl"
+[benchmarks.fastvideo-bf16-latency-c1.video]
+backend = "fastvideo"
+poll_interval_s = 0.1
+media_dir = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/media/gb200-8/bf16/fastvideo/latency/fastvideo-bf16-latency-c1"
+[benchmarks.fastvideo-bf16-latency-c1.metrics]
+videos_per_second = "higher"
+"video_latency_ms.p95" = "lower"
+
+[benchmarks.fastvideo-bf16-latency-c1.provenance]
+hardware = "gb200-8"
+checkpoint_revision = "3da2ddfe1954d9cda4c05b643dc0f26007a655c5"
+checkpoint = "/workspace/models/FastVideo-FastH3-8-Step-V2"
+system_revision = "9b0e57fe4b3a8c112ff24cc22f752eb0608ccfab"
+source_lock = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/baseline/vllm-omni/20260926T041709Z/source-lock.json"
+deployment = "fastvideo-bf16"
+
+[benchmarks.fastvideo-bf16-throughput-c1-r1]
+server = "fastvideo-bf16"
+task = "video"
+model = "FastH3"
+dataset = "jsonl"
+dataset_path = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/protocol/workload/manifests/throughput-r1.jsonl"
+endpoint = "/v1/videos/sync"
+[benchmarks.fastvideo-bf16-throughput-c1-r1.load]
+num_prompts = 32
+request_rate = inf
+max_concurrency = 1
+warmup_requests = 0
+request_timeout_s = 21600
+seed = 20260925
+warmup_manifest = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/protocol/workload/manifests/warmup.jsonl"
+priming_manifest = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/protocol/workload/manifests/priming-c1-r1.jsonl"
+[benchmarks.fastvideo-bf16-throughput-c1-r1.video]
+backend = "fastvideo"
+poll_interval_s = 0.1
+media_dir = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/media/gb200-8/bf16/fastvideo/throughput/fastvideo-bf16-throughput-c1-r1"
+[benchmarks.fastvideo-bf16-throughput-c1-r1.metrics]
+videos_per_second = "higher"
+"video_latency_ms.p95" = "lower"
+
+[benchmarks.fastvideo-bf16-throughput-c1-r1.provenance]
+hardware = "gb200-8"
+checkpoint_revision = "3da2ddfe1954d9cda4c05b643dc0f26007a655c5"
+checkpoint = "/workspace/models/FastVideo-FastH3-8-Step-V2"
+system_revision = "9b0e57fe4b3a8c112ff24cc22f752eb0608ccfab"
+source_lock = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/baseline/vllm-omni/20260926T041709Z/source-lock.json"
+deployment = "fastvideo-bf16"
+
+[benchmarks.fastvideo-bf16-throughput-c1-r2]
+server = "fastvideo-bf16"
+task = "video"
+model = "FastH3"
+dataset = "jsonl"
+dataset_path = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/protocol/workload/manifests/throughput-r2.jsonl"
+endpoint = "/v1/videos/sync"
+[benchmarks.fastvideo-bf16-throughput-c1-r2.load]
+num_prompts = 32
+request_rate = inf
+max_concurrency = 1
+warmup_requests = 0
+request_timeout_s = 21600
+seed = 20260925
+warmup_manifest = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/protocol/workload/manifests/warmup.jsonl"
+priming_manifest = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/protocol/workload/manifests/priming-c1-r2.jsonl"
+[benchmarks.fastvideo-bf16-throughput-c1-r2.video]
+backend = "fastvideo"
+poll_interval_s = 0.1
+media_dir = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/media/gb200-8/bf16/fastvideo/throughput/fastvideo-bf16-throughput-c1-r2"
+[benchmarks.fastvideo-bf16-throughput-c1-r2.metrics]
+videos_per_second = "higher"
+"video_latency_ms.p95" = "lower"
+
+[benchmarks.fastvideo-bf16-throughput-c1-r2.provenance]
+hardware = "gb200-8"
+checkpoint_revision = "3da2ddfe1954d9cda4c05b643dc0f26007a655c5"
+checkpoint = "/workspace/models/FastVideo-FastH3-8-Step-V2"
+system_revision = "9b0e57fe4b3a8c112ff24cc22f752eb0608ccfab"
+source_lock = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/baseline/vllm-omni/20260926T041709Z/source-lock.json"
+deployment = "fastvideo-bf16"
+
+[benchmarks.fastvideo-bf16-throughput-c1-r3]
+server = "fastvideo-bf16"
+task = "video"
+model = "FastH3"
+dataset = "jsonl"
+dataset_path = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/protocol/workload/manifests/throughput-r3.jsonl"
+endpoint = "/v1/videos/sync"
+[benchmarks.fastvideo-bf16-throughput-c1-r3.load]
+num_prompts = 32
+request_rate = inf
+max_concurrency = 1
+warmup_requests = 0
+request_timeout_s = 21600
+seed = 20260925
+warmup_manifest = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/protocol/workload/manifests/warmup.jsonl"
+priming_manifest = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/protocol/workload/manifests/priming-c1-r3.jsonl"
+[benchmarks.fastvideo-bf16-throughput-c1-r3.video]
+backend = "fastvideo"
+poll_interval_s = 0.1
+media_dir = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/media/gb200-8/bf16/fastvideo/throughput/fastvideo-bf16-throughput-c1-r3"
+[benchmarks.fastvideo-bf16-throughput-c1-r3.metrics]
+videos_per_second = "higher"
+"video_latency_ms.p95" = "lower"
+
+[benchmarks.fastvideo-bf16-throughput-c1-r3.provenance]
+hardware = "gb200-8"
+checkpoint_revision = "3da2ddfe1954d9cda4c05b643dc0f26007a655c5"
+checkpoint = "/workspace/models/FastVideo-FastH3-8-Step-V2"
+system_revision = "9b0e57fe4b3a8c112ff24cc22f752eb0608ccfab"
+source_lock = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/baseline/vllm-omni/20260926T041709Z/source-lock.json"
+deployment = "fastvideo-bf16"
+
+[benchmarks.fastvideo-bf16-throughput-c2-r1]
+server = "fastvideo-bf16"
+task = "video"
+model = "FastH3"
+dataset = "jsonl"
+dataset_path = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/protocol/workload/manifests/throughput-r1.jsonl"
+endpoint = "/v1/videos/sync"
+[benchmarks.fastvideo-bf16-throughput-c2-r1.load]
+num_prompts = 32
+request_rate = inf
+max_concurrency = 2
+warmup_requests = 0
+request_timeout_s = 21600
+seed = 20260925
+warmup_manifest = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/protocol/workload/manifests/warmup.jsonl"
+priming_manifest = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/protocol/workload/manifests/priming-c2-r1.jsonl"
+[benchmarks.fastvideo-bf16-throughput-c2-r1.video]
+backend = "fastvideo"
+poll_interval_s = 0.1
+media_dir = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/media/gb200-8/bf16/fastvideo/throughput/fastvideo-bf16-throughput-c2-r1"
+[benchmarks.fastvideo-bf16-throughput-c2-r1.metrics]
+videos_per_second = "higher"
+"video_latency_ms.p95" = "lower"
+
+[benchmarks.fastvideo-bf16-throughput-c2-r1.provenance]
+hardware = "gb200-8"
+checkpoint_revision = "3da2ddfe1954d9cda4c05b643dc0f26007a655c5"
+checkpoint = "/workspace/models/FastVideo-FastH3-8-Step-V2"
+system_revision = "9b0e57fe4b3a8c112ff24cc22f752eb0608ccfab"
+source_lock = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/baseline/vllm-omni/20260926T041709Z/source-lock.json"
+deployment = "fastvideo-bf16"
+
+[benchmarks.fastvideo-bf16-throughput-c2-r2]
+server = "fastvideo-bf16"
+task = "video"
+model = "FastH3"
+dataset = "jsonl"
+dataset_path = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/protocol/workload/manifests/throughput-r2.jsonl"
+endpoint = "/v1/videos/sync"
+[benchmarks.fastvideo-bf16-throughput-c2-r2.load]
+num_prompts = 32
+request_rate = inf
+max_concurrency = 2
+warmup_requests = 0
+request_timeout_s = 21600
+seed = 20260925
+warmup_manifest = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/protocol/workload/manifests/warmup.jsonl"
+priming_manifest = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/protocol/workload/manifests/priming-c2-r2.jsonl"
+[benchmarks.fastvideo-bf16-throughput-c2-r2.video]
+backend = "fastvideo"
+poll_interval_s = 0.1
+media_dir = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/media/gb200-8/bf16/fastvideo/throughput/fastvideo-bf16-throughput-c2-r2"
+[benchmarks.fastvideo-bf16-throughput-c2-r2.metrics]
+videos_per_second = "higher"
+"video_latency_ms.p95" = "lower"
+
+[benchmarks.fastvideo-bf16-throughput-c2-r2.provenance]
+hardware = "gb200-8"
+checkpoint_revision = "3da2ddfe1954d9cda4c05b643dc0f26007a655c5"
+checkpoint = "/workspace/models/FastVideo-FastH3-8-Step-V2"
+system_revision = "9b0e57fe4b3a8c112ff24cc22f752eb0608ccfab"
+source_lock = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/baseline/vllm-omni/20260926T041709Z/source-lock.json"
+deployment = "fastvideo-bf16"
+
+[benchmarks.fastvideo-bf16-throughput-c2-r3]
+server = "fastvideo-bf16"
+task = "video"
+model = "FastH3"
+dataset = "jsonl"
+dataset_path = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/protocol/workload/manifests/throughput-r3.jsonl"
+endpoint = "/v1/videos/sync"
+[benchmarks.fastvideo-bf16-throughput-c2-r3.load]
+num_prompts = 32
+request_rate = inf
+max_concurrency = 2
+warmup_requests = 0
+request_timeout_s = 21600
+seed = 20260925
+warmup_manifest = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/protocol/workload/manifests/warmup.jsonl"
+priming_manifest = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/protocol/workload/manifests/priming-c2-r3.jsonl"
+[benchmarks.fastvideo-bf16-throughput-c2-r3.video]
+backend = "fastvideo"
+poll_interval_s = 0.1
+media_dir = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/media/gb200-8/bf16/fastvideo/throughput/fastvideo-bf16-throughput-c2-r3"
+[benchmarks.fastvideo-bf16-throughput-c2-r3.metrics]
+videos_per_second = "higher"
+"video_latency_ms.p95" = "lower"
+
+[benchmarks.fastvideo-bf16-throughput-c2-r3.provenance]
+hardware = "gb200-8"
+checkpoint_revision = "3da2ddfe1954d9cda4c05b643dc0f26007a655c5"
+checkpoint = "/workspace/models/FastVideo-FastH3-8-Step-V2"
+system_revision = "9b0e57fe4b3a8c112ff24cc22f752eb0608ccfab"
+source_lock = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/baseline/vllm-omni/20260926T041709Z/source-lock.json"
+deployment = "fastvideo-bf16"
+
+[benchmarks.fastvideo-bf16-throughput-c4-r1]
+server = "fastvideo-bf16"
+task = "video"
+model = "FastH3"
+dataset = "jsonl"
+dataset_path = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/protocol/workload/manifests/throughput-r1.jsonl"
+endpoint = "/v1/videos/sync"
+[benchmarks.fastvideo-bf16-throughput-c4-r1.load]
+num_prompts = 32
+request_rate = inf
+max_concurrency = 4
+warmup_requests = 0
+request_timeout_s = 21600
+seed = 20260925
+warmup_manifest = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/protocol/workload/manifests/warmup.jsonl"
+priming_manifest = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/protocol/workload/manifests/priming-c4-r1.jsonl"
+[benchmarks.fastvideo-bf16-throughput-c4-r1.video]
+backend = "fastvideo"
+poll_interval_s = 0.1
+media_dir = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/media/gb200-8/bf16/fastvideo/throughput/fastvideo-bf16-throughput-c4-r1"
+[benchmarks.fastvideo-bf16-throughput-c4-r1.metrics]
+videos_per_second = "higher"
+"video_latency_ms.p95" = "lower"
+
+[benchmarks.fastvideo-bf16-throughput-c4-r1.provenance]
+hardware = "gb200-8"
+checkpoint_revision = "3da2ddfe1954d9cda4c05b643dc0f26007a655c5"
+checkpoint = "/workspace/models/FastVideo-FastH3-8-Step-V2"
+system_revision = "9b0e57fe4b3a8c112ff24cc22f752eb0608ccfab"
+source_lock = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/baseline/vllm-omni/20260926T041709Z/source-lock.json"
+deployment = "fastvideo-bf16"
+
+[benchmarks.fastvideo-bf16-throughput-c4-r2]
+server = "fastvideo-bf16"
+task = "video"
+model = "FastH3"
+dataset = "jsonl"
+dataset_path = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/protocol/workload/manifests/throughput-r2.jsonl"
+endpoint = "/v1/videos/sync"
+[benchmarks.fastvideo-bf16-throughput-c4-r2.load]
+num_prompts = 32
+request_rate = inf
+max_concurrency = 4
+warmup_requests = 0
+request_timeout_s = 21600
+seed = 20260925
+warmup_manifest = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/protocol/workload/manifests/warmup.jsonl"
+priming_manifest = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/protocol/workload/manifests/priming-c4-r2.jsonl"
+[benchmarks.fastvideo-bf16-throughput-c4-r2.video]
+backend = "fastvideo"
+poll_interval_s = 0.1
+media_dir = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/media/gb200-8/bf16/fastvideo/throughput/fastvideo-bf16-throughput-c4-r2"
+[benchmarks.fastvideo-bf16-throughput-c4-r2.metrics]
+videos_per_second = "higher"
+"video_latency_ms.p95" = "lower"
+
+[benchmarks.fastvideo-bf16-throughput-c4-r2.provenance]
+hardware = "gb200-8"
+checkpoint_revision = "3da2ddfe1954d9cda4c05b643dc0f26007a655c5"
+checkpoint = "/workspace/models/FastVideo-FastH3-8-Step-V2"
+system_revision = "9b0e57fe4b3a8c112ff24cc22f752eb0608ccfab"
+source_lock = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/baseline/vllm-omni/20260926T041709Z/source-lock.json"
+deployment = "fastvideo-bf16"
+
+[benchmarks.fastvideo-bf16-throughput-c4-r3]
+server = "fastvideo-bf16"
+task = "video"
+model = "FastH3"
+dataset = "jsonl"
+dataset_path = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/protocol/workload/manifests/throughput-r3.jsonl"
+endpoint = "/v1/videos/sync"
+[benchmarks.fastvideo-bf16-throughput-c4-r3.load]
+num_prompts = 32
+request_rate = inf
+max_concurrency = 4
+warmup_requests = 0
+request_timeout_s = 21600
+seed = 20260925
+warmup_manifest = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/protocol/workload/manifests/warmup.jsonl"
+priming_manifest = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/protocol/workload/manifests/priming-c4-r3.jsonl"
+[benchmarks.fastvideo-bf16-throughput-c4-r3.video]
+backend = "fastvideo"
+poll_interval_s = 0.1
+media_dir = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/media/gb200-8/bf16/fastvideo/throughput/fastvideo-bf16-throughput-c4-r3"
+[benchmarks.fastvideo-bf16-throughput-c4-r3.metrics]
+videos_per_second = "higher"
+"video_latency_ms.p95" = "lower"
+
+[benchmarks.fastvideo-bf16-throughput-c4-r3.provenance]
+hardware = "gb200-8"
+checkpoint_revision = "3da2ddfe1954d9cda4c05b643dc0f26007a655c5"
+checkpoint = "/workspace/models/FastVideo-FastH3-8-Step-V2"
+system_revision = "9b0e57fe4b3a8c112ff24cc22f752eb0608ccfab"
+source_lock = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/baseline/vllm-omni/20260926T041709Z/source-lock.json"
+deployment = "fastvideo-bf16"
+
+[benchmarks.fastvideo-bf16-throughput-c8-r1]
+server = "fastvideo-bf16"
+task = "video"
+model = "FastH3"
+dataset = "jsonl"
+dataset_path = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/protocol/workload/manifests/throughput-r1.jsonl"
+endpoint = "/v1/videos/sync"
+[benchmarks.fastvideo-bf16-throughput-c8-r1.load]
+num_prompts = 32
+request_rate = inf
+max_concurrency = 8
+warmup_requests = 0
+request_timeout_s = 21600
+seed = 20260925
+warmup_manifest = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/protocol/workload/manifests/warmup.jsonl"
+priming_manifest = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/protocol/workload/manifests/priming-c8-r1.jsonl"
+[benchmarks.fastvideo-bf16-throughput-c8-r1.video]
+backend = "fastvideo"
+poll_interval_s = 0.1
+media_dir = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/media/gb200-8/bf16/fastvideo/throughput/fastvideo-bf16-throughput-c8-r1"
+[benchmarks.fastvideo-bf16-throughput-c8-r1.metrics]
+videos_per_second = "higher"
+"video_latency_ms.p95" = "lower"
+
+[benchmarks.fastvideo-bf16-throughput-c8-r1.provenance]
+hardware = "gb200-8"
+checkpoint_revision = "3da2ddfe1954d9cda4c05b643dc0f26007a655c5"
+checkpoint = "/workspace/models/FastVideo-FastH3-8-Step-V2"
+system_revision = "9b0e57fe4b3a8c112ff24cc22f752eb0608ccfab"
+source_lock = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/baseline/vllm-omni/20260926T041709Z/source-lock.json"
+deployment = "fastvideo-bf16"
+
+[benchmarks.fastvideo-bf16-throughput-c8-r2]
+server = "fastvideo-bf16"
+task = "video"
+model = "FastH3"
+dataset = "jsonl"
+dataset_path = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/protocol/workload/manifests/throughput-r2.jsonl"
+endpoint = "/v1/videos/sync"
+[benchmarks.fastvideo-bf16-throughput-c8-r2.load]
+num_prompts = 32
+request_rate = inf
+max_concurrency = 8
+warmup_requests = 0
+request_timeout_s = 21600
+seed = 20260925
+warmup_manifest = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/protocol/workload/manifests/warmup.jsonl"
+priming_manifest = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/protocol/workload/manifests/priming-c8-r2.jsonl"
+[benchmarks.fastvideo-bf16-throughput-c8-r2.video]
+backend = "fastvideo"
+poll_interval_s = 0.1
+media_dir = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/media/gb200-8/bf16/fastvideo/throughput/fastvideo-bf16-throughput-c8-r2"
+[benchmarks.fastvideo-bf16-throughput-c8-r2.metrics]
+videos_per_second = "higher"
+"video_latency_ms.p95" = "lower"
+
+[benchmarks.fastvideo-bf16-throughput-c8-r2.provenance]
+hardware = "gb200-8"
+checkpoint_revision = "3da2ddfe1954d9cda4c05b643dc0f26007a655c5"
+checkpoint = "/workspace/models/FastVideo-FastH3-8-Step-V2"
+system_revision = "9b0e57fe4b3a8c112ff24cc22f752eb0608ccfab"
+source_lock = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/baseline/vllm-omni/20260926T041709Z/source-lock.json"
+deployment = "fastvideo-bf16"
+
+[benchmarks.fastvideo-bf16-throughput-c8-r3]
+server = "fastvideo-bf16"
+task = "video"
+model = "FastH3"
+dataset = "jsonl"
+dataset_path = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/protocol/workload/manifests/throughput-r3.jsonl"
+endpoint = "/v1/videos/sync"
+[benchmarks.fastvideo-bf16-throughput-c8-r3.load]
+num_prompts = 32
+request_rate = inf
+max_concurrency = 8
+warmup_requests = 0
+request_timeout_s = 21600
+seed = 20260925
+warmup_manifest = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/protocol/workload/manifests/warmup.jsonl"
+priming_manifest = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/protocol/workload/manifests/priming-c8-r3.jsonl"
+[benchmarks.fastvideo-bf16-throughput-c8-r3.video]
+backend = "fastvideo"
+poll_interval_s = 0.1
+media_dir = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/media/gb200-8/bf16/fastvideo/throughput/fastvideo-bf16-throughput-c8-r3"
+[benchmarks.fastvideo-bf16-throughput-c8-r3.metrics]
+videos_per_second = "higher"
+"video_latency_ms.p95" = "lower"
+
+[benchmarks.fastvideo-bf16-throughput-c8-r3.provenance]
+hardware = "gb200-8"
+checkpoint_revision = "3da2ddfe1954d9cda4c05b643dc0f26007a655c5"
+checkpoint = "/workspace/models/FastVideo-FastH3-8-Step-V2"
+system_revision = "9b0e57fe4b3a8c112ff24cc22f752eb0608ccfab"
+source_lock = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/baseline/vllm-omni/20260926T041709Z/source-lock.json"
+deployment = "fastvideo-bf16"
+
+[benchmarks.fastvideo-bf16-throughput-c16-r1]
+server = "fastvideo-bf16"
+task = "video"
+model = "FastH3"
+dataset = "jsonl"
+dataset_path = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/protocol/workload/manifests/throughput-r1.jsonl"
+endpoint = "/v1/videos/sync"
+[benchmarks.fastvideo-bf16-throughput-c16-r1.load]
+num_prompts = 32
+request_rate = inf
+max_concurrency = 16
+warmup_requests = 0
+request_timeout_s = 21600
+seed = 20260925
+warmup_manifest = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/protocol/workload/manifests/warmup.jsonl"
+priming_manifest = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/protocol/workload/manifests/priming-c16-r1.jsonl"
+[benchmarks.fastvideo-bf16-throughput-c16-r1.video]
+backend = "fastvideo"
+poll_interval_s = 0.1
+media_dir = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/media/gb200-8/bf16/fastvideo/throughput/fastvideo-bf16-throughput-c16-r1"
+[benchmarks.fastvideo-bf16-throughput-c16-r1.metrics]
+videos_per_second = "higher"
+"video_latency_ms.p95" = "lower"
+
+[benchmarks.fastvideo-bf16-throughput-c16-r1.provenance]
+hardware = "gb200-8"
+checkpoint_revision = "3da2ddfe1954d9cda4c05b643dc0f26007a655c5"
+checkpoint = "/workspace/models/FastVideo-FastH3-8-Step-V2"
+system_revision = "9b0e57fe4b3a8c112ff24cc22f752eb0608ccfab"
+source_lock = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/baseline/vllm-omni/20260926T041709Z/source-lock.json"
+deployment = "fastvideo-bf16"
+
+[benchmarks.fastvideo-bf16-throughput-c16-r2]
+server = "fastvideo-bf16"
+task = "video"
+model = "FastH3"
+dataset = "jsonl"
+dataset_path = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/protocol/workload/manifests/throughput-r2.jsonl"
+endpoint = "/v1/videos/sync"
+[benchmarks.fastvideo-bf16-throughput-c16-r2.load]
+num_prompts = 32
+request_rate = inf
+max_concurrency = 16
+warmup_requests = 0
+request_timeout_s = 21600
+seed = 20260925
+warmup_manifest = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/protocol/workload/manifests/warmup.jsonl"
+priming_manifest = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/protocol/workload/manifests/priming-c16-r2.jsonl"
+[benchmarks.fastvideo-bf16-throughput-c16-r2.video]
+backend = "fastvideo"
+poll_interval_s = 0.1
+media_dir = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/media/gb200-8/bf16/fastvideo/throughput/fastvideo-bf16-throughput-c16-r2"
+[benchmarks.fastvideo-bf16-throughput-c16-r2.metrics]
+videos_per_second = "higher"
+"video_latency_ms.p95" = "lower"
+
+[benchmarks.fastvideo-bf16-throughput-c16-r2.provenance]
+hardware = "gb200-8"
+checkpoint_revision = "3da2ddfe1954d9cda4c05b643dc0f26007a655c5"
+checkpoint = "/workspace/models/FastVideo-FastH3-8-Step-V2"
+system_revision = "9b0e57fe4b3a8c112ff24cc22f752eb0608ccfab"
+source_lock = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/baseline/vllm-omni/20260926T041709Z/source-lock.json"
+deployment = "fastvideo-bf16"
+
+[benchmarks.fastvideo-bf16-throughput-c16-r3]
+server = "fastvideo-bf16"
+task = "video"
+model = "FastH3"
+dataset = "jsonl"
+dataset_path = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/protocol/workload/manifests/throughput-r3.jsonl"
+endpoint = "/v1/videos/sync"
+[benchmarks.fastvideo-bf16-throughput-c16-r3.load]
+num_prompts = 32
+request_rate = inf
+max_concurrency = 16
+warmup_requests = 0
+request_timeout_s = 21600
+seed = 20260925
+warmup_manifest = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/protocol/workload/manifests/warmup.jsonl"
+priming_manifest = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/protocol/workload/manifests/priming-c16-r3.jsonl"
+[benchmarks.fastvideo-bf16-throughput-c16-r3.video]
+backend = "fastvideo"
+poll_interval_s = 0.1
+media_dir = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/media/gb200-8/bf16/fastvideo/throughput/fastvideo-bf16-throughput-c16-r3"
+[benchmarks.fastvideo-bf16-throughput-c16-r3.metrics]
+videos_per_second = "higher"
+"video_latency_ms.p95" = "lower"
+
+[benchmarks.fastvideo-bf16-throughput-c16-r3.provenance]
+hardware = "gb200-8"
+checkpoint_revision = "3da2ddfe1954d9cda4c05b643dc0f26007a655c5"
+checkpoint = "/workspace/models/FastVideo-FastH3-8-Step-V2"
+system_revision = "9b0e57fe4b3a8c112ff24cc22f752eb0608ccfab"
+source_lock = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/baseline/vllm-omni/20260926T041709Z/source-lock.json"
+deployment = "fastvideo-bf16"
+
+[benchmarks.vllm-omni-bf16-qualification-c1]
+server = "vllm-omni-bf16"
+task = "video"
+model = "FastH3"
+dataset = "jsonl"
+dataset_path = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/protocol/workload/manifests/qualification.jsonl"
+endpoint = "/v1/videos/sync"
+[benchmarks.vllm-omni-bf16-qualification-c1.load]
+num_prompts = 6
+request_rate = inf
+max_concurrency = 1
+warmup_requests = 0
+request_timeout_s = 21600
+seed = 20260925
+warmup_manifest = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/protocol/workload/manifests/warmup.jsonl"
+[benchmarks.vllm-omni-bf16-qualification-c1.video]
+backend = "vllm-omni"
+poll_interval_s = 0.1
+[benchmarks.vllm-omni-bf16-qualification-c1.metrics]
+videos_per_second = "higher"
+"video_latency_ms.p95" = "lower"
+
+[benchmarks.vllm-omni-bf16-qualification-c1.provenance]
+hardware = "gb200-8"
+checkpoint_revision = "3da2ddfe1954d9cda4c05b643dc0f26007a655c5"
+checkpoint = "/workspace/models/FastVideo-FastH3-8-Step-V2"
+system_revision = "bcb4ae288f77dbee431c0649b72ef43a4722bb2b"
+source_lock = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/baseline/vllm-omni/20260926T041709Z/source-lock.json"
+deployment = "vllm-omni-bf16"
+
+[benchmarks.vllm-omni-bf16-latency-c1]
+server = "vllm-omni-bf16"
+task = "video"
+model = "FastH3"
+dataset = "jsonl"
+dataset_path = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/protocol/workload/manifests/latency.jsonl"
+endpoint = "/v1/videos/sync"
+[benchmarks.vllm-omni-bf16-latency-c1.load]
+num_prompts = 72
+request_rate = inf
+max_concurrency = 1
+warmup_requests = 0
+request_timeout_s = 21600
+seed = 20260925
+warmup_manifest = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/protocol/workload/manifests/warmup.jsonl"
+[benchmarks.vllm-omni-bf16-latency-c1.video]
+backend = "vllm-omni"
+poll_interval_s = 0.1
+media_dir = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/media/gb200-8/bf16/vllm-omni/latency/vllm-omni-bf16-latency-c1"
+[benchmarks.vllm-omni-bf16-latency-c1.metrics]
+videos_per_second = "higher"
+"video_latency_ms.p95" = "lower"
+
+[benchmarks.vllm-omni-bf16-latency-c1.provenance]
+hardware = "gb200-8"
+checkpoint_revision = "3da2ddfe1954d9cda4c05b643dc0f26007a655c5"
+checkpoint = "/workspace/models/FastVideo-FastH3-8-Step-V2"
+system_revision = "bcb4ae288f77dbee431c0649b72ef43a4722bb2b"
+source_lock = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/baseline/vllm-omni/20260926T041709Z/source-lock.json"
+deployment = "vllm-omni-bf16"
+
+[benchmarks.vllm-omni-bf16-throughput-c1-r1]
+server = "vllm-omni-bf16"
+task = "video"
+model = "FastH3"
+dataset = "jsonl"
+dataset_path = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/protocol/workload/manifests/throughput-r1.jsonl"
+endpoint = "/v1/videos/sync"
+[benchmarks.vllm-omni-bf16-throughput-c1-r1.load]
+num_prompts = 32
+request_rate = inf
+max_concurrency = 1
+warmup_requests = 0
+request_timeout_s = 21600
+seed = 20260925
+warmup_manifest = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/protocol/workload/manifests/warmup.jsonl"
+priming_manifest = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/protocol/workload/manifests/priming-c1-r1.jsonl"
+[benchmarks.vllm-omni-bf16-throughput-c1-r1.video]
+backend = "vllm-omni"
+poll_interval_s = 0.1
+media_dir = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/media/gb200-8/bf16/vllm-omni/throughput/vllm-omni-bf16-throughput-c1-r1"
+[benchmarks.vllm-omni-bf16-throughput-c1-r1.metrics]
+videos_per_second = "higher"
+"video_latency_ms.p95" = "lower"
+
+[benchmarks.vllm-omni-bf16-throughput-c1-r1.provenance]
+hardware = "gb200-8"
+checkpoint_revision = "3da2ddfe1954d9cda4c05b643dc0f26007a655c5"
+checkpoint = "/workspace/models/FastVideo-FastH3-8-Step-V2"
+system_revision = "bcb4ae288f77dbee431c0649b72ef43a4722bb2b"
+source_lock = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/baseline/vllm-omni/20260926T041709Z/source-lock.json"
+deployment = "vllm-omni-bf16"
+
+[benchmarks.vllm-omni-bf16-throughput-c1-r2]
+server = "vllm-omni-bf16"
+task = "video"
+model = "FastH3"
+dataset = "jsonl"
+dataset_path = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/protocol/workload/manifests/throughput-r2.jsonl"
+endpoint = "/v1/videos/sync"
+[benchmarks.vllm-omni-bf16-throughput-c1-r2.load]
+num_prompts = 32
+request_rate = inf
+max_concurrency = 1
+warmup_requests = 0
+request_timeout_s = 21600
+seed = 20260925
+warmup_manifest = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/protocol/workload/manifests/warmup.jsonl"
+priming_manifest = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/protocol/workload/manifests/priming-c1-r2.jsonl"
+[benchmarks.vllm-omni-bf16-throughput-c1-r2.video]
+backend = "vllm-omni"
+poll_interval_s = 0.1
+media_dir = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/media/gb200-8/bf16/vllm-omni/throughput/vllm-omni-bf16-throughput-c1-r2"
+[benchmarks.vllm-omni-bf16-throughput-c1-r2.metrics]
+videos_per_second = "higher"
+"video_latency_ms.p95" = "lower"
+
+[benchmarks.vllm-omni-bf16-throughput-c1-r2.provenance]
+hardware = "gb200-8"
+checkpoint_revision = "3da2ddfe1954d9cda4c05b643dc0f26007a655c5"
+checkpoint = "/workspace/models/FastVideo-FastH3-8-Step-V2"
+system_revision = "bcb4ae288f77dbee431c0649b72ef43a4722bb2b"
+source_lock = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/baseline/vllm-omni/20260926T041709Z/source-lock.json"
+deployment = "vllm-omni-bf16"
+
+[benchmarks.vllm-omni-bf16-throughput-c1-r3]
+server = "vllm-omni-bf16"
+task = "video"
+model = "FastH3"
+dataset = "jsonl"
+dataset_path = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/protocol/workload/manifests/throughput-r3.jsonl"
+endpoint = "/v1/videos/sync"
+[benchmarks.vllm-omni-bf16-throughput-c1-r3.load]
+num_prompts = 32
+request_rate = inf
+max_concurrency = 1
+warmup_requests = 0
+request_timeout_s = 21600
+seed = 20260925
+warmup_manifest = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/protocol/workload/manifests/warmup.jsonl"
+priming_manifest = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/protocol/workload/manifests/priming-c1-r3.jsonl"
+[benchmarks.vllm-omni-bf16-throughput-c1-r3.video]
+backend = "vllm-omni"
+poll_interval_s = 0.1
+media_dir = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/media/gb200-8/bf16/vllm-omni/throughput/vllm-omni-bf16-throughput-c1-r3"
+[benchmarks.vllm-omni-bf16-throughput-c1-r3.metrics]
+videos_per_second = "higher"
+"video_latency_ms.p95" = "lower"
+
+[benchmarks.vllm-omni-bf16-throughput-c1-r3.provenance]
+hardware = "gb200-8"
+checkpoint_revision = "3da2ddfe1954d9cda4c05b643dc0f26007a655c5"
+checkpoint = "/workspace/models/FastVideo-FastH3-8-Step-V2"
+system_revision = "bcb4ae288f77dbee431c0649b72ef43a4722bb2b"
+source_lock = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/baseline/vllm-omni/20260926T041709Z/source-lock.json"
+deployment = "vllm-omni-bf16"
+
+[benchmarks.vllm-omni-bf16-throughput-c2-r1]
+server = "vllm-omni-bf16"
+task = "video"
+model = "FastH3"
+dataset = "jsonl"
+dataset_path = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/protocol/workload/manifests/throughput-r1.jsonl"
+endpoint = "/v1/videos/sync"
+[benchmarks.vllm-omni-bf16-throughput-c2-r1.load]
+num_prompts = 32
+request_rate = inf
+max_concurrency = 2
+warmup_requests = 0
+request_timeout_s = 21600
+seed = 20260925
+warmup_manifest = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/protocol/workload/manifests/warmup.jsonl"
+priming_manifest = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/protocol/workload/manifests/priming-c2-r1.jsonl"
+[benchmarks.vllm-omni-bf16-throughput-c2-r1.video]
+backend = "vllm-omni"
+poll_interval_s = 0.1
+media_dir = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/media/gb200-8/bf16/vllm-omni/throughput/vllm-omni-bf16-throughput-c2-r1"
+[benchmarks.vllm-omni-bf16-throughput-c2-r1.metrics]
+videos_per_second = "higher"
+"video_latency_ms.p95" = "lower"
+
+[benchmarks.vllm-omni-bf16-throughput-c2-r1.provenance]
+hardware = "gb200-8"
+checkpoint_revision = "3da2ddfe1954d9cda4c05b643dc0f26007a655c5"
+checkpoint = "/workspace/models/FastVideo-FastH3-8-Step-V2"
+system_revision = "bcb4ae288f77dbee431c0649b72ef43a4722bb2b"
+source_lock = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/baseline/vllm-omni/20260926T041709Z/source-lock.json"
+deployment = "vllm-omni-bf16"
+
+[benchmarks.vllm-omni-bf16-throughput-c2-r2]
+server = "vllm-omni-bf16"
+task = "video"
+model = "FastH3"
+dataset = "jsonl"
+dataset_path = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/protocol/workload/manifests/throughput-r2.jsonl"
+endpoint = "/v1/videos/sync"
+[benchmarks.vllm-omni-bf16-throughput-c2-r2.load]
+num_prompts = 32
+request_rate = inf
+max_concurrency = 2
+warmup_requests = 0
+request_timeout_s = 21600
+seed = 20260925
+warmup_manifest = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/protocol/workload/manifests/warmup.jsonl"
+priming_manifest = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/protocol/workload/manifests/priming-c2-r2.jsonl"
+[benchmarks.vllm-omni-bf16-throughput-c2-r2.video]
+backend = "vllm-omni"
+poll_interval_s = 0.1
+media_dir = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/media/gb200-8/bf16/vllm-omni/throughput/vllm-omni-bf16-throughput-c2-r2"
+[benchmarks.vllm-omni-bf16-throughput-c2-r2.metrics]
+videos_per_second = "higher"
+"video_latency_ms.p95" = "lower"
+
+[benchmarks.vllm-omni-bf16-throughput-c2-r2.provenance]
+hardware = "gb200-8"
+checkpoint_revision = "3da2ddfe1954d9cda4c05b643dc0f26007a655c5"
+checkpoint = "/workspace/models/FastVideo-FastH3-8-Step-V2"
+system_revision = "bcb4ae288f77dbee431c0649b72ef43a4722bb2b"
+source_lock = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/baseline/vllm-omni/20260926T041709Z/source-lock.json"
+deployment = "vllm-omni-bf16"
+
+[benchmarks.vllm-omni-bf16-throughput-c2-r3]
+server = "vllm-omni-bf16"
+task = "video"
+model = "FastH3"
+dataset = "jsonl"
+dataset_path = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/protocol/workload/manifests/throughput-r3.jsonl"
+endpoint = "/v1/videos/sync"
+[benchmarks.vllm-omni-bf16-throughput-c2-r3.load]
+num_prompts = 32
+request_rate = inf
+max_concurrency = 2
+warmup_requests = 0
+request_timeout_s = 21600
+seed = 20260925
+warmup_manifest = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/protocol/workload/manifests/warmup.jsonl"
+priming_manifest = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/protocol/workload/manifests/priming-c2-r3.jsonl"
+[benchmarks.vllm-omni-bf16-throughput-c2-r3.video]
+backend = "vllm-omni"
+poll_interval_s = 0.1
+media_dir = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/media/gb200-8/bf16/vllm-omni/throughput/vllm-omni-bf16-throughput-c2-r3"
+[benchmarks.vllm-omni-bf16-throughput-c2-r3.metrics]
+videos_per_second = "higher"
+"video_latency_ms.p95" = "lower"
+
+[benchmarks.vllm-omni-bf16-throughput-c2-r3.provenance]
+hardware = "gb200-8"
+checkpoint_revision = "3da2ddfe1954d9cda4c05b643dc0f26007a655c5"
+checkpoint = "/workspace/models/FastVideo-FastH3-8-Step-V2"
+system_revision = "bcb4ae288f77dbee431c0649b72ef43a4722bb2b"
+source_lock = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/baseline/vllm-omni/20260926T041709Z/source-lock.json"
+deployment = "vllm-omni-bf16"
+
+[benchmarks.vllm-omni-bf16-throughput-c4-r1]
+server = "vllm-omni-bf16"
+task = "video"
+model = "FastH3"
+dataset = "jsonl"
+dataset_path = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/protocol/workload/manifests/throughput-r1.jsonl"
+endpoint = "/v1/videos/sync"
+[benchmarks.vllm-omni-bf16-throughput-c4-r1.load]
+num_prompts = 32
+request_rate = inf
+max_concurrency = 4
+warmup_requests = 0
+request_timeout_s = 21600
+seed = 20260925
+warmup_manifest = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/protocol/workload/manifests/warmup.jsonl"
+priming_manifest = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/protocol/workload/manifests/priming-c4-r1.jsonl"
+[benchmarks.vllm-omni-bf16-throughput-c4-r1.video]
+backend = "vllm-omni"
+poll_interval_s = 0.1
+media_dir = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/media/gb200-8/bf16/vllm-omni/throughput/vllm-omni-bf16-throughput-c4-r1"
+[benchmarks.vllm-omni-bf16-throughput-c4-r1.metrics]
+videos_per_second = "higher"
+"video_latency_ms.p95" = "lower"
+
+[benchmarks.vllm-omni-bf16-throughput-c4-r1.provenance]
+hardware = "gb200-8"
+checkpoint_revision = "3da2ddfe1954d9cda4c05b643dc0f26007a655c5"
+checkpoint = "/workspace/models/FastVideo-FastH3-8-Step-V2"
+system_revision = "bcb4ae288f77dbee431c0649b72ef43a4722bb2b"
+source_lock = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/baseline/vllm-omni/20260926T041709Z/source-lock.json"
+deployment = "vllm-omni-bf16"
+
+[benchmarks.vllm-omni-bf16-throughput-c4-r2]
+server = "vllm-omni-bf16"
+task = "video"
+model = "FastH3"
+dataset = "jsonl"
+dataset_path = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/protocol/workload/manifests/throughput-r2.jsonl"
+endpoint = "/v1/videos/sync"
+[benchmarks.vllm-omni-bf16-throughput-c4-r2.load]
+num_prompts = 32
+request_rate = inf
+max_concurrency = 4
+warmup_requests = 0
+request_timeout_s = 21600
+seed = 20260925
+warmup_manifest = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/protocol/workload/manifests/warmup.jsonl"
+priming_manifest = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/protocol/workload/manifests/priming-c4-r2.jsonl"
+[benchmarks.vllm-omni-bf16-throughput-c4-r2.video]
+backend = "vllm-omni"
+poll_interval_s = 0.1
+media_dir = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/media/gb200-8/bf16/vllm-omni/throughput/vllm-omni-bf16-throughput-c4-r2"
+[benchmarks.vllm-omni-bf16-throughput-c4-r2.metrics]
+videos_per_second = "higher"
+"video_latency_ms.p95" = "lower"
+
+[benchmarks.vllm-omni-bf16-throughput-c4-r2.provenance]
+hardware = "gb200-8"
+checkpoint_revision = "3da2ddfe1954d9cda4c05b643dc0f26007a655c5"
+checkpoint = "/workspace/models/FastVideo-FastH3-8-Step-V2"
+system_revision = "bcb4ae288f77dbee431c0649b72ef43a4722bb2b"
+source_lock = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/baseline/vllm-omni/20260926T041709Z/source-lock.json"
+deployment = "vllm-omni-bf16"
+
+[benchmarks.vllm-omni-bf16-throughput-c4-r3]
+server = "vllm-omni-bf16"
+task = "video"
+model = "FastH3"
+dataset = "jsonl"
+dataset_path = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/protocol/workload/manifests/throughput-r3.jsonl"
+endpoint = "/v1/videos/sync"
+[benchmarks.vllm-omni-bf16-throughput-c4-r3.load]
+num_prompts = 32
+request_rate = inf
+max_concurrency = 4
+warmup_requests = 0
+request_timeout_s = 21600
+seed = 20260925
+warmup_manifest = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/protocol/workload/manifests/warmup.jsonl"
+priming_manifest = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/protocol/workload/manifests/priming-c4-r3.jsonl"
+[benchmarks.vllm-omni-bf16-throughput-c4-r3.video]
+backend = "vllm-omni"
+poll_interval_s = 0.1
+media_dir = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/media/gb200-8/bf16/vllm-omni/throughput/vllm-omni-bf16-throughput-c4-r3"
+[benchmarks.vllm-omni-bf16-throughput-c4-r3.metrics]
+videos_per_second = "higher"
+"video_latency_ms.p95" = "lower"
+
+[benchmarks.vllm-omni-bf16-throughput-c4-r3.provenance]
+hardware = "gb200-8"
+checkpoint_revision = "3da2ddfe1954d9cda4c05b643dc0f26007a655c5"
+checkpoint = "/workspace/models/FastVideo-FastH3-8-Step-V2"
+system_revision = "bcb4ae288f77dbee431c0649b72ef43a4722bb2b"
+source_lock = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/baseline/vllm-omni/20260926T041709Z/source-lock.json"
+deployment = "vllm-omni-bf16"
+
+[benchmarks.vllm-omni-bf16-throughput-c8-r1]
+server = "vllm-omni-bf16"
+task = "video"
+model = "FastH3"
+dataset = "jsonl"
+dataset_path = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/protocol/workload/manifests/throughput-r1.jsonl"
+endpoint = "/v1/videos/sync"
+[benchmarks.vllm-omni-bf16-throughput-c8-r1.load]
+num_prompts = 32
+request_rate = inf
+max_concurrency = 8
+warmup_requests = 0
+request_timeout_s = 21600
+seed = 20260925
+warmup_manifest = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/protocol/workload/manifests/warmup.jsonl"
+priming_manifest = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/protocol/workload/manifests/priming-c8-r1.jsonl"
+[benchmarks.vllm-omni-bf16-throughput-c8-r1.video]
+backend = "vllm-omni"
+poll_interval_s = 0.1
+media_dir = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/media/gb200-8/bf16/vllm-omni/throughput/vllm-omni-bf16-throughput-c8-r1"
+[benchmarks.vllm-omni-bf16-throughput-c8-r1.metrics]
+videos_per_second = "higher"
+"video_latency_ms.p95" = "lower"
+
+[benchmarks.vllm-omni-bf16-throughput-c8-r1.provenance]
+hardware = "gb200-8"
+checkpoint_revision = "3da2ddfe1954d9cda4c05b643dc0f26007a655c5"
+checkpoint = "/workspace/models/FastVideo-FastH3-8-Step-V2"
+system_revision = "bcb4ae288f77dbee431c0649b72ef43a4722bb2b"
+source_lock = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/baseline/vllm-omni/20260926T041709Z/source-lock.json"
+deployment = "vllm-omni-bf16"
+
+[benchmarks.vllm-omni-bf16-throughput-c8-r2]
+server = "vllm-omni-bf16"
+task = "video"
+model = "FastH3"
+dataset = "jsonl"
+dataset_path = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/protocol/workload/manifests/throughput-r2.jsonl"
+endpoint = "/v1/videos/sync"
+[benchmarks.vllm-omni-bf16-throughput-c8-r2.load]
+num_prompts = 32
+request_rate = inf
+max_concurrency = 8
+warmup_requests = 0
+request_timeout_s = 21600
+seed = 20260925
+warmup_manifest = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/protocol/workload/manifests/warmup.jsonl"
+priming_manifest = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/protocol/workload/manifests/priming-c8-r2.jsonl"
+[benchmarks.vllm-omni-bf16-throughput-c8-r2.video]
+backend = "vllm-omni"
+poll_interval_s = 0.1
+media_dir = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/media/gb200-8/bf16/vllm-omni/throughput/vllm-omni-bf16-throughput-c8-r2"
+[benchmarks.vllm-omni-bf16-throughput-c8-r2.metrics]
+videos_per_second = "higher"
+"video_latency_ms.p95" = "lower"
+
+[benchmarks.vllm-omni-bf16-throughput-c8-r2.provenance]
+hardware = "gb200-8"
+checkpoint_revision = "3da2ddfe1954d9cda4c05b643dc0f26007a655c5"
+checkpoint = "/workspace/models/FastVideo-FastH3-8-Step-V2"
+system_revision = "bcb4ae288f77dbee431c0649b72ef43a4722bb2b"
+source_lock = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/baseline/vllm-omni/20260926T041709Z/source-lock.json"
+deployment = "vllm-omni-bf16"
+
+[benchmarks.vllm-omni-bf16-throughput-c8-r3]
+server = "vllm-omni-bf16"
+task = "video"
+model = "FastH3"
+dataset = "jsonl"
+dataset_path = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/protocol/workload/manifests/throughput-r3.jsonl"
+endpoint = "/v1/videos/sync"
+[benchmarks.vllm-omni-bf16-throughput-c8-r3.load]
+num_prompts = 32
+request_rate = inf
+max_concurrency = 8
+warmup_requests = 0
+request_timeout_s = 21600
+seed = 20260925
+warmup_manifest = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/protocol/workload/manifests/warmup.jsonl"
+priming_manifest = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/protocol/workload/manifests/priming-c8-r3.jsonl"
+[benchmarks.vllm-omni-bf16-throughput-c8-r3.video]
+backend = "vllm-omni"
+poll_interval_s = 0.1
+media_dir = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/media/gb200-8/bf16/vllm-omni/throughput/vllm-omni-bf16-throughput-c8-r3"
+[benchmarks.vllm-omni-bf16-throughput-c8-r3.metrics]
+videos_per_second = "higher"
+"video_latency_ms.p95" = "lower"
+
+[benchmarks.vllm-omni-bf16-throughput-c8-r3.provenance]
+hardware = "gb200-8"
+checkpoint_revision = "3da2ddfe1954d9cda4c05b643dc0f26007a655c5"
+checkpoint = "/workspace/models/FastVideo-FastH3-8-Step-V2"
+system_revision = "bcb4ae288f77dbee431c0649b72ef43a4722bb2b"
+source_lock = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/baseline/vllm-omni/20260926T041709Z/source-lock.json"
+deployment = "vllm-omni-bf16"
+
+[benchmarks.vllm-omni-bf16-throughput-c16-r1]
+server = "vllm-omni-bf16"
+task = "video"
+model = "FastH3"
+dataset = "jsonl"
+dataset_path = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/protocol/workload/manifests/throughput-r1.jsonl"
+endpoint = "/v1/videos/sync"
+[benchmarks.vllm-omni-bf16-throughput-c16-r1.load]
+num_prompts = 32
+request_rate = inf
+max_concurrency = 16
+warmup_requests = 0
+request_timeout_s = 21600
+seed = 20260925
+warmup_manifest = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/protocol/workload/manifests/warmup.jsonl"
+priming_manifest = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/protocol/workload/manifests/priming-c16-r1.jsonl"
+[benchmarks.vllm-omni-bf16-throughput-c16-r1.video]
+backend = "vllm-omni"
+poll_interval_s = 0.1
+media_dir = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/media/gb200-8/bf16/vllm-omni/throughput/vllm-omni-bf16-throughput-c16-r1"
+[benchmarks.vllm-omni-bf16-throughput-c16-r1.metrics]
+videos_per_second = "higher"
+"video_latency_ms.p95" = "lower"
+
+[benchmarks.vllm-omni-bf16-throughput-c16-r1.provenance]
+hardware = "gb200-8"
+checkpoint_revision = "3da2ddfe1954d9cda4c05b643dc0f26007a655c5"
+checkpoint = "/workspace/models/FastVideo-FastH3-8-Step-V2"
+system_revision = "bcb4ae288f77dbee431c0649b72ef43a4722bb2b"
+source_lock = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/baseline/vllm-omni/20260926T041709Z/source-lock.json"
+deployment = "vllm-omni-bf16"
+
+[benchmarks.vllm-omni-bf16-throughput-c16-r2]
+server = "vllm-omni-bf16"
+task = "video"
+model = "FastH3"
+dataset = "jsonl"
+dataset_path = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/protocol/workload/manifests/throughput-r2.jsonl"
+endpoint = "/v1/videos/sync"
+[benchmarks.vllm-omni-bf16-throughput-c16-r2.load]
+num_prompts = 32
+request_rate = inf
+max_concurrency = 16
+warmup_requests = 0
+request_timeout_s = 21600
+seed = 20260925
+warmup_manifest = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/protocol/workload/manifests/warmup.jsonl"
+priming_manifest = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/protocol/workload/manifests/priming-c16-r2.jsonl"
+[benchmarks.vllm-omni-bf16-throughput-c16-r2.video]
+backend = "vllm-omni"
+poll_interval_s = 0.1
+media_dir = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/media/gb200-8/bf16/vllm-omni/throughput/vllm-omni-bf16-throughput-c16-r2"
+[benchmarks.vllm-omni-bf16-throughput-c16-r2.metrics]
+videos_per_second = "higher"
+"video_latency_ms.p95" = "lower"
+
+[benchmarks.vllm-omni-bf16-throughput-c16-r2.provenance]
+hardware = "gb200-8"
+checkpoint_revision = "3da2ddfe1954d9cda4c05b643dc0f26007a655c5"
+checkpoint = "/workspace/models/FastVideo-FastH3-8-Step-V2"
+system_revision = "bcb4ae288f77dbee431c0649b72ef43a4722bb2b"
+source_lock = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/baseline/vllm-omni/20260926T041709Z/source-lock.json"
+deployment = "vllm-omni-bf16"
+
+[benchmarks.vllm-omni-bf16-throughput-c16-r3]
+server = "vllm-omni-bf16"
+task = "video"
+model = "FastH3"
+dataset = "jsonl"
+dataset_path = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/protocol/workload/manifests/throughput-r3.jsonl"
+endpoint = "/v1/videos/sync"
+[benchmarks.vllm-omni-bf16-throughput-c16-r3.load]
+num_prompts = 32
+request_rate = inf
+max_concurrency = 16
+warmup_requests = 0
+request_timeout_s = 21600
+seed = 20260925
+warmup_manifest = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/protocol/workload/manifests/warmup.jsonl"
+priming_manifest = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/protocol/workload/manifests/priming-c16-r3.jsonl"
+[benchmarks.vllm-omni-bf16-throughput-c16-r3.video]
+backend = "vllm-omni"
+poll_interval_s = 0.1
+media_dir = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/media/gb200-8/bf16/vllm-omni/throughput/vllm-omni-bf16-throughput-c16-r3"
+[benchmarks.vllm-omni-bf16-throughput-c16-r3.metrics]
+videos_per_second = "higher"
+"video_latency_ms.p95" = "lower"
+
+[benchmarks.vllm-omni-bf16-throughput-c16-r3.provenance]
+hardware = "gb200-8"
+checkpoint_revision = "3da2ddfe1954d9cda4c05b643dc0f26007a655c5"
+checkpoint = "/workspace/models/FastVideo-FastH3-8-Step-V2"
+system_revision = "bcb4ae288f77dbee431c0649b72ef43a4722bb2b"
+source_lock = "/workspace/UniServe/artifacts/blog-fast-h3-8step-20260925/baseline/vllm-omni/20260926T041709Z/source-lock.json"
+deployment = "vllm-omni-bf16"
+
+[suites.all]
+points = ["uniserve-bf16-qualification-c1","uniserve-bf16-latency-c1","uniserve-bf16-throughput-c1-r1","uniserve-bf16-throughput-c1-r2","uniserve-bf16-throughput-c1-r3","uniserve-bf16-throughput-c2-r1","uniserve-bf16-throughput-c2-r2","uniserve-bf16-throughput-c2-r3","uniserve-bf16-throughput-c4-r1","uniserve-bf16-throughput-c4-r2","uniserve-bf16-throughput-c4-r3","uniserve-bf16-throughput-c8-r1","uniserve-bf16-throughput-c8-r2","uniserve-bf16-throughput-c8-r3","uniserve-bf16-throughput-c16-r1","uniserve-bf16-throughput-c16-r2","uniserve-bf16-throughput-c16-r3","uniserve-nvfp4-qualification-c1","uniserve-nvfp4-latency-c1","uniserve-nvfp4-throughput-c1-r1","uniserve-nvfp4-throughput-c1-r2","uniserve-nvfp4-throughput-c1-r3","uniserve-nvfp4-throughput-c2-r1","uniserve-nvfp4-throughput-c2-r2","uniserve-nvfp4-throughput-c2-r3","uniserve-nvfp4-throughput-c4-r1","uniserve-nvfp4-throughput-c4-r2","uniserve-nvfp4-throughput-c4-r3","uniserve-nvfp4-throughput-c8-r1","uniserve-nvfp4-throughput-c8-r2","uniserve-nvfp4-throughput-c8-r3","uniserve-nvfp4-throughput-c16-r1","uniserve-nvfp4-throughput-c16-r2","uniserve-nvfp4-throughput-c16-r3","fastvideo-bf16-qualification-c1","fastvideo-bf16-latency-c1","fastvideo-bf16-throughput-c1-r1","fastvideo-bf16-throughput-c1-r2","fastvideo-bf16-throughput-c1-r3","fastvideo-bf16-throughput-c2-r1","fastvideo-bf16-throughput-c2-r2","fastvideo-bf16-throughput-c2-r3","fastvideo-bf16-throughput-c4-r1","fastvideo-bf16-throughput-c4-r2","fastvideo-bf16-throughput-c4-r3","fastvideo-bf16-throughput-c8-r1","fastvideo-bf16-throughput-c8-r2","fastvideo-bf16-throughput-c8-r3","fastvideo-bf16-throughput-c16-r1","fastvideo-bf16-throughput-c16-r2","fastvideo-bf16-throughput-c16-r3","vllm-omni-bf16-qualification-c1","vllm-omni-bf16-latency-c1","vllm-omni-bf16-throughput-c1-r1","vllm-omni-bf16-throughput-c1-r2","vllm-omni-bf16-throughput-c1-r3","vllm-omni-bf16-throughput-c2-r1","vllm-omni-bf16-throughput-c2-r2","vllm-omni-bf16-throughput-c2-r3","vllm-omni-bf16-throughput-c4-r1","vllm-omni-bf16-throughput-c4-r2","vllm-omni-bf16-throughput-c4-r3","vllm-omni-bf16-throughput-c8-r1","vllm-omni-bf16-throughput-c8-r2","vllm-omni-bf16-throughput-c8-r3","vllm-omni-bf16-throughput-c16-r1","vllm-omni-bf16-throughput-c16-r2","vllm-omni-bf16-throughput-c16-r3"]

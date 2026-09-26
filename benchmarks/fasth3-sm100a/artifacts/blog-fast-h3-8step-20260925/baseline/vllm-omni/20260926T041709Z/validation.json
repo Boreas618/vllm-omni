@@ -1,0 +1,32 @@
+{
+  "evaluator": {
+    "command": ".venv/bin/python -m pytest -q tests/python/unit/eval_driver",
+    "passed": 53
+  },
+  "vsa_regression": {
+    "command": "../../.venv-vllm-omni/bin/python -m pytest -q -s tests/diffusion/models/minimax_h3/test_vsa_sparsity.py",
+    "cwd": "refs/vllm-omni",
+    "passed": 8,
+    "gpu_cases": 6,
+    "cpu_cases": 2,
+    "observed_providers": [
+      "triton",
+      "sm100a"
+    ],
+    "log": "vsa-regression.log"
+  },
+  "native_extension": {
+    "direct_calls": 2,
+    "provenance": "kernel-rebuilt.json"
+  },
+  "ruff": "check and format --check passed for changed evaluator and vLLM-Omni files",
+  "diff_check": {
+    "uniserve": "passed",
+    "vllm-omni": "passed"
+  },
+  "plans_resolved": {
+    "gb200-4": 70,
+    "gb200-8": 68,
+    "rtxpro6000-8": 85
+  }
+}

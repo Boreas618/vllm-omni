@@ -1,0 +1,2493 @@
+diff --git a/tests/python/integration/model_loading/test_modelopt_checkpoint.py b/tests/python/integration/model_loading/test_modelopt_checkpoint.py
+index af36b7f5..62065ef1 100644
+--- a/tests/python/integration/model_loading/test_modelopt_checkpoint.py
++++ b/tests/python/integration/model_loading/test_modelopt_checkpoint.py
+@@ -47,7 +47,7 @@ MODELOPT_NVFP4 = {
+ }
+ 
+ 
+-def _export(root, quantization_config=MODELOPT_NVFP4):
++def _export(root, quantization_config=MODELOPT_NVFP4, *, manifest=False):
+     """Rewrite a dense checkpoint in ModelOpt's unified NVFP4 layout."""
+     qwen_checkpoint(root)
+     path = root / "model.safetensors"
+@@ -62,27 +62,60 @@ def _export(root, quantization_config=MODELOPT_NVFP4):
+             0, 256, (rows, columns // 2), dtype=torch.uint8, generator=generator
+         )
+         encoded[name] = values
+-        state[name + ".weight"] = values
++        state[name + (".weight_packed" if manifest else ".weight")] = values
+         state[name + ".weight_scale"] = torch.ones(rows, columns // 16).to(
+             torch.float8_e4m3fn
+         )
+-        state[name + ".weight_scale_2"] = torch.tensor(
+-            0.01, dtype=torch.float32
+-        )
+-        state[name + ".input_scale"] = torch.tensor(
+-            input_scale, dtype=torch.float32
+-        )
++        state[
++            name + (".weight_tensor_scale" if manifest else ".weight_scale_2")
++        ] = torch.tensor(0.01, dtype=torch.float32)
++        if not manifest:
++            state[name + ".input_scale"] = torch.tensor(
++                input_scale, dtype=torch.float32
++            )
+     save_file(state, path)
+     config = json.loads((root / "config.json").read_text())
+-    config["quantization_config"] = quantization_config
++    if manifest:
++        # The packed manifest names public numerical modules rather than
++        # checkpoint fields, including separate branches of a gated MLP.
++        modules = {}
++        for name, scale in PACKED.items():
++            path = name.replace("model.", "backbone.")
++            path = path.replace("gate_proj", "gate_up.projections.gate")
++            path = path.replace("up_proj", "gate_up.projections.up")
++            path = path.replace("down_proj", "down")
++            modules[path] = {"activation_amax": scale * 6 * 448}
++        (root / "modelopt_manifest.json").write_text(
++            json.dumps(
++                {
++                    "schema_version": 1,
++                    "numerical_format": {
++                        "activation": "a4",
++                        "block_scale": "fp8_e4m3",
++                        "block_size": 16,
++                        "output": "bf16",
++                        "tensor_scale": "fp32",
++                        "values": "e2m1",
++                        "weight": "w4",
++                    },
++                    "components": {
++                        "decoder": {"enabled": True, "modules": modules}
++                    },
++                }
++            )
++        )
++    else:
++        config["quantization_config"] = quantization_config
+     (root / "config.json").write_text(json.dumps(config))
+     return encoded
+ 
+ 
++@pytest.mark.parametrize("manifest", (False, True))
+ def test_packed_linears_run_with_their_weights_and_static_input_scales(
+     tmp_path,
++    manifest,
+ ):
+-    encoded = _export(tmp_path)
++    encoded = _export(tmp_path, manifest=manifest)
+ 
+     config = models.read_config(tmp_path)
+ 
+@@ -114,6 +147,32 @@ def test_packed_linears_run_with_their_weights_and_static_input_scales(
+     )
+     for path, module in packed.items():
+         assert module.input_quantizer == quantized[path].activation
++        buffers = module.weight.buffers()
++        assert torch.all(buffers["block_scale"] == 56)  # E4M3 encoding of 1
++        torch.testing.assert_close(buffers["tensor_scale"], torch.tensor(0.01))
++
++
++@pytest.mark.parametrize("mutation", ("format", "scale", "missing", "dense"))
++def test_packed_manifest_rejects_inconsistent_calibration(tmp_path, mutation):
++    _export(tmp_path, manifest=True)
++    path = tmp_path / "modelopt_manifest.json"
++    manifest = json.loads(path.read_text())
++    modules = manifest["components"]["decoder"]["modules"]
++    first = next(iter(modules))
++    if mutation == "format":
++        manifest["numerical_format"]["block_size"] = 32
++    elif mutation == "scale":
++        modules[first]["activation_amax"] = 0
++    elif mutation == "missing":
++        del modules[first]
++    else:
++        modules["backbone.layers.1.mlp.gate_up.projections.gate"] = {
++            "activation_amax": 2688
++        }
++    path.write_text(json.dumps(manifest))
++
++    with pytest.raises(ValueError, match="ModelOpt"):
++        models.read_config(tmp_path)
+ 
+ 
+ @pytest.mark.parametrize(
+diff --git a/tests/python/unit/eval_driver/test_arrival.py b/tests/python/unit/eval_driver/test_arrival.py
+index 74e87035..4e57ec7c 100644
+--- a/tests/python/unit/eval_driver/test_arrival.py
++++ b/tests/python/unit/eval_driver/test_arrival.py
+@@ -6,6 +6,7 @@ from types import SimpleNamespace
+ import pytest
+ 
+ from uniserve_eval.load.arrival import run_load
++from uniserve_eval.types import RequestRecord
+ 
+ pytestmark = pytest.mark.unit
+ 
+@@ -15,12 +16,18 @@ def test_warmup_and_measurement_share_the_submission_concurrency_limit():
+     peak = dict(active)
+ 
+     async def submit(row, scheduled):
++        record = RequestRecord(request_id="row", task="text")
++        record.begin(
++            endpoint="/test", scheduled_time=scheduled, requested_output_len=0
++        )
+         phase = "warmup" if scheduled is None else "measured"
+         active[phase] += 1
+         peak[phase] = max(peak[phase], active[phase])
+         await asyncio.sleep(0)
+         active[phase] -= 1
+-        return SimpleNamespace(success=True)
++        record.close_now()
++        record.mark_success()
++        return record
+ 
+     result = asyncio.run(
+         run_load(
+@@ -40,8 +47,15 @@ def test_measured_duration_excludes_warmup(monkeypatch):
+     monkeypatch.setattr("time.perf_counter", lambda: clock[0])
+ 
+     async def submit(row, scheduled):
++        record = RequestRecord(
++            request_id="row", task="text", start_time=clock[0]
++        )
+         clock[0] += 120.0 if scheduled is None else 7.0
+-        return SimpleNamespace(success=True)
++        record.close_now()
++        record.mark_success()
++        # Returning later must not extend the transport measurement window.
++        clock[0] += 20.0
++        return record
+ 
+     result = asyncio.run(
+         run_load(
+@@ -61,6 +75,7 @@ def test_finite_rate_duration_ends_at_the_last_completion(monkeypatch):
+     real_sleep = asyncio.sleep
+ 
+     async def advance(delay):
++        await real_sleep(0)
+         clock[0] += delay
+         await real_sleep(0)
+ 
+@@ -71,7 +86,12 @@ def test_finite_rate_duration_ends_at_the_last_completion(monkeypatch):
+     monkeypatch.setattr("numpy.random.exponential", lambda scale: 0.25)
+ 
+     async def submit(row, scheduled):
+-        return SimpleNamespace(success=True)
++        record = RequestRecord(
++            request_id="row", task="text", start_time=clock[0]
++        )
++        record.close_now()
++        record.mark_success()
++        return record
+ 
+     result = asyncio.run(
+         run_load(
+diff --git a/tests/python/unit/models/test_h3_modelopt.py b/tests/python/unit/models/test_h3_modelopt.py
+index 758316c4..f78c84c6 100644
+--- a/tests/python/unit/models/test_h3_modelopt.py
++++ b/tests/python/unit/models/test_h3_modelopt.py
+@@ -34,14 +34,42 @@ MODELOPT_NVFP4 = {
+ }
+ 
+ 
+-@pytest.fixture
+-def packed_checkpoint(tmp_path):
++@pytest.fixture(params=("unified", "manifest"))
++def packed_checkpoint(tmp_path, request):
+     source = Path(__file__).parents[2] / "fixtures/models/fasth3"
+     shutil.copytree(source, tmp_path, dirs_exist_ok=True)
+     (tmp_path / "modular_model_index.json").write_text(
+         json.dumps({"_class_name": "MiniMaxH3ModularPipeline"}),
+         encoding="utf-8",
+     )
++    if request.param == "manifest":
++        (tmp_path / "modelopt_manifest.json").write_text(
++            json.dumps(
++                {
++                    "schema_version": 1,
++                    "numerical_format": {
++                        "activation": "a4",
++                        "block_scale": "fp8_e4m3",
++                        "block_size": 16,
++                        "output": "bf16",
++                        "tensor_scale": "fp32",
++                        "values": "e2m1",
++                        "weight": "w4",
++                    },
++                    "components": {
++                        "denoiser": {
++                            "enabled": True,
++                            "modules": {
++                                "denoiser.transformer.layers.0.mlp.down": {
++                                    "activation_amax": 2688
++                                }
++                            },
++                        }
++                    },
++                }
++            )
++        )
++        return tmp_path
+     for component in ("transformer", "vae"):
+         path = tmp_path / component / "config.json"
+         config = json.loads(path.read_text())
+diff --git a/uniserve/loading/checkpoint.py b/uniserve/loading/checkpoint.py
+index ebbdc052..60384b3c 100644
+--- a/uniserve/loading/checkpoint.py
++++ b/uniserve/loading/checkpoint.py
+@@ -360,8 +360,9 @@ class FP8Weight(Weight):
+ class NVFP4Weight(Weight):
+     """Expose packed ModelOpt NVFP4 values in their calibrated scale domain.
+ 
+-    `tensor_scale` is ModelOpt's `weight_scale_2`, the weight's global amax
+-    divided by 6 * 448. `activation_scale` is the static `input_scale` the
++    `tensor_scale` is ModelOpt's `weight_scale_2` (or the packed export's
++    `weight_tensor_scale`), the weight's global amax divided by 6 * 448.
++    `activation_scale` is the static `input_scale` the
+     same calibration recorded for the module's input, in the same domain,
+     when the export quantizes activations.
+     """
+@@ -527,19 +528,39 @@ class Reader:
+         # architecture mappings and TP slicing identical to a dense
+         # checkpoint.
+         for name, values in tuple(self._weights.items()):
+-            if values.dtype != torch.uint8 or not name.endswith(".weight"):
++            packed = name.endswith(".weight_packed")
++            if values.dtype != torch.uint8 or not (
++                packed or name.endswith(".weight")
++            ):
+                 continue
+-            prefix = name.removesuffix(".weight")
+-            tensor_scale = self._weights.get(prefix + ".weight_scale_2")
++            prefix = name.removesuffix(
++                ".weight_packed" if packed else ".weight"
++            )
++            tensor_scale = self._weights.get(
++                prefix
++                + (".weight_tensor_scale" if packed else ".weight_scale_2")
++            )
+             if tensor_scale is None:
++                if packed:
++                    raise ValueError(
++                        f"NVFP4 checkpoint {name!r} requires its tensor scale"
++                    )
+                 continue
+             block_scale = self._weights.get(prefix + ".weight_scale")
+             if block_scale is None:
+                 raise ValueError(
+                     f"NVFP4 checkpoint {name!r} requires its K16 block scales"
+                 )
+-            self._weights[name] = NVFP4Weight(
+-                name,
++            logical = prefix + ".weight"
++            if packed and logical in self._weights:
++                raise ValueError(
++                    f"checkpoint declares two weights for {logical!r}"
++                )
++            # Packed exports keep the physical byte field separately. The
++            # logical weight preserves ordinary mappings and slice semantics;
++            # its source accounting includes every physical scale and value.
++            self._weights[logical] = NVFP4Weight(
++                logical,
+                 values,
+                 block_scale,
+                 tensor_scale,
+diff --git a/uniserve_eval/artifacts.py b/uniserve_eval/artifacts.py
+index 30eba138..ae9124cf 100644
+--- a/uniserve_eval/artifacts.py
++++ b/uniserve_eval/artifacts.py
+@@ -22,8 +22,7 @@ from pathlib import Path
+ from typing import Any
+ 
+ from .transport.images import inspect_image_bytes
+-from .transport.video import inspect_video_bytes
+-from .types import DecodedImage, DecodedVideo
++from .types import DecodedImage
+ 
+ 
+ class ArtifactWriter:
+@@ -74,6 +73,32 @@ class ArtifactWriter:
+                 temporary_path.unlink(missing_ok=True)
+         return path
+ 
++    def write_original_video(self, path: Path, data: bytes) -> Path:
++        """Durably retain bytes, including bodies rejected by inspection.
++
++        Callers supply a request-qualified path. Existing different bytes are
++        never overwritten, so a canonical output cannot silently change.
++        """
++        path.parent.mkdir(parents=True, exist_ok=True)
++        if path.exists():
++            if path.read_bytes() != data:
++                raise FileExistsError(f"original media already exists: {path}")
++            return path
++        temporary_path = None
++        try:
++            with tempfile.NamedTemporaryFile(
++                dir=path.parent, delete=False
++            ) as handle:
++                temporary_path = Path(handle.name)
++                handle.write(data)
++                handle.flush()
++                os.fsync(handle.fileno())
++            os.link(temporary_path, path)
++        finally:
++            if temporary_path is not None:
++                temporary_path.unlink(missing_ok=True)
++        return path
++
+     def write_jsonl(self, name: str, payloads: list[Any]) -> Path:
+         """Serialize values as an atomically replaced JSON Lines file."""
+         path = self.output_dir / name
+@@ -147,44 +172,6 @@ class ArtifactWriter:
+                 temporary_path.unlink(missing_ok=True)
+         return path
+ 
+-    def write_video_sample(self, video: DecodedVideo) -> Path:
+-        """Validate and store a content-addressed MP4 sample.
+-
+-        Validation, reuse, and error behavior follow `write_image_sample`,
+-        with `VideoOutputError` raised when `inspect_video_bytes` rejects the
+-        bytes or the declared MIME type.
+-        """
+-        inspected = inspect_video_bytes(video.data, declared_mime=video.mime)
+-        if inspected.metadata_dict() != video.metadata_dict():
+-            raise ValueError(
+-                "generated video metadata does not match its response bytes"
+-            )
+-
+-        path = self.samples_dir / video.sample_filename
+-        if path.exists():
+-            if path.read_bytes() != video.data:
+-                raise ValueError("content-addressed video sample collision")
+-            return path
+-
+-        temporary_path: Path | None = None
+-        try:
+-            with tempfile.NamedTemporaryFile(
+-                mode="wb",
+-                dir=path.parent,
+-                prefix=f".{path.name}.",
+-                suffix=".tmp",
+-                delete=False,
+-            ) as handle:
+-                temporary_path = Path(handle.name)
+-                handle.write(video.data)
+-                handle.flush()
+-                os.fsync(handle.fileno())
+-            os.replace(temporary_path, path)
+-        finally:
+-            if temporary_path is not None:
+-                temporary_path.unlink(missing_ok=True)
+-        return path
+-
+ 
+ def _jsonable(payload: Any) -> Any:
+     """Convert supported structured values into JSON-compatible values.
+diff --git a/uniserve_eval/cli.py b/uniserve_eval/cli.py
+index d3209680..f3a9cd06 100644
+--- a/uniserve_eval/cli.py
++++ b/uniserve_eval/cli.py
+@@ -65,6 +65,7 @@ def plan(args: argparse.Namespace) -> None:
+                     else point.load.request_rate
+                 ),
+                 "max_concurrency": point.load.max_concurrency,
++                "workload": point.workload_dict(),
+                 "metrics": [metric.as_dict() for metric in point.metrics],
+             }
+         )
+@@ -161,7 +162,7 @@ def build_parser() -> argparse.ArgumentParser:
+     command.add_argument("--executable", type=Path)
+     command.add_argument("--output-root", type=Path)
+     command.add_argument("--launch-timeout-s", type=float, default=1800)
+-    command.add_argument("--request-timeout-s", type=float, default=6 * 60 * 60)
++    command.add_argument("--request-timeout-s", type=float)
+     command.set_defaults(function=run)
+     return parser
+ 
+diff --git a/uniserve_eval/config.py b/uniserve_eval/config.py
+index 6677fe28..8e8d0c85 100644
+--- a/uniserve_eval/config.py
++++ b/uniserve_eval/config.py
+@@ -65,6 +65,7 @@ _ROOT_FIELDS = {
+     "image",
+     "video",
+     "metrics",
++    "provenance",
+ }
+ _LOAD_FIELDS = set(LoadConfig.__dataclass_fields__)
+ _SAMPLING_FIELDS = set(SamplingConfig.__dataclass_fields__)
+@@ -414,6 +415,9 @@ def _benchmark_point(
+         tokenizer=tokenizer,
+         endpoint=endpoint,
+         question=question,
++        provenance=_mapping(
++            value.get("provenance", {}), f"benchmarks.{name}.provenance"
++        ),
+     )
+ 
+ 
+diff --git a/uniserve_eval/datasets/jsonl.py b/uniserve_eval/datasets/jsonl.py
+index 1e8e00d2..7c4dd992 100644
+--- a/uniserve_eval/datasets/jsonl.py
++++ b/uniserve_eval/datasets/jsonl.py
+@@ -30,6 +30,7 @@ _OPTIONAL = (
+     "seed",
+     "aspect_ratio",
+     "seconds",
++    "metadata",
+ )
+ 
+ 
+diff --git a/uniserve_eval/load/arrival.py b/uniserve_eval/load/arrival.py
+index fed8ba8f..7fd2793c 100644
+--- a/uniserve_eval/load/arrival.py
++++ b/uniserve_eval/load/arrival.py
+@@ -4,9 +4,7 @@
+ ``submit`` coroutine that builds and sends one request. This module owns only
+ arrival timing, the client-side concurrency limit, and the measured window;
+ request construction, transport, and metrics live elsewhere. Submission
+-outputs are opaque here except for warmup, which reads their ``success``
+-attribute and, for the failure message, ``classifier``, ``status_code``, and
+-``error``.
++records supply monotonic start and terminal timestamps for the load window.
+ """
+ 
+ from __future__ import annotations
+@@ -19,9 +17,9 @@ from typing import Any, TypeVar
+ 
+ import numpy as np
+ 
+-from ..types import Example
++from ..types import Example, RequestRecord
+ 
+-T = TypeVar("T")
++T = TypeVar("T", bound=RequestRecord)
+ # ``submit(example, scheduled)`` sends one request. ``scheduled`` is the
+ # ``time.perf_counter()`` arrival time for measured requests and ``None`` for
+ # warmup requests.
+@@ -88,8 +86,10 @@ async def run_load(
+     max_concurrency: int | None,
+     submit: Submit[T],
+     warmup_requests: int = 1,
++    warmup_rows: list[Example] | None = None,
++    inspect_warmup: Callable[[list[T]], None] | None = None,
+ ) -> LoadResult:
+-    """Run warmup, settle, and measured requests under a concurrency limit.
++    """Run excluded warmup and measured requests under a concurrency limit.
+ 
+     Warmup sends ``rows[0]`` ``warmup_requests`` times concurrently, within
+     the concurrency limit. The measured phase then submits every row once at
+@@ -103,6 +103,9 @@ async def run_load(
+             ``0``) for no limit.
+         submit: Coroutine that sends one example; see ``Submit``.
+         warmup_requests: Number of warmup submissions; ``0`` skips warmup.
++        warmup_rows: Explicit excluded corpus, replacing first-row repetition.
++        inspect_warmup: Inspect excluded outputs after their slots are released
++            and before checking warmup success.
+ 
+     Returns:
+         Warmup and measured outputs in submission order, and the measured
+@@ -135,21 +138,20 @@ async def run_load(
+ 
+     # Warmup exercises the same request path outside the reported duration.
+     warmup_outputs: list[T] = []
+-    if warmup_requests > 0:
++    excluded = (
++        warmup_rows if warmup_rows is not None else [rows[0]] * warmup_requests
++    )
++    if excluded:
+         warmup_outputs = await asyncio.gather(
+-            *[limited(rows[0], None) for _ in range(warmup_requests)]
++            *[limited(row, None) for row in excluded]
+         )
++        if inspect_warmup is not None:
++            inspect_warmup(warmup_outputs)
+         if not all(
+             getattr(output, "success", False) for output in warmup_outputs
+         ):
+             raise WarmupFailure(list(warmup_outputs))
+ 
+-    # A fixed pause precedes the measured window, with or without warmup,
+-    # and lies outside the reported duration.
+-    await asyncio.sleep(1.0)
+-
+-    benchmark_start_time = time.perf_counter()
+-
+     tasks: list[asyncio.Task[T]] = []
+     try:
+         async for row in get_request(rows, request_rate):
+@@ -163,15 +165,13 @@ async def run_load(
+             task.cancel()
+         await asyncio.gather(*tasks, return_exceptions=True)
+         raise
+-    benchmark_end_time = time.perf_counter()
+-
+-    # Duration runs from the first arrival until every measured request has
+-    # finished. The arrival loop ends at the final arrival (see
+-    # ``get_request``), so the window closes at the last completion and
+-    # holds no inter-arrival delay beyond it. ``metrics.summarize`` divides
+-    # its throughputs by this duration.
++    # Every attempted request, including errors and deadlines, contributes to
++    # the window. Coroutine cleanup and subsequent inspection do not.
++    duration = max(output.final_event_time for output in outputs) - min(
++        output.start_time for output in outputs
++    )
+     return LoadResult(
+         tuple(warmup_outputs),
+         tuple(outputs),
+-        benchmark_end_time - benchmark_start_time,
++        duration,
+     )
+diff --git a/uniserve_eval/metrics.py b/uniserve_eval/metrics.py
+index 1003b0b9..273b6f0a 100644
+--- a/uniserve_eval/metrics.py
++++ b/uniserve_eval/metrics.py
+@@ -205,7 +205,7 @@ def summarize(
+         for record in successful
+         if record.decoded_video is not None
+     ]
+-    if videos:
++    if any(record.task == "video" for record in records):
+         summary["completed_videos"] = len(videos)
+         summary["videos_per_second"] = len(videos) / duration
+         # Only MP4 bytes of returned videos count; images do not contribute.
+diff --git a/uniserve_eval/pipeline/run.py b/uniserve_eval/pipeline/run.py
+index 6076e0b3..e4a404ec 100644
+--- a/uniserve_eval/pipeline/run.py
++++ b/uniserve_eval/pipeline/run.py
+@@ -7,13 +7,17 @@ The bundle in the output directory contains:
+   `preparing` to `running` (once dataset rows are selected) and then to
+   `completed` or `failed`; a failure before row selection goes directly from
+   `preparing` to `failed`.
+-- `warmup_requests.jsonl` and `requests.jsonl`: warmup and measured request
++- `warmup_requests.jsonl`, `priming_requests.jsonl`, and `requests.jsonl`:
++  excluded warmup, excluded queue priming, and measured request
+   records; only measured records feed metrics and validation. When the
+   measured window fails or is interrupted, `requests.jsonl` holds the
+   measured requests that finished before it, in completion order, and
+   `run.json` is `failed`.
+ - `gpu_samples.jsonl`: `GpuStorageSampler` telemetry snapshots.
+-- `samples/`: decoded image and video outputs referenced by the records.
++- `samples/`: image outputs and original video response bodies, including
++  invalid bodies. A configured `video.media_dir` holds measured videos.
++- `media_index.jsonl` and `media_validity.jsonl`: original-output references,
++  checksums, request identities, timing records, and validity checks.
+ - `summary.json` and `summary.md`: the validated summary, written only on the
+   completion path.
+ 
+@@ -25,7 +29,11 @@ streams; it then carries that persistence error as `artifact_error`.
+ 
+ from __future__ import annotations
+ 
++import hashlib
++import os
++import resource
+ import time
++from dataclasses import replace
+ from pathlib import Path
+ from typing import Any, cast
+ 
+@@ -36,6 +44,7 @@ from ..artifacts import ArtifactWriter
+ from ..datasets import load_examples
+ from ..load import GpuStorageSampler, WarmupFailure, run_load
+ from ..tasks import get_task
++from ..tasks.video import VideoTask
+ from ..transport import send_request
+ from ..types import (
+     BenchmarkPoint,
+@@ -53,7 +62,7 @@ async def run_point(
+     output_dir: str | Path,
+     *,
+     launch: dict[str, Any] | None = None,
+-    timeout_s: float = 6 * 60 * 60.0,
++    timeout_s: float | None = None,
+ ) -> RunResult:
+     """Run dataset loading, warmup, measured load, validation, and persistence.
+ 
+@@ -62,9 +71,8 @@ async def run_point(
+         point: The resolved benchmark point to execute.
+         output_dir: The bundle directory; it must be absent or empty.
+         launch: The `describe_launch` provenance record, if any.
+-        timeout_s: The httpx timeout in seconds, applied to each connect,
+-            read, write, and pool wait of a benchmark request; the
+-            `/version` provenance fetch uses its own shorter timeout.
++        timeout_s: Override the profile's logical video request deadline and
++            HTTP operation timeout. Provenance uses a separate short timeout.
+ 
+     Returns:
+         The summary and bundle directory. A point whose validation fails
+@@ -81,6 +89,7 @@ async def run_point(
+             error.
+     """  # noqa: E501
+     output_path = Path(output_dir)
++    timeout_s = point.load.request_timeout_s if timeout_s is None else timeout_s
+     if output_path.exists() and any(output_path.iterdir()):
+         raise FileExistsError(f"result directory is not empty: {output_path}")
+ 
+@@ -89,9 +98,11 @@ async def run_point(
+     launch_record = launch or {}
+     selection: dict[str, Any] | None = None
+     warmup_records: list[RequestRecord] = []
++    priming_records: list[RequestRecord] = []
+     records: list[RequestRecord] = []
+     sampler: GpuStorageSampler | None = None
+     duration = 0.0
++    phase = "measured"
+ 
+     # Empty streams and the preparing record make partial failures
+     # inspectable with the same artifact names as completed points.
+@@ -112,7 +123,33 @@ async def run_point(
+         # state.
+         task = get_task(point.task)(point)
+         rows, tokenizer = load_examples(point)
++        if len({row.id for row in rows}) != len(rows):
++            raise ValueError("request IDs must be unique within a manifest")
++        warmup_rows = _excluded_rows(point, point.load.warmup_manifest)
++        priming_rows = _excluded_rows(point, point.load.priming_manifest)
++        # Frozen manifests can carry thousands of token IDs per row. Copying
++        # those provenance fields belongs before dispatch, outside every slot.
++        all_rows = [*rows, *(warmup_rows or []), *(priming_rows or [])]
++        examples = {id(row): row.as_dict() for row in all_rows}
++        video_requests = (
++            {id(row): task.build_request(row) for row in all_rows}
++            if isinstance(task, VideoTask)
++            else {}
++        )
+         selection = selected_rows_identity(rows)
++        writer.write_jsonl("examples.jsonl", [row.as_dict() for row in rows])
++        writer.write_json(
++            "client.json",
++            {
++                "request_timeout_s": timeout_s,
++                "cpu_affinity": sorted(os.sched_getaffinity(0)),
++                "connection_limits": None,
++                "keepalive_expiry_s": None,
++                "media_buffer": "host_memory",
++                "warmup_rows": selected_rows_identity(warmup_rows or []),
++                "priming_rows": selected_rows_identity(priming_rows or []),
++            },
++        )
+         writer.write_json(
+             "run.json",
+             _run_state(
+@@ -133,7 +170,9 @@ async def run_point(
+         # in-flight requests is `run_load`'s optional `max_concurrency`
+         # semaphore.
+         limits = httpx.Limits(
+-            max_connections=None, max_keepalive_connections=None
++            max_connections=None,
++            max_keepalive_connections=None,
++            keepalive_expiry=None,
+         )
+         async with httpx.AsyncClient(
+             timeout=timeout_s, limits=limits
+@@ -147,7 +186,9 @@ async def run_point(
+                 `scheduled` is None for warmup requests and the measured
+                 arrival time from `time.perf_counter` otherwise.
+                 """
+-                request = task.build_request(example)
++                request = video_requests.get(id(example))
++                if request is None:
++                    request = task.build_request(example)
+ 
+                 # The fallback becomes the record's `requested_output_len`;
+                 # it is 0 when neither the row nor `sampling.max_tokens`
+@@ -166,35 +207,63 @@ async def run_point(
+                     prompt_len=int(example.prompt_len or 0),
+                     output_len_fallback=output_len_fallback,
+                     scheduled_time=scheduled,
++                    timeout_s=timeout_s,
+                 )
++                record.example = examples[id(example)]
+ 
+                 # Measured records are kept as they finish, so a load that
+                 # raises or is cancelled still leaves them for the failure
+                 # bundle. `run_load` cancels every outstanding submission
+                 # before it raises, so none is added afterwards.
+-                if scheduled is not None:
++                if scheduled is None:
++                    warmup_records.append(record)
++                elif phase == "priming":
++                    priming_records.append(record)
++                else:
+                     records.append(record)
+                 return record
+ 
+-            # Sampling spans warmup, the settle pause, and the measured
+-            # window.
++            # Sampling spans excluded requests and the measured window.
+             sampler = GpuStorageSampler()
+             sampler.start()
+ 
++            def inspect(records: list[RequestRecord]) -> None:
++                if isinstance(task, VideoTask):
++                    for record in records:
++                        task.inspect_output(record)
++
+             try:
++                if priming_rows:
++                    phase = "priming"
++                    # Shape warmup precedes queue priming. Its validation is
++                    # outside all slots, and priming has no subsequent pause.
++                    primed = await run_load(
++                        priming_rows,
++                        request_rate=float("inf"),
++                        max_concurrency=point.load.max_concurrency,
++                        submit=submit,
++                        warmup_requests=point.load.warmup_requests,
++                        warmup_rows=warmup_rows,
++                        inspect_warmup=inspect,
++                    )
++                    warmup_records = list(primed.warmup_outputs)
++                    priming_records = list(primed.outputs)
++                    phase = "measured"
++                    if not all(record.success for record in priming_records):
++                        raise WarmupFailure(priming_records)
++                    # Priming is excluded from metrics. Inspection runs after
++                    # measurement to preserve the primed queues and caches.
+                 load_result = await run_load(
+                     rows,
+                     request_rate=point.load.request_rate,
+                     max_concurrency=point.load.max_concurrency,
+                     submit=submit,
+-                    warmup_requests=point.load.warmup_requests,
++                    warmup_requests=0
++                    if priming_rows
++                    else point.load.warmup_requests,
++                    warmup_rows=[] if priming_rows else warmup_rows,
++                    inspect_warmup=inspect,
+                 )
+-            except WarmupFailure as error:
+-                # `WarmupFailure` is the only `run_load` exception that
+-                # carries outputs; keeping them lets the failure bundle
+-                # persist the warmup records.
+-                warmup_records = cast(list[RequestRecord], list(error.outputs))
+-                raise
+             finally:
+                 sampler.stop()
+ 
+@@ -202,11 +271,12 @@ async def run_point(
+             # separate diagnostic stream. The completed load's outputs, in
+             # submission order, replace the completion-order records that
+             # `submit` collected.
+-            warmup_records = cast(
+-                list[RequestRecord], list(load_result.warmup_outputs)
+-            )
++            if not priming_rows:
++                warmup_records = list(load_result.warmup_outputs)
+             records = cast(list[RequestRecord], list(load_result.outputs))
+             duration = load_result.duration_s
++            inspect(records)
++            inspect(priming_records)
+ 
+             # Provenance is fetched after the measured window closes.
+             server_version = await _fetch_server_version(client, base_url)
+@@ -222,14 +292,30 @@ async def run_point(
+             server_version=server_version,
+             launch=launch_record,
+         )
++        if priming_records:
++            summary["validation"]["checks"]["priming_valid"] = all(
++                record.success for record in priming_records
++            )
++            summary["validation"]["valid"] = all(
++                summary["validation"]["checks"].values()
++            )
+ 
+         if sampler.summary() is not None:
+             summary["gpu_memory"] = sampler.summary()
++        summary["client"] = {
++            "peak_rss_bytes": resource.getrusage(resource.RUSAGE_SELF).ru_maxrss
++            * 1024,
++            "retained_body_bytes": sum(
++                len(record.video_body or b"")
++                for record in [*warmup_records, *priming_records, *records]
++            ),
++        }
+ 
+         # The completed lifecycle record is written after every result
+         # artifact so it acts as the bundle's commit marker.
+         _write_records(writer, "warmup_requests.jsonl", warmup_records)
+-        _write_records(writer, "requests.jsonl", records)
++        _write_records(writer, "priming_requests.jsonl", priming_records)
++        _write_records(writer, "requests.jsonl", records, point.video.media_dir)
+         writer.write_jsonl("gpu_samples.jsonl", list(sampler.sample_records))
+         writer.write_json("summary.json", summary)
+         (output_path / "summary.md").write_text(
+@@ -281,7 +367,10 @@ async def run_point(
+                 list(sampler.sample_records) if sampler is not None else [],
+             )
+             _write_records(writer, "warmup_requests.jsonl", warmup_records)
+-            _write_records(writer, "requests.jsonl", records)
++            _write_records(writer, "priming_requests.jsonl", priming_records)
++            _write_records(
++                writer, "requests.jsonl", records, point.video.media_dir
++            )
+         except Exception as artifact_error:
+             failure["artifact_error"] = {
+                 "type": type(artifact_error).__name__,
+@@ -294,6 +383,7 @@ async def run_point(
+ def _write_empty_streams(writer: ArtifactWriter) -> None:
+     """Create durable empty record streams before fallible benchmark work."""
+     writer.write_jsonl("warmup_requests.jsonl", [])
++    writer.write_jsonl("priming_requests.jsonl", [])
+     writer.write_jsonl("requests.jsonl", [])
+     writer.write_jsonl("gpu_samples.jsonl", [])
+ 
+@@ -302,23 +392,94 @@ def _write_records(
+     writer: ArtifactWriter,
+     name: str,
+     records: list[RequestRecord],
++    media_dir: str | None = None,
+ ) -> None:
+-    """Persist decoded media samples and their request records.
++    """Persist original media and its request records after measurement.
+ 
+     Samples are written under `samples/` before the JSONL stream that
+     references them.
+ 
+     Raises:
+-        ValueError: From `ArtifactWriter`, including `ImageOutputError` and
+-            `VideoOutputError`, when sample bytes fail inspection, do not
+-            match their recorded metadata, or collide with a different sample.
++        ValueError: Invalid image metadata or unsafe media request IDs.
++        FileExistsError: Different media already occupies the requested path.
+     """
+     for record in records:
+         for image in record.decoded_images:
+             writer.write_image_sample(image)
+-        if record.decoded_video is not None:
+-            writer.write_video_sample(record.decoded_video)
++        if record.video_body is not None:
++            checksum = hashlib.sha256(record.video_body).hexdigest()
++            if media_dir is not None:
++                if Path(
++                    record.request_id
++                ).name != record.request_id or record.request_id in {".", ".."}:
++                    raise ValueError(
++                        "media request ID must be a filename component"
++                    )
++                path = Path(media_dir) / f"{record.request_id}.mp4"
++            else:
++                path = writer.samples_dir / f"{checksum}.mp4"
++            writer.write_original_video(path, record.video_body)
++            record.original_output = {
++                "path": str(path),
++                "sha256": checksum,
++                "byte_size": len(record.video_body),
++                "mime": record.video_mime,
++            }
+     writer.write_jsonl(name, [record.record_dict() for record in records])
++    if name == "requests.jsonl":
++        writer.write_jsonl(
++            "media_index.jsonl",
++            [
++                {
++                    "request_id": record.request_id,
++                    "success": record.success,
++                    "classifier": record.classifier,
++                    "original_output": record.original_output,
++                    "media_checks": record.media_checks,
++                    "example": record.example,
++                    "run": str((writer.output_dir / "run.json").resolve()),
++                    "timing_records": str(
++                        (writer.output_dir / "requests.jsonl").resolve()
++                    ),
++                }
++                for record in records
++            ],
++        )
++        writer.write_jsonl(
++            "media_validity.jsonl",
++            [
++                {
++                    "request_id": record.request_id,
++                    "valid": record.success,
++                    "classifier": record.classifier,
++                    "checks": record.media_checks,
++                    "video": record.decoded_video.metadata_dict()
++                    if record.decoded_video
++                    else None,
++                }
++                for record in records
++                if record.task == "video"
++            ],
++        )
++
++
++def _excluded_rows(
++    point: BenchmarkPoint, path: str | None
++) -> list[Example] | None:
++    """Load all rows of an explicit excluded manifest in its frozen order."""
++    if path is None:
++        return None
++    count = sum(
++        bool(line.strip()) for line in Path(path).read_text().splitlines()
++    )
++    excluded = replace(
++        point,
++        dataset="jsonl",
++        dataset_path=path,
++        load=replace(point.load, num_prompts=count),
++    )
++    rows, _ = load_examples(excluded)
++    return rows
+ 
+ 
+ def _run_state(
+diff --git a/uniserve_eval/tasks/video.py b/uniserve_eval/tasks/video.py
+index ceed0ba9..98742758 100644
+--- a/uniserve_eval/tasks/video.py
++++ b/uniserve_eval/tasks/video.py
+@@ -1,11 +1,7 @@
+-"""Defines synchronous text-to-video-with-audio benchmark behavior.
++"""Build native video requests and inspect complete MP4s after measurement.
+ 
+-Requests go to ``/v1/videos/sync``, whose response body is the encoded MP4
+-itself; ``uniserve_eval.transport.video`` decodes it into the ``DecodedVideo``
+-metadata that ``VideoTask.validate_output`` checks. The expected raster, frame
+-rate, codecs, and audio clock are the fixed output contract of the MiniMax H3
+-profile (``uniserve_models.minimax_h3`` and the worker's MP4 muxer in
+-``uniserve_worker.media.container``).
++Synchronous and asynchronous adapters share the MiniMax H3 media contract.
++Inspection uses each request's duration and never runs inside a load slot.
+ """
+ 
+ from __future__ import annotations
+@@ -14,6 +10,7 @@ import math
+ from collections.abc import Sequence
+ from typing import ClassVar
+ 
++from ..transport.video import VideoOutputError, inspect_video_bytes
+ from ..types import (
+     VIDEOS_SYNC,
+     Example,
+@@ -26,15 +23,22 @@ from .base import BenchmarkTask
+ 
+ 
+ class VideoTask(BenchmarkTask):
+-    """Builds synchronous video requests and validates the media contract."""
++    """Builds native video requests and validates the media contract."""
+ 
+     name: ClassVar[TaskName] = TaskName.VIDEO
+-    allowed_endpoints: ClassVar[tuple[str, ...]] = (VIDEOS_SYNC,)
++    allowed_endpoints: ClassVar[tuple[str, ...]] = (VIDEOS_SYNC, "/v1/videos")
+     default_endpoint: ClassVar[str] = VIDEOS_SYNC
+     default_stream: ClassVar[bool] = False
+ 
+     def build_request(self, example: Example) -> TaskRequest:
+         """Build a deterministic duration- and seed-qualified video request."""
++        seconds = float(
++            example.seconds
++            if example.seconds is not None
++            else self.point.video.seconds
++        )
++        if not math.isfinite(seconds) or not 4 <= seconds <= 15:
++            raise ValueError("H3 seconds must be finite and in [4, 15]")
+         return TaskRequest(
+             self.point.endpoint,
+             {
+@@ -45,27 +49,44 @@ class VideoTask(BenchmarkTask):
+                     if example.seed is not None
+                     else self.point.load.seed
+                 ),
+-                "seconds": float(
+-                    example.seconds
+-                    if example.seconds is not None
+-                    else self.point.video.seconds
+-                ),
++                "seconds": seconds,
+             },
+             stream=False,
++            video_backend=self.point.video.backend,
++            poll_interval_s=self.point.video.poll_interval_s,
+         )
+ 
++    def inspect_output(self, record: RequestRecord) -> None:
++        """Decode and classify a response outside the load window."""
++        if not record.success:
++            return
++        try:
++            record.decoded_video = inspect_video_bytes(
++                record.video_body or b"", declared_mime=record.video_mime
++            )
++        except VideoOutputError as error:
++            record.mark_failure(error.classifier, str(error))
++        record.media_checks = self.validate_output([record]).checks
++        if not all(record.media_checks.values()):
++            failed = [
++                key for key, passed in record.media_checks.items() if not passed
++            ]
++            if record.success:
++                record.mark_failure("invalid_video_output", ", ".join(failed))
++
+     def validate_output(
+         self, records: Sequence[RequestRecord]
+     ) -> ValidationResult:
+         """Validate fixed video geometry, codecs, audio, and duration alignment."""  # noqa: E501
+-        # The expected frame count reproduces the server's duration resolution
+-        # in `InputProcessor::video_sampling`: round seconds to the nearest
+-        # frame at 24 fps, then round up to the form 17k + 5 (k media units of
+-        # 17 frames plus a final 5-frame tail), as `align_num_frames` does.
+-        # Rows that override `seconds` are still checked against the point's
+-        # duration.
+-        raw_frames = math.floor(float(self.point.video.seconds) * 24.0 + 0.5)
+-        expected_frames = int(raw_frames + (5 - raw_frames) % 17)
++        # Python round uses the API's ties-to-even rule before upward alignment.
++        expected_frames = []
++        for record in records:
++            seconds = record.requested_seconds
++            raw_frames = round(
++                (seconds if seconds is not None else self.point.video.seconds)
++                * 24
++            )
++            expected_frames.append(raw_frames + (5 - raw_frames) % 17)
+         outputs = [record.decoded_video for record in records]
+         present = bool(outputs) and all(
+             output is not None for output in outputs
+@@ -84,11 +105,13 @@ class VideoTask(BenchmarkTask):
+                 and all(
+                     video.width == 1344
+                     and video.height == 768
+-                    and video.frame_count == expected_frames
++                    and video.frame_count == frames
+                     # The container frame rate is a rational; require exactly
+                     # 24 fps.
+                     and video.fps_numerator == 24 * video.fps_denominator
+-                    for video in videos
++                    for video, frames in zip(
++                        videos, expected_frames, strict=True
++                    )
+                 ),
+                 "aac_stereo_32khz_audio": present
+                 and all(
+@@ -103,6 +126,17 @@ class VideoTask(BenchmarkTask):
+                     <= duration_tolerance_s
+                     for video in videos
+                 ),
++                "nonzero_video_variance": present
++                and all(
++                    math.isfinite(video.video_variance)
++                    and video.video_variance > 0
++                    for video in videos
++                ),
++                "nonzero_audio_rms": present
++                and all(
++                    math.isfinite(video.audio_rms) and video.audio_rms > 0
++                    for video in videos
++                ),
+             },
+             statistics={
+                 "completed_videos": len(videos),
+diff --git a/uniserve_eval/transport/client.py b/uniserve_eval/transport/client.py
+index 27f78447..74020813 100644
+--- a/uniserve_eval/transport/client.py
++++ b/uniserve_eval/transport/client.py
+@@ -2,10 +2,11 @@
+ 
+ ``send_request`` is the single entry point the benchmark runner
+ (``uniserve_eval.pipeline.run``) uses per request. It routes by endpoint to a
+-transport for synchronous video, image generations, streamed chat, or
++transport for native video APIs, image generations, streamed chat, or
+ non-streaming chat, and folds everything observable into one
+ ``RequestRecord``: HTTP status, success and a stable failure classifier, client
+-timing, token usage with its provenance, generated text, and decoded media.
++timing, token usage with its provenance, generated text, and media. Video
++bodies remain encoded until the runner inspects them after measurement.
+ 
+ All timestamps are ``time.perf_counter`` values on the same clock as
+ ``RequestRecord.start_time``. Streamed events carry the client receipt time
+@@ -14,6 +15,7 @@ that ``SseParser`` stamps into their ``_client_t`` field.
+ 
+ from __future__ import annotations
+ 
++import asyncio
+ import time
+ from typing import Any
+ 
+@@ -21,9 +23,9 @@ import httpx
+ 
+ from ..types import IMAGES_GENERATIONS, VIDEOS_SYNC, RequestRecord, TaskRequest
+ from .images import ImageOutputError, decode_openai_image_parts
++from .native_video import receive_video
+ from .openai import OpenAIChat
+ from .sse import aiter_sse_events
+-from .video import VideoOutputError, inspect_video_bytes
+ 
+ 
+ async def send_request(
+@@ -36,6 +38,7 @@ async def send_request(
+     prompt_len: int = 0,
+     output_len_fallback: int = 0,
+     scheduled_time: float | None = None,
++    timeout_s: float = 6 * 60 * 60,
+ ) -> RequestRecord:
+     """Dispatch one task request through its endpoint-specific transport.
+ 
+@@ -48,8 +51,9 @@ async def send_request(
+ 
+     Returns:
+         The closed record. HTTP status and response-content failures carry
+-        their own classifiers; any raised ``Exception``, including httpx
+-        connection errors and timeouts, becomes ``transport_failure``.
++        their own classifiers. Expiration of the overall logical deadline
++        becomes ``request_deadline``; other raised ``Exception`` instances,
++        including httpx connection errors, become ``transport_failure``.
+         Exceptions outside ``Exception``, such as ``asyncio.CancelledError``,
+         propagate.
+     """
+@@ -66,8 +70,12 @@ async def send_request(
+         requested_output_len=int(output_len_fallback),
+     )
+     try:
+-        if request.endpoint == VIDEOS_SYNC:
+-            await _send_video(client, url, payload, record)
++        if request.video_backend is not None or request.endpoint == VIDEOS_SYNC:
++            record.prompt_len = prompt_len
++            record.requested_seconds = float(payload["seconds"])
++            # One deadline covers dispatch, polling and the complete media body.
++            async with asyncio.timeout(timeout_s):
++                await receive_video(client, base_url, request, record)
+         elif request.endpoint == IMAGES_GENERATIONS:
+             await _send_images(client, url, payload, record)
+         elif request.stream:
+@@ -78,6 +86,11 @@ async def send_request(
+             await _send_chat(
+                 client, url, payload, record, prompt_len, output_len_fallback
+             )
++    except TimeoutError:
++        record.close_at(record.start_time + timeout_s)
++        record.mark_failure(
++            "request_deadline", f"logical request exceeded {timeout_s}s"
++        )
+     except Exception as error:  # noqa: BLE001 - benchmarks emit structured failures.
+         record.mark_transport_exception(error)
+     return record
+@@ -295,37 +308,6 @@ async def _send_chat_stream(
+     _attach_images(record, image_parts)
+ 
+ 
+-async def _send_video(
+-    client: httpx.AsyncClient,
+-    url: str,
+-    payload: dict[str, Any],
+-    record: RequestRecord,
+-) -> None:
+-    """Execute a synchronous video request and validate its raw MP4 body.
+-
+-    Latency closes once the complete body has been read, before the MP4 is
+-    inspected.
+-    """
+-    async with client.stream("POST", url, json=payload) as response:
+-        record.note_http(response.status_code)
+-        body = await response.aread()
+-        record.close_now()
+-        if response.status_code >= 400:
+-            record.mark_failure(
+-                f"transport_status_{response.status_code}",
+-                body.decode("utf-8", errors="replace")[:500],
+-            )
+-            return
+-        try:
+-            record.decoded_video = inspect_video_bytes(
+-                body, declared_mime=response.headers.get("content-type", "")
+-            )
+-        except VideoOutputError as error:
+-            record.mark_failure(error.classifier, str(error))
+-            return
+-        record.mark_success()
+-
+-
+ def _classify_images(payload: Any) -> tuple[bool, str]:
+     """Classify the structural validity of an image-generations payload.
+ 
+diff --git a/uniserve_eval/transport/video.py b/uniserve_eval/transport/video.py
+index af76db37..12b94aa2 100644
+--- a/uniserve_eval/transport/video.py
++++ b/uniserve_eval/transport/video.py
+@@ -7,9 +7,8 @@ derived from the bytes and the normalized media type. Model-specific
+ expectations such as codecs, raster, frame count, and audio format are
+ checked by ``VideoTask.validate_output``, not here.
+ 
+-``ArtifactWriter.write_video_sample`` inspects the sample bytes again before
+-storing them and requires metadata equal to the transport's result, so the
+-returned metadata must stay a deterministic function of those inputs.
++Inspection runs after transport completion for the entire measured batch.
++Original response bytes are persisted even when inspection rejects them.
+ """
+ 
+ from __future__ import annotations
+@@ -18,6 +17,8 @@ import hashlib
+ import io
+ from fractions import Fraction
+ 
++import numpy as np
++
+ from ..types import DecodedVideo
+ 
+ 
+@@ -91,17 +92,46 @@ def inspect_video_bytes(data: bytes, *, declared_mime: str) -> DecodedVideo:
+             audio_samples = 0
+             audio_channels: int | None = None
+             audio_sample_rate: int | None = None
++            pixel_count = 0
++            pixel_sum = pixel_squares = 0.0
++            pcm_count = 0
++            pcm_squares = 0.0
+ 
+             # Fully decode both streams; container metadata alone cannot prove
+             # that frames and PCM samples are readable.
+             for frame in container.decode(video=0, audio=0):
+                 if isinstance(frame, av.VideoFrame):
+                     frame_count += 1
++                    pixels = frame.to_ndarray(format="rgb24").astype(np.float64)
++                    pixel_count += pixels.size
++                    pixel_sum += float(pixels.sum())
++                    pixel_squares += float(np.square(pixels).sum())
++                    if (frame.width, frame.height) != (
++                        video_stream.codec_context.width,
++                        video_stream.codec_context.height,
++                    ):
++                        raise VideoOutputError(
++                            "response_inconsistent_video_shape",
++                            "video raster changes within the response",
++                        )
+                     continue
+                 if isinstance(frame, av.AudioFrame):
+                     # `samples` counts samples per channel, so the total over
+                     # sample rate is the audio duration in seconds.
+                     audio_samples += int(frame.samples)
++                    pcm = frame.to_ndarray()
++                    # Report RMS in normalized PCM units for integer formats.
++                    scale = (
++                        max(
++                            abs(np.iinfo(pcm.dtype).min),
++                            np.iinfo(pcm.dtype).max,
++                        )
++                        if np.issubdtype(pcm.dtype, np.integer)
++                        else 1.0
++                    )
++                    normalized = pcm.astype(np.float64) / scale
++                    pcm_count += pcm.size
++                    pcm_squares += float(np.square(normalized).sum())
+                     channels = len(frame.layout.channels)
+                     rate = int(frame.sample_rate)
+                     if audio_channels is None:
+@@ -159,6 +189,12 @@ def inspect_video_bytes(data: bytes, *, declared_mime: str) -> DecodedVideo:
+                 audio_sample_rate=audio_sample_rate,
+                 audio_samples=audio_samples,
+                 sample_filename=f"{checksum}.mp4",
++                video_variance=max(
++                    0.0,
++                    pixel_squares / pixel_count
++                    - (pixel_sum / pixel_count) ** 2,
++                ),
++                audio_rms=float(np.sqrt(pcm_squares / pcm_count)),
+             )
+     except VideoOutputError:
+         raise
+diff --git a/uniserve_eval/types.py b/uniserve_eval/types.py
+index 7fe2585c..cf21b17c 100644
+--- a/uniserve_eval/types.py
++++ b/uniserve_eval/types.py
+@@ -81,6 +81,9 @@ class LoadConfig:
+     max_concurrency: int | None = None
+     warmup_requests: int = 1
+     seed: int = 42
++    warmup_manifest: str | None = None
++    priming_manifest: str | None = None
++    request_timeout_s: float = 6 * 60 * 60
+ 
+     def __post_init__(self) -> None:
+         """Validate load parameters that govern request scheduling."""
+@@ -92,6 +95,13 @@ class LoadConfig:
+             raise ValueError("max_concurrency must be positive")
+         if self.warmup_requests < 0:
+             raise ValueError("warmup_requests must be non-negative")
++        if self.warmup_manifest and self.warmup_requests:
++            raise ValueError("warmup_manifest requires warmup_requests = 0")
++        if (
++            not math.isfinite(self.request_timeout_s)
++            or self.request_timeout_s <= 0
++        ):
++            raise ValueError("request_timeout_s must be finite and positive")
+ 
+ 
+ @dataclass(frozen=True)
+@@ -156,14 +166,16 @@ class ImageConfig:
+ class VideoConfig:
+     """Configures generated duration and synthesized prompt length.
+ 
+-    ``seconds`` is the requested duration of rows without a per-row override
+-    and the duration ``VideoTask.validate_output`` checks every output
+-    against. ``prompt_tokens`` is the tokenizer length of the prompts that
++    ``seconds`` is the requested duration of rows without a per-row override.
++    ``prompt_tokens`` is the tokenizer length of the prompts that
+     the MiniMax H3 dataset synthesizes.
+     """
+ 
+     seconds: float = 5.0
+     prompt_tokens: int = 1000
++    backend: str = "uniserve"
++    poll_interval_s: float = 0.1
++    media_dir: str | None = None
+ 
+     def __post_init__(self) -> None:
+         """Validate finite duration and positive prompt length."""
+@@ -171,6 +183,10 @@ class VideoConfig:
+             raise ValueError("video seconds must be finite and positive")
+         if self.prompt_tokens < 1:
+             raise ValueError("video prompt_tokens must be positive")
++        if self.backend not in {"uniserve", "vllm-omni", "sglang", "fastvideo"}:
++            raise ValueError("unknown video backend")
++        if not math.isfinite(self.poll_interval_s) or self.poll_interval_s <= 0:
++            raise ValueError("poll_interval_s must be finite and positive")
+ 
+ 
+ @dataclass(frozen=True)
+@@ -198,6 +214,7 @@ class Example:
+     seed: int | None = None
+     aspect_ratio: str | None = None
+     seconds: float | None = None
++    metadata: dict[str, Any] = field(default_factory=dict)
+ 
+     def as_dict(self) -> dict[str, Any]:
+         """Return populated fields as a JSON-compatible mapping."""
+@@ -215,6 +232,8 @@ class TaskRequest:
+     endpoint: str
+     payload: dict[str, Any]
+     stream: bool
++    video_backend: str | None = None
++    poll_interval_s: float = 0.1
+ 
+ 
+ @dataclass(frozen=True)
+@@ -270,6 +289,8 @@ class DecodedVideo:
+     audio_sample_rate: int
+     audio_samples: int
+     sample_filename: str
++    video_variance: float = 0.0
++    audio_rms: float = 0.0
+ 
+     @property
+     def fps(self) -> float:
+@@ -302,6 +323,8 @@ class DecodedVideo:
+             "audio_channels": self.audio_channels,
+             "audio_sample_rate": self.audio_sample_rate,
+             "audio_samples": self.audio_samples,
++            "video_variance": self.video_variance,
++            "audio_rms": self.audio_rms,
+             "video_duration_s": self.video_duration_s,
+             "audio_duration_s": self.audio_duration_s,
+             "sample_filename": self.sample_filename,
+@@ -366,6 +389,12 @@ class RequestRecord:
+     image_steps: list[int] = field(default_factory=list)
+     decoded_images: list[DecodedImage] = field(default_factory=list, repr=False)
+     decoded_video: DecodedVideo | None = field(default=None, repr=False)
++    video_body: bytes | None = field(default=None, repr=False)
++    video_mime: str = ""
++    requested_seconds: float | None = None
++    media_checks: dict[str, bool] = field(default_factory=dict)
++    original_output: dict[str, Any] | None = None
++    example: dict[str, Any] | None = None
+     status_code: int | None = None
+     finish_reason: str | None = None
+     stop_reason: str | None = None
+@@ -625,6 +654,15 @@ class RequestRecord:
+                 if self.decoded_video is not None
+                 else None
+             ),
++            "requested_seconds": self.requested_seconds,
++            "media_checks": self.media_checks,
++            "original_output": self.original_output,
++            "example": self.example,
++            "real_time_factor": (
++                self.latency / self.decoded_video.video_duration_s
++                if self.decoded_video is not None
++                else None
++            ),
+             # Transport terminal state remains available for validation reports.
+             "status_code": self.status_code,
+             "finish_reason": self.finish_reason,
+@@ -651,6 +689,7 @@ class BenchmarkPoint:
+     tokenizer: str | None = None
+     endpoint: str = CHAT_COMPLETIONS
+     question: str | None = None
++    provenance: dict[str, Any] = field(default_factory=dict)
+ 
+     def __post_init__(self) -> None:
+         """Normalize the task identifier and require protected metrics."""
+@@ -682,6 +721,7 @@ class BenchmarkPoint:
+             "tokenizer": self.tokenizer,
+             "endpoint": self.endpoint,
+             "question": self.question,
++            "provenance": self.provenance,
+             "load": load,
+             "sampling": asdict(self.sampling),
+             "image": asdict(self.image),
+diff --git a/uniserve_models/loading.py b/uniserve_models/loading.py
+index e68a0cdd..7b331516 100644
+--- a/uniserve_models/loading.py
++++ b/uniserve_models/loading.py
+@@ -758,7 +758,73 @@ def _require_static_nvfp4(source: str, declared: Mapping) -> None:
+         )
+ 
+ 
+-def _calibrated_quantization(model, declarations, sources, declared, io):
++def _manifest_scales(root: Path, model: nn.Module) -> dict[str, float] | None:
++    """Read native module calibration from a packed ModelOpt manifest.
++
++    The manifest owns the W4A4 representation, including on ranks without a
++    quantized component. Per-module amax is converted to ModelOpt's tensor
++    scale; K16 block encoding remains a numerical layer operation.
++    """
++    path = root / "modelopt_manifest.json"
++    if not path.is_file():
++        return None
++    manifest = _json(path)
++    expected = {
++        "activation": "a4",
++        "block_scale": "fp8_e4m3",
++        "block_size": 16,
++        "output": "bf16",
++        "tensor_scale": "fp32",
++        "values": "e2m1",
++        "weight": "w4",
++    }
++    if (
++        manifest.get("schema_version") != 1
++        or manifest.get("numerical_format") != expected
++    ):
++        raise ValueError("ModelOpt manifest must declare static NVFP4 W4A4 K16")
++    components = manifest.get("components")
++    if not isinstance(components, dict) or not components:
++        raise ValueError("ModelOpt manifest requires component calibration")
++    paths = dict(model.named_modules(remove_duplicate=False))
++    scales = {}
++    for name, component in components.items():
++        if not isinstance(component, dict) or not isinstance(
++            component.get("enabled"), bool
++        ):
++            raise ValueError(f"invalid ModelOpt component {name!r}")
++        modules = component.get("modules")
++        if (
++            not isinstance(modules, dict)
++            or bool(modules) != component["enabled"]
++        ):
++            raise ValueError(f"invalid ModelOpt calibration for {name!r}")
++        for path, calibration in modules.items():
++            amax = (
++                calibration.get("activation_amax")
++                if isinstance(calibration, dict)
++                else None
++            )
++            if (
++                not isinstance(paths.get(path), Linear)
++                or path in scales
++                or not isinstance(amax, (int, float))
++                or isinstance(amax, bool)
++                or not math.isfinite(amax)
++                or amax <= 0
++            ):
++                raise ValueError(
++                    f"invalid ModelOpt activation calibration for {path!r}"
++                )
++            scales[path] = amax / (6 * 448)
++    if not scales:
++        raise ValueError("ModelOpt manifest declares no calibrated modules")
++    return scales
++
++
++def _calibrated_quantization(
++    model, declarations, sources, declared, io, manifest_scales=None
++):
+     """Configure every Linear a ModelOpt NVFP4 export stores packed.
+ 
+     The checkpoint tensors decide which modules are quantized: a module whose
+@@ -770,10 +836,13 @@ def _calibrated_quantization(model, declarations, sources, declared, io):
+     Args:
+         model: Meta-device model whose module paths receive the result.
+         declarations: The package's checkpoint mappings for ``model``.
+-        sources: Resolved sources; only those named in ``declared`` are read.
++        sources: Resolved sources; unified exports read those named in
++            ``declared`` and manifest exports inspect every resolved source.
+         declared: ModelOpt ``quantization_config`` per source name, each
+             checked against ``_require_static_nvfp4``.
+         io: Checkpoint IO policy for opening the sources.
++        manifest_scales: Native module activation scales from a packed
++            manifest, or ``None`` for unified exports with input_scale tensors.
+ 
+     Returns:
+         A ``QuantizationConfig`` for every module path that owns a packed
+@@ -796,7 +865,7 @@ def _calibrated_quantization(model, declarations, sources, declared, io):
+ 
+     scales: dict[str, float] = {}
+     for source in sources:
+-        if source.name not in declared:
++        if manifest_scales is None and source.name not in declared:
+             continue
+         packed = 0
+         with source.open(io=io) as reader:
+@@ -805,15 +874,38 @@ def _calibrated_quantization(model, declarations, sources, declared, io):
+                     continue
+                 for assignment in component.map_weights(reader):
+                     weight = assignment.source
++                    targets = owners[id(assignment.target)]
+                     if not isinstance(weight, checkpoint.NVFP4Weight):
++                        if manifest_scales is not None and any(
++                            path in manifest_scales
++                            and assignment.target is paths[path].weight
++                            for path in targets
++                        ):
++                            raise ValueError(
++                                f"ModelOpt calibrated weight {weight.name!r} "
++                                "is not packed"
++                            )
+                         continue
+-                    value = weight.input_scale()
+-                    if value is None or not math.isfinite(value) or value <= 0:
+-                        raise ValueError(
+-                            f"ModelOpt weight {weight.name!r} requires a "
+-                            "positive static input_scale"
++                    stored_scale = weight.input_scale()
++                    for path in targets:
++                        value = (
++                            stored_scale
++                            if manifest_scales is None
++                            else manifest_scales.get(path)
+                         )
+-                    for path in owners[id(assignment.target)]:
++                        if (
++                            value is None
++                            or not math.isfinite(value)
++                            or value <= 0
++                        ):
++                            raise ValueError(
++                                f"ModelOpt weight {weight.name!r} requires a "
++                                "positive static input_scale"
++                            )
++                        if stored_scale is not None and stored_scale != value:
++                            raise ValueError(
++                                f"{path} has conflicting activation calibration"
++                            )
+                         if not isinstance(paths[path], Linear):
+                             raise ValueError(
+                                 f"ModelOpt weight {weight.name!r} maps onto "
+@@ -825,7 +917,7 @@ def _calibrated_quantization(model, declarations, sources, declared, io):
+                                 "activation scales"
+                             )
+                     packed += 1
+-        if not packed:
++        if not packed and source.name in declared:
+             raise ValueError(
+                 f"ModelOpt source {source.name} stores no packed NVFP4 weights"
+             )
+@@ -1012,7 +1104,7 @@ def read_config(
+     if quantization is not None and not isinstance(quantization, dict):
+         raise ValueError("checkpoint quantization_config must be an object")
+ 
+-    # A ModelOpt export declares `quant_method: modelopt` in the root
++    # A unified ModelOpt export declares `quant_method: modelopt` in the root
+     # configuration of a single-model checkpoint, or in each quantized
+     # component's config.json of a diffusers pipeline.
+     modelopt = {}
+@@ -1032,12 +1124,19 @@ def read_config(
+         declared = _component_quantization(root, declaration)
+         if declared is not None:
+             modelopt[declaration.name] = declared
+-    if modelopt and quantization is not None:
++    # Packed exports instead publish native module calibration in a root
++    # manifest. Its metadata is fetched with the architecture sidecars.
++    manifest_scales = _manifest_scales(root, model)
++    if modelopt and manifest_scales is not None:
++        raise ValueError(
++            "checkpoint declares both unified and manifest ModelOpt calibration"
++        )
++    if (modelopt or manifest_scales is not None) and quantization is not None:
+         raise ValueError(
+             "a calibrated ModelOpt checkpoint cannot also declare a "
+             "dynamic quantization_config"
+         )
+-    if modelopt:
++    if modelopt or manifest_scales is not None:
+         # Packed weights and their calibrated scales form one immutable
+         # checkpoint contract. Runtime precision presets apply only to dense
+         # checkpoints and must not be offered for this source.
+@@ -1047,7 +1146,7 @@ def read_config(
+             quantization={
+                 **base.quantization,
+                 **_calibrated_quantization(
+-                    model, declarations, sources, modelopt, io
++                    model, declarations, sources, modelopt, io, manifest_scales
+                 ),
+             },
+         )
+diff --git a/tests/python/unit/eval_driver/test_campaign.py b/tests/python/unit/eval_driver/test_campaign.py
+new file mode 100644
+index 00000000..215a5e08
+--- /dev/null
++++ b/tests/python/unit/eval_driver/test_campaign.py
+@@ -0,0 +1,88 @@
++"""The frozen campaign preserves its declared populations and partitions."""
++
++import hashlib
++import json
++from collections import Counter
++
++import pytest
++
++from uniserve_eval.campaign import SHAPES, freeze_corpus
++
++pytestmark = pytest.mark.unit
++
++
++def test_frozen_partitions_balance_shapes_and_are_reproducible(tmp_path):
++    rows = []
++
++    def add(partition, family, shape, **metadata):
++        seconds, tokens = shape
++        identity = str(len(rows))
++        frames = round(seconds * 24)
++        rows.append(
++            {
++                "id": identity,
++                "prompt": identity,
++                "seconds": seconds,
++                "prompt_len": tokens,
++                "seed": len(rows),
++                "metadata": {
++                    "partition": partition,
++                    "family": str(family),
++                    "variant": identity,
++                    "token_ids": [0] * tokens,
++                    "tokenizer_repository": "fixture",
++                    "tokenizer_revision": "fixture",
++                    "provenance": {"kind": "test_fixture"},
++                    "prompt_sha256": hashlib.sha256(
++                        identity.encode()
++                    ).hexdigest(),
++                    "aligned_frames": frames + (5 - frames) % 17,
++                    **metadata,
++                },
++            }
++        )
++
++    for family in range(6):
++        for shape in SHAPES:
++            for seed in range(2):
++                add("latency", family, shape)
++                rows[-1]["seed"] = seed
++    for shape in SHAPES:
++        for i in range(16):
++            add("throughput", i % 6, shape)
++    for partition in ("qualification", "warmup"):
++        for i, shape in enumerate(SHAPES):
++            add(partition, i, shape)
++    for concurrency in (1, 2, 4, 8, 16):
++        for repetition in (1, 2, 3):
++            for i in range(2 * concurrency):
++                add(
++                    "priming",
++                    i % 6,
++                    SHAPES[i % 6],
++                    concurrency=concurrency,
++                    repetition=repetition,
++                )
++
++    source = tmp_path / "corpus.jsonl"
++    source.write_text("".join(json.dumps(row) + "\n" for row in rows))
++    first = freeze_corpus(source, tmp_path / "first")
++    second = freeze_corpus(source, tmp_path / "second")
++    all_throughput = []
++    for repetition in (1, 2, 3):
++        entry = first["manifests"][f"throughput-r{repetition}"]
++        assert entry["count"] == 32
++        with open(entry["path"]) as handle:
++            records = [json.loads(line) for line in handle]
++        counts = Counter((row["seconds"], row["prompt_len"]) for row in records)
++        assert sorted(counts.values()) == [5, 5, 5, 5, 6, 6]
++        all_throughput.extend(records)
++    assert len({row["id"] for row in all_throughput}) == 96
++    assert Counter(
++        (row["seconds"], row["prompt_len"]) for row in all_throughput
++    ) == Counter(dict.fromkeys(SHAPES, 16))
++    assert first["manifests"]["latency"]["count"] == 72
++    for name, entry in first["manifests"].items():
++        assert entry["sha256"] == second["manifests"][name]["sha256"]
++    with pytest.raises(FileExistsError):
++        freeze_corpus(source, tmp_path / "first")
+diff --git a/tests/python/unit/eval_driver/test_video_campaign.py b/tests/python/unit/eval_driver/test_video_campaign.py
+new file mode 100644
+index 00000000..656500f8
+--- /dev/null
++++ b/tests/python/unit/eval_driver/test_video_campaign.py
+@@ -0,0 +1,451 @@
++"""Complete-media timing, excluded workloads and per-request goodput."""
++
++from __future__ import annotations
++
++import asyncio
++import io
++import json
++import threading
++import time
++from dataclasses import replace
++from email.parser import BytesParser
++from email.policy import default
++from fractions import Fraction
++from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
++from pathlib import Path
++
++import av
++import httpx
++import numpy as np
++import pytest
++
++from uniserve_eval.pipeline.run import run_point
++from uniserve_eval.tasks.video import VideoTask
++from uniserve_eval.transport.client import send_request
++from uniserve_eval.types import (
++    VIDEOS_SYNC,
++    BenchmarkPoint,
++    DecodedVideo,
++    Example,
++    LoadConfig,
++    MetricDefinition,
++    RequestRecord,
++    TaskName,
++    VideoConfig,
++)
++
++pytestmark = pytest.mark.unit
++
++
++def point(**kwargs):
++    return BenchmarkPoint(
++        name="video",
++        server="video",
++        task=TaskName.VIDEO,
++        model="h3",
++        dataset="jsonl",
++        endpoint=VIDEOS_SYNC,
++        metrics=(MetricDefinition(("videos_per_second",), "higher"),),
++        **kwargs,
++    )
++
++
++@pytest.fixture(scope="module")
++def media():
++    """Encoded fixture with the real H3 shape, audio and frame contract."""
++    result = io.BytesIO()
++    frames = 107  # Four requested seconds align upward to 107 frames.
++    with av.open(result, "w", format="mp4") as container:
++        video = container.add_stream("libx264", rate=24)
++        video.width, video.height, video.pix_fmt = 1344, 768, "yuv420p"
++        video.options = {"preset": "ultrafast", "crf": "35"}
++        audio = container.add_stream("aac", rate=32000)
++        audio.layout = "stereo"
++        pixels = np.zeros((768, 1344, 3), dtype=np.uint8)
++        pixels[:, :672] = 180
++        for index in range(frames):
++            frame = av.VideoFrame.from_ndarray(pixels, format="rgb24")
++            frame.pts = index
++            for packet in video.encode(frame):
++                container.mux(packet)
++        for packet in video.encode():
++            container.mux(packet)
++        samples = round(frames / 24 * 32000)
++        signal = (
++            0.1 * np.sin(np.arange(samples) * 2 * np.pi * 440 / 32000)
++        ).astype("float32")
++        frame = av.AudioFrame.from_ndarray(
++            np.stack([signal, signal]), format="fltp", layout="stereo"
++        )
++        frame.sample_rate = 32000
++        frame.pts = 0
++        frame.time_base = Fraction(1, 32000)
++        for packet in audio.encode(frame):
++            container.mux(packet)
++        for packet in audio.encode():
++            container.mux(packet)
++    return result.getvalue()
++
++
++def test_each_duration_uses_ties_to_even_and_native_alignment():
++    task = VideoTask(point())
++    records = []
++    # 106.5 rounds to 106, giving 107; half-up would incorrectly yield 124.
++    for seconds, frames in [
++        (4, 107),
++        (106.5 / 24, 107),
++        (5, 124),
++        (10, 243),
++        (15, 362),
++    ]:
++        video = DecodedVideo(
++            data=b"",
++            sha256="",
++            byte_size=0,
++            mime="video/mp4",
++            width=1344,
++            height=768,
++            frame_count=frames,
++            fps_numerator=24,
++            fps_denominator=1,
++            video_codec="h264",
++            audio_codec="aac",
++            audio_channels=2,
++            audio_sample_rate=32000,
++            audio_samples=round(frames / 24 * 32000),
++            sample_filename="sample.mp4",
++            video_variance=1,
++            audio_rms=0.1,
++        )
++        records.append(
++            RequestRecord(
++                request_id=str(seconds),
++                task="video",
++                requested_seconds=seconds,
++                decoded_video=video,
++            )
++        )
++    assert task.validate_output(records).valid
++    records[-1].decoded_video = replace(
++        records[-1].decoded_video, frame_count=124
++    )
++    assert not task.validate_output(records).valid
++
++
++@pytest.mark.parametrize(
++    "backend,endpoint",
++    [
++        ("uniserve", VIDEOS_SYNC),
++        ("vllm-omni", VIDEOS_SYNC),
++        ("fastvideo", VIDEOS_SYNC),
++        ("sglang", "/v1/videos"),
++    ],
++)
++@pytest.mark.parametrize("seconds,frames", [(5, 124), (106.5 / 24, 107)])
++def test_native_transport_waits_for_media_and_enforces_logical_deadline(
++    backend, endpoint, seconds, frames
++):
++    async def exercise():
++        async def handler(request):
++            if request.method == "POST":
++                if backend == "vllm-omni":
++                    message = BytesParser(policy=default).parsebytes(
++                        b"Content-Type: "
++                        + request.headers["content-type"].encode()
++                        + b"\r\n\r\n"
++                        + request.content
++                    )
++                    fields = {
++                        part.get_param(
++                            "name", header="content-disposition"
++                        ): part.get_payload(decode=True).decode()
++                        for part in message.iter_parts()
++                    }
++                    assert fields["prompt"] == "precise prompt"
++                    assert int(fields["num_inference_steps"]) == 8
++                    assert int(fields["width"]) == 1344
++                    assert int(fields["height"]) == 768
++                    assert int(fields["fps"]) == 24
++                    assert fields["aspect_ratio"] == "16:9"
++                    assert float(fields["guidance_scale"]) == 1
++                    assert float(fields["flow_shift"]) == 10
++                    assert json.loads(fields["extra_params"]) == {
++                        "task": "t2va",
++                        "duration": seconds,
++                        "audio_flow_shift": 3.0,
++                    }
++                else:
++                    assert (
++                        json.loads(request.content)["prompt"]
++                        == "precise prompt"
++                    )
++                    if backend == "fastvideo":
++                        payload = json.loads(request.content)
++                        if float(seconds).is_integer():
++                            assert payload["seconds"] == seconds
++                        else:
++                            assert "seconds" not in payload
++                        assert payload["num_frames"] == frames
++                if endpoint == "/v1/videos":
++                    payload = json.loads(request.content)
++                    assert payload["task"] == "t2va"
++                    assert payload["conditions"] == []
++                    assert payload["target"] == {
++                        "short_edge": 768,
++                        "aspect_ratio": "16:9",
++                        "duration_seconds": seconds,
++                    }
++                    # Native H3 rejects generic transport timing fields.
++                    assert "fps" not in payload and "num_frames" not in payload
++                    return httpx.Response(
++                        200, json={"id": "job", "status": "queued"}
++                    )
++            elif not request.url.path.endswith("/content"):
++                return httpx.Response(
++                    200, json={"id": "job", "status": "completed"}
++                )
++            await asyncio.sleep(0.03)
++            return httpx.Response(
++                200,
++                content=b"original bytes",
++                headers={"content-type": "video/mp4"},
++            )
++
++        config = replace(
++            point(video=VideoConfig(backend=backend, poll_interval_s=0.001)),
++            endpoint=endpoint,
++        )
++        request = VideoTask(config).build_request(
++            Example("row", "precise prompt", seconds=seconds, seed=11)
++        )
++        async with httpx.AsyncClient(
++            transport=httpx.MockTransport(handler)
++        ) as client:
++            record = await send_request(
++                client,
++                "http://backend",
++                request,
++                "row",
++                task="video",
++                prompt_len=1000,
++                timeout_s=1,
++            )
++            assert record.success and record.video_body == b"original bytes"
++            assert record.prompt_len == 1000
++            assert record.latency >= 0.03
++            expired = await send_request(
++                client,
++                "http://backend",
++                request,
++                "row",
++                task="video",
++                timeout_s=0.01,
++            )
++            assert not expired.success
++            assert expired.classifier == "request_deadline"
++            assert expired.latency == pytest.approx(0.01)
++
++    asyncio.run(exercise())
++
++
++@pytest.mark.parametrize("failed", [False, True])
++def test_async_job_failure_or_published_media_url_is_terminal(failed):
++    async def exercise():
++        async def handler(request):
++            if request.method == "POST":
++                return httpx.Response(
++                    200, json={"id": "job", "status": "queued"}
++                )
++            if request.url.path == "/v1/videos/job":
++                return httpx.Response(
++                    200,
++                    json={
++                        "id": "job",
++                        "status": "failed" if failed else "completed",
++                        "error": "decoder failed",
++                        "url": "/published/output.mp4",
++                    },
++                )
++            if request.url.path == "/published/output.mp4":
++                await asyncio.sleep(0.02)
++                return httpx.Response(
++                    200,
++                    content=b"published media",
++                    headers={"content-type": "video/mp4"},
++                )
++            return httpx.Response(404)
++
++        task = VideoTask(
++            replace(
++                point(
++                    video=VideoConfig(backend="sglang", poll_interval_s=0.001)
++                ),
++                endpoint="/v1/videos",
++            )
++        )
++        async with httpx.AsyncClient(
++            transport=httpx.MockTransport(handler)
++        ) as client:
++            record = await send_request(
++                client,
++                "http://backend",
++                task.build_request(Example("row", "scene", seconds=5)),
++                "row",
++                task="video",
++            )
++        assert record.final_event_time >= record.start_time
++        if failed:
++            assert not record.success
++            assert record.classifier == "video_job_failed"
++            assert "decoder failed" in record.error
++        else:
++            assert record.success
++            assert record.video_body == b"published media"
++            assert record.latency >= 0.02
++
++    asyncio.run(exercise())
++
++
++def test_run_releases_slots_before_inspection_and_retains_invalid_media(
++    tmp_path, media, monkeypatch
++):
++    received = []
++
++    class Handler(BaseHTTPRequestHandler):
++        def do_POST(self):  # noqa: N802
++            request = json.loads(
++                self.rfile.read(int(self.headers["content-length"]))
++            )
++            received.append(request["prompt"])
++            body = b"broken mp4" if request["prompt"] == "invalid" else media
++            self.send_response(200)
++            self.send_header("content-type", "video/mp4")
++            self.send_header("content-length", str(len(body)))
++            self.end_headers()
++            self.wfile.write(body)
++
++        def do_GET(self):  # noqa: N802
++            self.send_response(404)
++            self.end_headers()
++
++        def log_message(self, *_args):
++            pass
++
++    rows = [
++        {"id": prompt, "prompt": prompt, "seconds": 4}
++        for prompt in ("valid", "invalid")
++    ]
++    manifest = tmp_path / "rows.jsonl"
++    manifest.write_text("".join(json.dumps(row) + "\n" for row in rows))
++    warmup = tmp_path / "warmup.jsonl"
++    priming = tmp_path / "priming.jsonl"
++    for path, identity in ((warmup, "warmup"), (priming, "prime")):
++        path.write_text(
++            json.dumps({"id": identity, "prompt": identity, "seconds": 4})
++            + "\n"
++        )
++    # PyAV is an external decoder boundary. Decoding any response before both
++    # requests arrive would occupy the first closed-loop slot and fail here.
++    open_media = av.open
++
++    def decode(*args, **kwargs):
++        assert received in (["warmup"], ["warmup", "prime", "valid", "invalid"])
++        return open_media(*args, **kwargs)
++
++    monkeypatch.setattr(av, "open", decode)
++    server = ThreadingHTTPServer(("127.0.0.1", 0), Handler)
++    thread = threading.Thread(target=server.serve_forever, daemon=True)
++    thread.start()
++    config = point(
++        dataset_path=str(manifest),
++        load=LoadConfig(
++            num_prompts=2,
++            max_concurrency=1,
++            warmup_requests=0,
++            warmup_manifest=str(warmup),
++            priming_manifest=str(priming),
++        ),
++    )
++    try:
++        result = asyncio.run(
++            run_point(
++                f"http://127.0.0.1:{server.server_port}",
++                config,
++                tmp_path / "result",
++            )
++        )
++    finally:
++        server.shutdown()
++        server.server_close()
++        thread.join()
++    records = [
++        json.loads(line)
++        for line in (result.output_dir / "requests.jsonl")
++        .read_text()
++        .splitlines()
++    ]
++    assert [record["success"] for record in records] == [True, False]
++    assert (
++        Path(records[1]["original_output"]["path"]).read_bytes()
++        == b"broken mp4"
++    )
++    duration = max(record["final_event_time"] for record in records) - min(
++        record["client_send_time"] for record in records
++    )
++    assert result.summary["elapsed_s"] == duration
++    assert result.summary["metrics"]["videos_per_second"] == 1 / duration
++    assert result.summary["failed_count"] == 1
++    for filename, identity in (
++        ("warmup_requests.jsonl", "warmup"),
++        ("priming_requests.jsonl", "prime"),
++    ):
++        excluded = [
++            json.loads(line)
++            for line in (result.output_dir / filename).read_text().splitlines()
++        ]
++        assert [record["request_id"] for record in excluded] == [identity]
++        assert excluded[0]["success"]
++
++
++def test_excluded_manifests_preserve_order_and_do_not_enter_measurements(
++    tmp_path,
++):
++    from uniserve_eval.load.arrival import run_load
++
++    observed = []
++    warmup = [
++        Example(
++            f"warm-{duration}-{tokens}",
++            "warm",
++            seconds=duration,
++            prompt_len=tokens,
++        )
++        for duration in (5, 10, 15)
++        for tokens in (1000, 10000)
++    ]
++    measured = [Example("measured", "measure")]
++
++    async def submit(row, scheduled):
++        observed.append((row.id, scheduled))
++        record = RequestRecord(
++            request_id=row.id, task="video", start_time=time.perf_counter()
++        )
++        record.close_now()
++        record.mark_success()
++        return record
++
++    result = asyncio.run(
++        run_load(
++            measured,
++            request_rate=float("inf"),
++            max_concurrency=1,
++            submit=submit,
++            warmup_requests=0,
++            warmup_rows=warmup,
++        )
++    )
++    assert [row for row, _ in observed] == [row.id for row in warmup] + [
++        "measured"
++    ]
++    assert all(scheduled is None for _, scheduled in observed[:6])
++    assert [record.request_id for record in result.outputs] == ["measured"]
+diff --git a/uniserve_eval/campaign.py b/uniserve_eval/campaign.py
+new file mode 100644
+index 00000000..2a2fcf81
+--- /dev/null
++++ b/uniserve_eval/campaign.py
+@@ -0,0 +1,167 @@
++"""Freeze the declared FastH3 workload partitions from authored request rows.
++
++The input corpus contains already-authored prompts and token IDs. This module
++does not synthesize text or select prompts using any generated media or timings.
++"""
++
++from __future__ import annotations
++
++import argparse
++import hashlib
++import json
++import random
++from collections import Counter
++from pathlib import Path
++
++SHAPES = tuple(
++    (seconds, tokens) for seconds in (5, 10, 15) for tokens in (1000, 10000)
++)
++
++
++def freeze_corpus(source: Path, output: Path, *, seed: int = 20260925) -> dict:
++    """Validate authored rows and freeze balanced, disjoint JSONL partitions.
++
++    Every row has a ``metadata.partition`` of latency, throughput, warmup,
++    qualification or priming. Priming additionally declares concurrency and
++    repetition (1 through 3). All prompts and IDs are globally unique.
++    Existing output directories are rejected to preserve the frozen corpus.
++    """
++    rows = [
++        json.loads(line)
++        for line in source.read_text().splitlines()
++        if line.strip()
++    ]
++    if len({row["id"] for row in rows}) != len(rows):
++        raise ValueError("duplicate request ID")
++    if len({row["prompt"] for row in rows}) != len(rows):
++        raise ValueError("every campaign request must have unique prompt bytes")
++    for row in rows:
++        metadata = row["metadata"]
++        shape = (row["seconds"], row["prompt_len"])
++        if shape not in SHAPES:
++            raise ValueError(f"invalid campaign shape: {shape}")
++        if len(metadata["token_ids"]) != row["prompt_len"]:
++            raise ValueError("declared token count differs from token IDs")
++        digest = hashlib.sha256(row["prompt"].encode()).hexdigest()
++        if digest != metadata["prompt_sha256"]:
++            raise ValueError("prompt checksum mismatch")
++        frames = round(row["seconds"] * 24)
++        if metadata["aligned_frames"] != frames + (5 - frames) % 17:
++            raise ValueError("incorrect temporal alignment")
++        for key in (
++            "family",
++            "variant",
++            "provenance",
++            "tokenizer_repository",
++            "tokenizer_revision",
++        ):
++            if not metadata.get(key):
++                raise ValueError(f"missing prompt provenance: {key}")
++
++    groups: dict[str, list[dict]] = {}
++    rng = random.Random(seed)
++    latency = [row for row in rows if row["metadata"]["partition"] == "latency"]
++    if len({row["seed"] for row in latency}) != 2:
++        raise ValueError("the latency corpus requires two frozen seeds")
++    families = {row["metadata"]["family"] for row in latency}
++    counts = Counter(
++        (row["metadata"]["family"], row["seconds"], row["prompt_len"])
++        for row in latency
++    )
++    if len(families) != 6 or counts != Counter(
++        {(family, *shape): 2 for family in families for shape in SHAPES}
++    ):
++        raise ValueError(
++            "latency requires six families x six shapes x two seeds"
++        )
++    for cell in counts:
++        seeds = {
++            row["seed"]
++            for row in latency
++            if (row["metadata"]["family"], row["seconds"], row["prompt_len"])
++            == cell
++        }
++        if len(seeds) != 2:
++            raise ValueError("each latency cell requires two distinct seeds")
++    rng.shuffle(latency)
++    groups["latency"] = latency
++
++    throughput = [
++        row for row in rows if row["metadata"]["partition"] == "throughput"
++    ]
++    cells = {
++        shape: [
++            row
++            for row in throughput
++            if (row["seconds"], row["prompt_len"]) == shape
++        ]
++        for shape in SHAPES
++    }
++    if any(len(cell) != 16 for cell in cells.values()):
++        raise ValueError("throughput requires 16 unique requests per shape")
++    for cell in cells.values():
++        rng.shuffle(cell)
++    for repetition in range(3):
++        selected = []
++        for index, shape in enumerate(SHAPES):
++            count = 6 if index // 2 == repetition else 5
++            selected.extend(cells[shape][:count])
++            del cells[shape][:count]
++        rng.shuffle(selected)
++        groups[f"throughput-r{repetition + 1}"] = selected
++
++    for phase in ("warmup", "qualification"):
++        selected = [
++            row for row in rows if row["metadata"]["partition"] == phase
++        ]
++        if Counter(
++            (row["seconds"], row["prompt_len"]) for row in selected
++        ) != Counter(SHAPES):
++            raise ValueError(f"{phase} must cover each of the six shapes once")
++        groups[phase] = selected
++    for concurrency in (1, 2, 4, 8, 16):
++        for repetition in (1, 2, 3):
++            selected = [
++                row
++                for row in rows
++                if row["metadata"]["partition"] == "priming"
++                and row["metadata"].get("concurrency") == concurrency
++                and row["metadata"].get("repetition") == repetition
++            ]
++            if len(selected) != 2 * concurrency:
++                raise ValueError(
++                    "each repetition requires 2 x concurrency priming rows"
++                )
++            groups[f"priming-c{concurrency}-r{repetition}"] = selected
++    if sum(map(len, groups.values())) != len(rows):
++        raise ValueError("unassigned corpus rows")
++
++    output.mkdir(parents=True, exist_ok=False)
++    index = {"seed": seed, "manifests": {}}
++    for name, selected in groups.items():
++        for order, row in enumerate(selected):
++            row["metadata"]["execution_order"] = order
++        data = "".join(
++            json.dumps(row, ensure_ascii=False) + "\n" for row in selected
++        ).encode()
++        path = output / f"{name}.jsonl"
++        path.write_bytes(data)
++        index["manifests"][name] = {
++            "path": str(path.resolve()),
++            "count": len(selected),
++            "sha256": hashlib.sha256(data).hexdigest(),
++        }
++    (output / "index.json").write_text(json.dumps(index, indent=2) + "\n")
++    return index
++
++
++def main() -> None:
++    parser = argparse.ArgumentParser(description=__doc__)
++    parser.add_argument("source", type=Path)
++    parser.add_argument("output", type=Path)
++    args = parser.parse_args()
++    freeze_corpus(args.source, args.output)
++
++
++if __name__ == "__main__":
++    main()
+diff --git a/uniserve_eval/transport/native_video.py b/uniserve_eval/transport/native_video.py
+new file mode 100644
+index 00000000..509d33df
+--- /dev/null
++++ b/uniserve_eval/transport/native_video.py
+@@ -0,0 +1,135 @@
++"""Native video APIs, ending only when all encoded media bytes arrive.
++
++No decoding, hashing or filesystem work belongs in these logical requests.
++The caller owns the overall deadline and retains bodies for later inspection.
++"""
++
++from __future__ import annotations
++
++import asyncio
++import json
++from urllib.parse import quote, urljoin
++
++import httpx
++
++from ..types import RequestRecord, TaskRequest
++
++
++async def receive_video(
++    client: httpx.AsyncClient,
++    base_url: str,
++    request: TaskRequest,
++    record: RequestRecord,
++) -> None:
++    """Submit the native payload, poll as needed, and collect original bytes."""
++    backend = request.video_backend or "uniserve"
++    payload = dict(request.payload)
++    if backend == "fastvideo":
++        # FastVideo counts sigma points: nine points yield eight forwards.
++        payload.update(size="1344x768", fps=24, num_inference_steps=9)
++    if backend == "vllm-omni":
++        seconds = float(payload.pop("seconds"))
++        # Omni's pinned V2 ladder counts intervals (forwards), not points.
++        # Its native duration field also preserves fractional seconds without
++        # the generic OpenAI form field's integer restriction.
++        payload.update(
++            width=1344,
++            height=768,
++            aspect_ratio="16:9",
++            fps=24,
++            num_inference_steps=8,
++            guidance_scale=1.0,
++            flow_shift=10.0,
++            extra_params=json.dumps(
++                {"task": "t2va", "duration": seconds, "audio_flow_shift": 3.0}
++            ),
++        )
++        # vLLM-Omni's native video endpoint consumes multipart form fields.
++        fields = {key: (None, str(value)) for key, value in payload.items()}
++        kwargs = {"files": fields}
++    else:
++        if backend == "fastvideo":
++            # FastVideo validates an already aligned causal-VAE frame count.
++            # Preserve requested seconds separately from the actual work.
++            frames = round(float(payload["seconds"]) * 24)
++            payload["num_frames"] = frames + (5 - frames) % 17
++            if not float(payload["seconds"]).is_integer():
++                # The generic seconds field accepts integers only; the
++                # aligned native frame count carries fractional durations.
++                payload.pop("seconds")
++        elif backend == "sglang":
++            # Native H3 admission rejects fps/num_frames and derives both
++            # modalities from this canonical target, not generic seconds.
++            seconds = float(payload.pop("seconds"))
++            payload.update(
++                task="t2va",
++                conditions=[],
++                target={
++                    "short_edge": 768,
++                    "aspect_ratio": "16:9",
++                    "duration_seconds": seconds,
++                },
++                num_inference_steps=9,
++                flow_shift=10.0,
++                audio_flow_shift=3.0,
++            )
++        kwargs = {"json": payload}
++    url = base_url.rstrip("/") + request.endpoint
++
++    if request.endpoint.endswith("/sync"):
++        await _body(client, "POST", url, record, **kwargs)
++        return
++
++    response = await client.post(url, **kwargs)
++    record.note_http(response.status_code)
++    if _failed_status(response, record):
++        return
++    job = response.json()
++    job_id = quote(str(job["id"]), safe="")
++    poll_url = f"{url}/{job_id}"
++    while job.get("status") != "completed":
++        if job.get("status") in {"failed", "cancelled"}:
++            record.close_now()
++            record.mark_failure("video_job_failed", str(job.get("error", job)))
++            return
++        await asyncio.sleep(request.poll_interval_s)
++        response = await client.get(poll_url)
++        if _failed_status(response, record):
++            return
++        job = response.json()
++
++    # SGLang may publish a storage URL instead of a local content route.
++    media_url = urljoin(base_url + "/", job.get("url") or f"{poll_url}/content")
++    await _body(client, "GET", media_url, record)
++
++
++def _failed_status(response: httpx.Response, record: RequestRecord) -> bool:
++    if response.status_code < 400:
++        return False
++    record.status_code = response.status_code
++    if record.final_event_time is None:
++        record.close_now()
++    record.mark_failure(
++        f"transport_status_{response.status_code}", response.text[:500]
++    )
++    return True
++
++
++async def _body(
++    client: httpx.AsyncClient,
++    method: str,
++    url: str,
++    record: RequestRecord,
++    **kwargs,
++) -> None:
++    async with client.stream(
++        method, url, follow_redirects=True, **kwargs
++    ) as response:
++        record.note_http(response.status_code)
++        record.video_mime = response.headers.get("content-type", "")
++        # Encoded bodies are buffered in host memory; no media work delays the
++        # next slot. Keep even invalid bodies for post-run failure artifacts.
++        record.video_body = await response.aread()
++        record.close_now()
++        if not _failed_status(response, record):
++            record.mark_success()

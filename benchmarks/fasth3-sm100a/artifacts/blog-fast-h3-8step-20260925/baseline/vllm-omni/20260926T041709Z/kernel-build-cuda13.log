@@ -1,0 +1,11 @@
+Using Python 3.12.3 environment at: .venv-vllm-omni
+Resolved 1 package in 498ms
+   Building fastvideo-kernel==0.3.4
+      Built fastvideo-kernel==0.3.4
+Prepared 1 package in 1m 23s
+Uninstalled 1 package in 55ms
+warning: Failed to hardlink files; falling back to full copy. This may lead to degraded performance.
+         If the cache and target directories are on different filesystems, hardlinking may not be supported.
+         If this is intentional, set `export UV_LINK_MODE=copy` or use `--link-mode=copy` to suppress this warning.
+Installed 1 package in 149ms
+ ~ fastvideo-kernel==0.3.4

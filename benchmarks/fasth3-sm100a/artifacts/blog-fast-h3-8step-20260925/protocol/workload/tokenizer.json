@@ -1,0 +1,21 @@
+{
+  "tokenizer_repository": "FastVideo/FastVideo-FastH3-8-Step-V2",
+  "revision": "3da2ddfe1954d9cda4c05b643dc0f26007a655c5",
+  "files": {
+    "tokenizer.json": "a5d85b6dcc535e6b93115a9ef287e6132fdbf30270da6218194ba742261173c7",
+    "tokenizer_config.json": "a07e942ac874baa13758de8d1fbdb186683cc03416b5589e1b6671c6b3057c68",
+    "merges.txt": "599bab54075088774b1733fde865d5bd747cbcc7a547c5bc12610e874e26f5e3",
+    "vocab.json": "ca10d7e9fb3ed18575dd1e277a2579c16d108e32f27439684afa0e10b1440910"
+  },
+  "token_count_policy": "raw prompt, no added special tokens",
+  "authoring_sources": {
+    "author_workload.py": "2f8c2ee466f6ec4c7acb16cdf0f3ce9d810fa8659d32b46f3992cd3e626d8619",
+    "scenes/ceramics.md": "f544590b58d5ba84a7916295e45e0f867c4db57318b63a6d582d97c4f0912b4d",
+    "scenes/harbor.md": "e49bafad30e814adf7e56beae83f2aee4a74f489e9bff142cd4ea06b3f291754",
+    "scenes/market.md": "3a0f850ea692ddf4e2f57d5ba7222e0a4b3edde54afca61b3449d7bff55a7232",
+    "scenes/observatory.md": "7ae938eba235a48f8de677f99bffc1370e16a4d33b31b9a28b0638bb759c4909",
+    "scenes/percussion.md": "d069acebe5dfb03a2b62bb37e077e440d302a461bc766a7151578a16ec581f1e",
+    "scenes/photography.md": "5c35cb328d720ef5666d0c861a405b54a38f9854bcfe334552968e7c281145ff",
+    "scenes/river.md": "7d0256a12d6955382585ecdd1e7d4139e2d90ca84dd0194c042744519557652d"
+  }
+}

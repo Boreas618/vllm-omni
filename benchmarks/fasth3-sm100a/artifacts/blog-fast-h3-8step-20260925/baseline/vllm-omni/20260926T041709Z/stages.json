@@ -1,0 +1,134 @@
+[
+  {
+    "request_id": "warmup-harbor-030",
+    "seconds": 5.0,
+    "prompt_tokens": 1000,
+    "excluded": true,
+    "e2e_s": 20.56727786641568,
+    "encode_prompt_s": 0.800065,
+    "diffuse_s": 15.396771,
+    "decode_s": 2.185542,
+    "forward_s": 20.101784
+  },
+  {
+    "request_id": "warmup-ceramics-030",
+    "seconds": 5.0,
+    "prompt_tokens": 10000,
+    "excluded": true,
+    "e2e_s": 11.879635226912796,
+    "encode_prompt_s": 0.586026,
+    "diffuse_s": 9.371389,
+    "decode_s": 1.420065,
+    "forward_s": 11.388327
+  },
+  {
+    "request_id": "warmup-percussion-030",
+    "seconds": 10.0,
+    "prompt_tokens": 1000,
+    "excluded": true,
+    "e2e_s": 16.587431678548455,
+    "encode_prompt_s": 0.069259,
+    "diffuse_s": 12.759533,
+    "decode_s": 2.845614,
+    "forward_s": 15.685052
+  },
+  {
+    "request_id": "warmup-river-030",
+    "seconds": 10.0,
+    "prompt_tokens": 10000,
+    "excluded": true,
+    "e2e_s": 22.253867337480187,
+    "encode_prompt_s": 0.53153,
+    "diffuse_s": 17.951102,
+    "decode_s": 2.792107,
+    "forward_s": 21.287863
+  },
+  {
+    "request_id": "warmup-observatory-024",
+    "seconds": 15.0,
+    "prompt_tokens": 1000,
+    "excluded": true,
+    "e2e_s": 27.595616259612143,
+    "encode_prompt_s": 0.068819,
+    "diffuse_s": 22.171017,
+    "decode_s": 4.157137,
+    "forward_s": 26.411637
+  },
+  {
+    "request_id": "warmup-market-024",
+    "seconds": 15.0,
+    "prompt_tokens": 10000,
+    "excluded": true,
+    "e2e_s": 36.049652128480375,
+    "encode_prompt_s": 0.538428,
+    "diffuse_s": 30.006063,
+    "decode_s": 4.07296,
+    "forward_s": 34.628895
+  },
+  {
+    "request_id": "qualification-harbor-031",
+    "seconds": 5.0,
+    "prompt_tokens": 1000,
+    "excluded": false,
+    "e2e_s": 7.9032459277659655,
+    "encode_prompt_s": 0.068223,
+    "diffuse_s": 5.973159,
+    "decode_s": 1.431919,
+    "forward_s": 7.48243
+  },
+  {
+    "request_id": "qualification-ceramics-031",
+    "seconds": 5.0,
+    "prompt_tokens": 10000,
+    "excluded": false,
+    "e2e_s": 11.83096170797944,
+    "encode_prompt_s": 0.535888,
+    "diffuse_s": 9.410016,
+    "decode_s": 1.39007,
+    "forward_s": 11.344461
+  },
+  {
+    "request_id": "qualification-percussion-031",
+    "seconds": 10.0,
+    "prompt_tokens": 1000,
+    "excluded": false,
+    "e2e_s": 16.408726070076227,
+    "encode_prompt_s": 0.068456,
+    "diffuse_s": 12.769479,
+    "decode_s": 2.734275,
+    "forward_s": 15.58391
+  },
+  {
+    "request_id": "qualification-river-031",
+    "seconds": 10.0,
+    "prompt_tokens": 10000,
+    "excluded": false,
+    "e2e_s": 22.128757558763027,
+    "encode_prompt_s": 0.535397,
+    "diffuse_s": 18.004615,
+    "decode_s": 2.712022,
+    "forward_s": 21.263426
+  },
+  {
+    "request_id": "qualification-observatory-025",
+    "seconds": 15.0,
+    "prompt_tokens": 1000,
+    "excluded": false,
+    "e2e_s": 27.654617466032505,
+    "encode_prompt_s": 0.068536,
+    "diffuse_s": 22.251348,
+    "decode_s": 4.156974,
+    "forward_s": 26.492851
+  },
+  {
+    "request_id": "qualification-market-025",
+    "seconds": 15.0,
+    "prompt_tokens": 10000,
+    "excluded": false,
+    "e2e_s": 35.96395068522543,
+    "encode_prompt_s": 0.542652,
+    "diffuse_s": 30.090307,
+    "decode_s": 4.135174,
+    "forward_s": 34.785303
+  }
+]
