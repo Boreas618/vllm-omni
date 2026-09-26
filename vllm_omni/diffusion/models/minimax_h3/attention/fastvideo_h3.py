@@ -127,7 +127,15 @@ class MiniMaxH3VSAImpl(FastVideoVSAImpl):
         q_pool = mean_pool_tiles(q_tiled[:, : logical_blocks * 64], sizes, block_size=64)
         k_pool = mean_pool_tiles(k_tiled[:, : logical_blocks * 64], sizes, block_size=64)
         scores = torch.matmul(q_pool, k_pool.transpose(-2, -1)) * self.softmax_scale
-        block_map = build_prefix_dense_block_map(scores, prefix_blocks, video_blocks, self.topk)
+        # Full FastH3 checkpoints declare a sparsity fraction, so the selected
+        # video-tile count grows with the clip. Prefix keys remain exempt.
+        sparsity = attn_metadata.extra.get("vsa_h3_sparsity")
+        topk = self.topk
+        if sparsity is not None:
+            if not math.isfinite(sparsity) or not 0.0 <= sparsity <= 1.0:
+                raise ValueError(f"invalid VSA-H3 sparsity: {sparsity}")
+            topk = max(1, min(math.ceil((1.0 - sparsity) * video_blocks), video_blocks))
+        block_map = build_prefix_dense_block_map(scores, prefix_blocks, video_blocks, topk)
         kernel_sizes = sizes
         if pair_pad:
             block_map = torch.nn.functional.pad(block_map, (0, 1, 0, 1), value=False)
@@ -141,7 +149,7 @@ class MiniMaxH3VSAImpl(FastVideoVSAImpl):
             video_shape,
             prefix_blocks,
             video_blocks,
-            min(self.topk, video_blocks),
+            min(topk, video_blocks),
             kernel_blocks,
         )
         output = fastvideo_block_sparse_attn_bshd(
@@ -173,7 +181,10 @@ class MiniMaxH3VSAImpl(FastVideoVSAImpl):
         value: torch.Tensor,
         attn_metadata: AttentionMetadata | None = None,
     ) -> torch.Tensor:
+        trained_vsa = attn_metadata is not None and "vsa_h3_sparsity" in attn_metadata.extra
         if _get_h3_layout(attn_metadata) is None:
+            if trained_vsa:
+                raise ValueError("trained VSA-H3 requires complete layout metadata")
             return super().forward_cuda(query, key, value, attn_metadata)
 
         original_query, original_key, original_value = query, key, value
@@ -182,6 +193,8 @@ class MiniMaxH3VSAImpl(FastVideoVSAImpl):
         if attn_metadata is not None and attn_metadata.packed_padding is not None:
             valid_seq_len = attn_metadata.packed_padding.q_length
             if attn_metadata.packed_padding.kv_length != valid_seq_len:
+                if trained_vsa:
+                    raise ValueError("trained VSA-H3 packed Q/KV lengths must match")
                 return self._fallback(
                     original_query, original_key, original_value, attn_metadata, "packed Q/KV lengths must match"
                 )
@@ -202,7 +215,7 @@ class MiniMaxH3VSAImpl(FastVideoVSAImpl):
             # recover the request.
             if isinstance(exc, torch.AcceleratorError):
                 raise
-            if not self.fallback_on_error:
+            if trained_vsa or not self.fallback_on_error:
                 raise
             return self._fallback(
                 original_query, original_key, original_value, attn_metadata, f"VSA-H3 kernel failed: {exc}"

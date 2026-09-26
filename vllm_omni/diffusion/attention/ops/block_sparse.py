@@ -50,15 +50,18 @@ if not hasattr(torch.ops.vllm_omni, "fastvideo_block_sparse_attn_bshd"):
                         variable_block_sizes.to(torch.int32).contiguous(),
                         need_lse=False,
                     )
+                    logger.info_once("FASTVIDEO_VSA block-sparse provider: sm100a")
                     return out.transpose(1, 2).contiguous()
             except torch.AcceleratorError:
                 # A device fault can poison the context; do not launch another kernel.
                 raise
             except (ImportError, RuntimeError) as exc:
+                # warning_once caches its arguments. Retaining an exception
+                # also retains traceback tensors from a failed kernel call.
                 logger.warning_once(
                     "FASTVIDEO_VSA_SM100A=1 requested but the native Blackwell forward is "
                     "unavailable (%s); using the Triton block-sparse route instead.",
-                    exc,
+                    str(exc),
                 )
 
         from fastvideo_kernel.block_sparse_attn import block_sparse_attn
@@ -71,6 +74,7 @@ if not hasattr(torch.ops.vllm_omni, "fastvideo_block_sparse_attn_bshd"):
             block_map[..., :logical_blocks, :logical_blocks].contiguous(),
             variable_block_sizes[:logical_blocks].to(torch.int32).contiguous(),
         )
+        logger.info_once("FASTVIDEO_VSA block-sparse provider: triton")
         out = out.transpose(1, 2).contiguous()
         if out.shape[1] != query.shape[1]:
             out = torch.nn.functional.pad(out, (0, 0, 0, 0, 0, query.shape[1] - out.shape[1]))
