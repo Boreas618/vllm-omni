@@ -34,7 +34,7 @@ from vllm_omni.diffusion.offloader.module_residency import (
 from vllm_omni.platforms import current_omni_platform
 
 from .chunked_decode import decode_h3_chunks
-from .ops import install_h3_vae_optimizations
+from .ops import install_h3_vae_optimizations, store_h3_vae_decoder_linears_fp16
 from .packed_tokens import minimax_h3_patchify_video_latent
 from .vae_temporal import install_temporal_stream_patches
 
@@ -335,13 +335,20 @@ class MiniMaxH3VideoVAE(nn.Module, DistributedVaeMixin):
         encode_only: bool = False,
         decode_only: bool = False,
         trust_remote_code: bool = False,
+        fp16_decoder_linears: bool = False,
     ) -> None:
+        """``fp16_decoder_linears`` stores the decoder-block Linears in FP16 even
+        on devices without a validated H3 VAE operator set (see
+        :func:`store_h3_vae_decoder_linears_fp16`); devices with one always do.
+        """
         super().__init__()
         self._device_target = device
         self.encode_only = bool(encode_only)
         self.decode_only = bool(decode_only)
         if self.encode_only and self.decode_only:
             raise ValueError("MiniMax H3 video VAE cannot be both encode-only and decode-only")
+        if fp16_decoder_linears and device.type != "cuda":
+            raise ValueError("FP16 video VAE decoder Linears require CUDA, where decode runs under FP16 autocast")
         self.config_dict = _load_component_config(component_path)
         _check_trust_remote_code(component_path, self.config_dict, trust_remote_code)
         if self.encode_only:
@@ -358,10 +365,14 @@ class MiniMaxH3VideoVAE(nn.Module, DistributedVaeMixin):
         self.remote.eval().to(device=initial_device, dtype=torch.float32)
         decoder = getattr(self.remote.model, "decoder", None)
         if decoder is not None:
-            install_h3_vae_optimizations(
+            installed = install_h3_vae_optimizations(
                 decoder,
                 device=device,
             )
+            # Without a validated operator set the reference decoder kernels
+            # stay in place; the FP16 storage alone needs no kernel.
+            if fp16_decoder_linears and not installed and not store_h3_vae_decoder_linears_fp16(decoder):
+                raise ValueError("MiniMax H3 video VAE decoder does not match the FP16 Linear storage contract")
         install_temporal_stream_patches(self.remote.model)
         self.model = self.remote.model
         self._stager = None

@@ -356,6 +356,113 @@ def test_h3_vae_install_rejects_incompatible_remote_contract(monkeypatch, break_
     assert decoder.transformer_blocks[0].attn.to_qkv.weight.dtype == torch.float32
 
 
+def _block_linear_names(decoder):
+    return {
+        f"transformer_blocks.{index}.{suffix}.{kind}"
+        for index in range(len(decoder.transformer_blocks))
+        for suffix in ("attn.to_qkv", "attn.to_out", "ff.w1", "ff.w2")
+        for kind in ("weight", "bias")
+    }
+
+
+def test_h3_vae_fp16_storage_changes_only_block_linear_dtypes():
+    from vllm_omni.diffusion.models.minimax_h3.ops import vae as vae_ops
+
+    decoder = _make_decoder()
+    for parameter in decoder.parameters():
+        nn.init.normal_(parameter)
+    before = {name: tensor.detach().clone() for name, tensor in decoder.state_dict().items()}
+
+    assert vae_ops.store_h3_vae_decoder_linears_fp16(decoder)
+
+    after = decoder.state_dict()
+    converted = _block_linear_names(decoder)
+    assert set(after) == set(before)
+    for name, original in before.items():
+        if name in converted:
+            # The same round-to-nearest cast FP16 autocast applies per call.
+            assert after[name].dtype == torch.float16
+            assert torch.equal(after[name], original.to(torch.float16))
+        else:
+            assert after[name].dtype == torch.float32
+            assert torch.equal(after[name], original)
+    # Storage alone binds no optimized operator.
+    assert not hasattr(decoder, "_omni_h3_vae_optimizations_installed")
+    for block in decoder.transformer_blocks:
+        assert block.forward.__func__.__name__ == "forward"
+        assert block.attn.forward.__func__.__name__ == "forward"
+        assert block.ff.forward.__func__.__name__ == "forward"
+
+
+def test_h3_vae_fp16_storage_rejects_incompatible_remote_contract():
+    from vllm_omni.diffusion.models.minimax_h3.ops import vae as vae_ops
+
+    decoder = _make_decoder()
+    decoder.transformer_blocks[0].ff._compile_forward_enabled = True
+
+    assert not vae_ops.store_h3_vae_decoder_linears_fp16(decoder)
+    assert all(parameter.dtype == torch.float32 for parameter in decoder.parameters())
+
+
+def _video_vae_with_decoder(monkeypatch, decoder, *, device, fp16_decoder_linears):
+    from vllm_omni.diffusion.models.minimax_h3 import vae as vae_module
+    from vllm_omni.diffusion.models.minimax_h3.ops import vae as vae_ops
+
+    class FakeModel(torch.nn.Module):
+        def __init__(self):
+            super().__init__()
+            self.decoder = decoder
+
+    class FakeRemote(torch.nn.Module):
+        def __init__(self):
+            super().__init__()
+            self.model = FakeModel()
+
+    monkeypatch.setattr(
+        vae_module,
+        "_load_component_config",
+        lambda _path: {"latent_channels": 1, "latents_mean": [0.0], "latents_std": [1.0]},
+    )
+    monkeypatch.setattr(vae_module, "_load_remote_component", lambda _path, _config, **_kwargs: FakeRemote())
+    monkeypatch.setattr(vae_module, "PinnedModuleStager", Mock())
+    # A device without a validated H3 VAE operator set, such as SM120.
+    monkeypatch.setattr(vae_ops, "resolve_h3_vae_operators", lambda _device: None)
+    return vae_module.MiniMaxH3VideoVAE(
+        "unused",
+        device=device,
+        load_device=torch.device("cpu"),
+        fp16_decoder_linears=fp16_decoder_linears,
+    )
+
+
+@pytest.mark.parametrize("fp16_decoder_linears", [False, True])
+def test_video_vae_fp16_decoder_linears_switch_without_operator_set(monkeypatch, fp16_decoder_linears):
+    decoder = _make_decoder()
+
+    _video_vae_with_decoder(
+        monkeypatch,
+        decoder,
+        device=torch.device("cuda"),
+        fp16_decoder_linears=fp16_decoder_linears,
+    )
+
+    converted = _block_linear_names(decoder)
+    for name, tensor in decoder.state_dict().items():
+        expected = torch.float16 if fp16_decoder_linears and name in converted else torch.float32
+        assert tensor.dtype == expected
+    assert decoder.transformer_blocks[0].forward.__func__.__name__ == "forward"
+
+
+def test_video_vae_fp16_decoder_linears_require_cuda(monkeypatch):
+    with pytest.raises(ValueError, match="require CUDA"):
+        _video_vae_with_decoder(
+            monkeypatch,
+            _make_decoder(),
+            device=torch.device("cpu"),
+            fp16_decoder_linears=True,
+        )
+
+
 def test_h3_vae_dispatch_is_extended_by_adding_an_operator_set(monkeypatch):
     from vllm_omni.diffusion.models.minimax_h3.ops.vae import dispatch
 

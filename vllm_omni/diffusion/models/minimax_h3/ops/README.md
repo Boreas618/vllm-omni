@@ -32,6 +32,11 @@ operator evidence has been collected on SM90, with independent full-decode and
 stress validation on SM103. Enabling a target and claiming it as validated are
 kept separate so the evidence remains clear.
 
+The FP16 storage of the decoder-block Linears needs no kernel: it equals the
+per-call cast of the FP16 decode autocast. Devices without an operator set,
+such as SM120, keep FP32 storage by default and can opt into FP16 storage alone
+with `--cache-config '{"minimax_h3_vae_fp16_decoder_linears": true}'`.
+
 ## Extending platform support
 
 Validation and improvements for other platforms are welcome. A contribution

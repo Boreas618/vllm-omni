@@ -1081,6 +1081,7 @@ class MiniMaxH3Pipeline(
             load_device=component_load_device,
             decode_only=not self.load_vae_encoder,
             trust_remote_code=od_config.trust_remote_code,
+            fp16_decoder_linears=_cache_flag(od_config.cache_config, "minimax_h3_vae_fp16_decoder_linears"),
         )
         self.audio_vae = MiniMaxH3AudioVAE(
             os.path.join(vae_model_path, "audio_vae"),

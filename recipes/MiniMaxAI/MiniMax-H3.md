@@ -123,6 +123,21 @@ same time on a host sized for this minimum.
 The consumer-GPU profiles below are HBM budgets only. They still require the
 host-RAM budget above.
 
+#### FP16 video VAE decoder weights
+
+Video decoding always runs under FP16 autocast, which casts the FP32 Linear
+weights of the 36 ViT decoder blocks to FP16 on every call. On SM90, SM100 and
+SM103 the validated H3 VAE kernels store those weights in FP16 once, halving
+them from 9.0 GiB to 4.5 GiB. Other CUDA GPUs, such as SM120, keep FP32
+weights by default. Storing the same FP16 tensors needs no kernel and gives the
+Linears identical FP16 operands, so decoded output is unchanged:
+
+```bash
+--cache-config '{"minimax_h3_vae_fp16_decoder_linears": true}'
+```
+
+Combine keys in one JSON object when other `--cache-config` options are set.
+
 ### Single GPU: blockwise capacity path
 
 Use ordinary layerwise offload when one GPU cannot keep the Qwen3-VL encoder

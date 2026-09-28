@@ -180,27 +180,43 @@ def _decoder_block_linears(decoder: nn.Module) -> tuple[nn.Linear, ...] | None:
     return tuple(linears)
 
 
+def store_h3_vae_decoder_linears_fp16(decoder: nn.Module) -> bool:
+    """Store the decoder-block Linear weights and biases in FP16.
+
+    Every H3 video decode runs under FP16 CUDA autocast, which casts these
+    FP32 tensors to FP16 (round to nearest even) on each call. Storing the
+    same rounded tensors removes only that per-call cast: the Linears receive
+    identical FP16 operands, and nothing in the decoder reads their dtype. A
+    call outside FP16 autocast fails with a dtype mismatch instead of
+    computing differently. It needs no custom kernel and therefore no
+    device-specific operator set. Returns ``False`` without changes unless the
+    decoder matches the validated remote block contract with FP32 Linears.
+    """
+
+    linears = _decoder_block_linears(decoder)
+    if linears is None or any(linear.weight.dtype != torch.float32 for linear in linears):
+        return False
+    for linear in linears:
+        linear.to(dtype=torch.float16)
+    return True
+
+
 def install_h3_vae_optimizations(
     decoder: nn.Module,
     *,
     device: torch.device,
 ) -> bool:
-    """Install the operators selected for ``device`` once."""
+    """Install the operators selected for ``device`` once.
+
+    The operator set also stores the decoder-block Linears in FP16, which
+    avoids rebuilding the same autocast casts per tile.
+    """
 
     if getattr(decoder, "_omni_h3_vae_optimizations_installed", False):
         return True
     operators = resolve_h3_vae_operators(device)
-    if operators is None:
+    if operators is None or not store_h3_vae_decoder_linears_fp16(decoder):
         return False
-
-    linears = _decoder_block_linears(decoder)
-    if linears is None or any(linear.weight.dtype != torch.float32 for linear in linears):
-        return False
-
-    # The H3 decode path always uses FP16 CUDA autocast. Persisting these
-    # rounded decoder-block weights avoids rebuilding the same casts per tile.
-    for linear in linears:
-        linear.to(dtype=torch.float16)
 
     for block in decoder.transformer_blocks:
         block.ff._omni_silu_and_mul = SiluAndMul()
@@ -214,4 +230,4 @@ def install_h3_vae_optimizations(
     return True
 
 
-__all__ = ["install_h3_vae_optimizations"]
+__all__ = ["install_h3_vae_optimizations", "store_h3_vae_decoder_linears_fp16"]
