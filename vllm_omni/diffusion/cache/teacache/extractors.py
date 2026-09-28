@@ -1368,7 +1368,13 @@ def extract_minimax_h3_context(
     if local_len == seq_len:
         state_combined_indices = combined_indices
 
-    shift_msa, scale_msa, *_ = module.blocks[0].adaln_proj(t_emb)
+    # Online AdaLN supplies precomputed per-block projections; resident
+    # AdaLN leaves both None and every block projects t_emb itself.
+    block_modulation, final_modulation = module.adaln_modulation(unique_timesteps)
+    shift_msa, scale_msa, *_ = module.blocks[0].adaln_proj(
+        t_emb,
+        None if block_modulation is None else block_modulation[0],
+    )
     modulated_input = module.blocks[0].norm1(decoder_input)
     modulated_input = indexed_scale_shift_(
         modulated_input,
@@ -1404,7 +1410,7 @@ def extract_minimax_h3_context(
                 rope_table,
                 combined_indices,
             )
-        for block in module.blocks:
+        for index, block in enumerate(module.blocks):
             hidden = block(
                 hidden,
                 t_emb=t_emb,
@@ -1414,6 +1420,7 @@ def extract_minimax_h3_context(
                 max_seqlen=max_seqlen,
                 packed_total=seq_len,
                 video_layout=video_layout,
+                modulation=None if block_modulation is None else block_modulation[index],
             )
         # TeaCache stores residuals as block_output - decoder_input. Strict SP
         # must keep both tensors rank-local until postprocess projects local
@@ -1428,6 +1435,7 @@ def extract_minimax_h3_context(
                 hidden,
                 t_emb=t_emb,
                 inverse_indices=inverse_indices,
+                modulation=final_modulation,
             )
         else:
             local_inverse_indices = inverse_indices.narrow(
@@ -1439,6 +1447,7 @@ def extract_minimax_h3_context(
                 hidden,
                 t_emb=t_emb,
                 inverse_indices=local_inverse_indices,
+                modulation=final_modulation,
             )
             compact_logits = torch.cat((video_logits, audio_logits), dim=-1)
             compact_logits = module.sp_gather(compact_logits)

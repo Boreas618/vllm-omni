@@ -97,6 +97,7 @@ from vllm_omni.quantization.component_config import (
     resolve_encoder_quant_config as _resolve_encoder_quant_config,
 )
 
+from .adaln_cache import schedule_contract, timestep_plans
 from .batched_packing import minimax_h3_batched_forward_kwargs
 from .condition_noise import (
     minimax_h3_audio_cond_noise_aug_rows,
@@ -199,6 +200,21 @@ MINIMAX_H3_DIFFUSION_DOWNLOAD_PATTERNS = {
         "Ref2VA/transformer/**",
     ],
 }
+
+
+def _cache_setting(cache_config: Any, key: str, default: Any = None) -> Any:
+    """Read a model-specific ``--cache-config`` key from a dict or DiffusionCacheConfig."""
+    if isinstance(cache_config, Mapping):
+        return cache_config.get(key, default)
+    return getattr(cache_config, key, default)
+
+
+def _cache_flag(cache_config: Any, key: str) -> bool:
+    """Read an opt-in boolean ``--cache-config`` key (default off)."""
+    value = _cache_setting(cache_config, key, False)
+    if type(value) is not bool:
+        raise ValueError(f"{key} must be a boolean")
+    return value
 
 
 def _resolve_minimax_h3_text_encoder_quant_config(
@@ -950,6 +966,7 @@ class MiniMaxH3Pipeline(
             od_config,
             quant_config=transformer_quant_config,
             diffusers_weights=modular,
+            adaln_plans=self._online_adaln_plans(od_config, expected_partition),
         )
         if self._fasth3_checkpoint is not None:
             self.transformer.enable_vsa_gates(sparsity=self._fasth3_checkpoint.vsa_sparsity)
@@ -1158,6 +1175,58 @@ class MiniMaxH3Pipeline(
         """True when --lora-path was consumed as a load-time weight fusion."""
         return self._fasth3 is not None
 
+    def _online_adaln_plans(self, od_config: OmniDiffusionConfig, partition: str) -> list[torch.Tensor] | None:
+        """Resolve ``minimax_h3_adaln_online`` into the pinned schedule's timestep plans.
+
+        Online AdaLN computes the AdaLN projections of the FastH3 V2 T2VA
+        schedule while the DiT weights load and never keeps the projection
+        weights (see :class:`MiniMaxH3AdalnTable`). Deployments that could
+        bypass that load, run the DiT from host memory, or hand every block the
+        same arguments are rejected here, before any weight is allocated. LoRA
+        is already excluded by the FastH3 V2 serving contract; TP>1 and
+        quantized AdaLN are rejected by the transformer.
+        """
+        cache_config = od_config.cache_config
+        if not _cache_flag(cache_config, "minimax_h3_adaln_online"):
+            return None
+        if self._fasth3_checkpoint is None:
+            raise ValueError("minimax_h3_adaln_online requires the FastH3 V2 checkpoint and its pinned schedule")
+        if _cache_setting(cache_config, "minimax_h3_adaln_cache_path") is not None:
+            raise ValueError("minimax_h3_adaln_online replaces AdaLN sidecars; remove minimax_h3_adaln_cache_path")
+        if str(getattr(od_config, "cache_backend", "none") or "none").lower() == "cache_dit":
+            raise ValueError(
+                "minimax_h3_adaln_online is incompatible with Cache-DiT, which calls every block with the "
+                "first block's arguments and would apply one layer's AdaLN projection to all blocks"
+            )
+        resolved_offload = resolve_offload(od_config)
+        if (resolved_offload.strategy is not OffloadStrategy.NONE and resolved_offload.offloads(DIT_COMPONENT)) or any(
+            bool(getattr(od_config, flag, False))
+            for flag in ("enable_cpu_offload", "enable_layerwise_offload", "enable_distributed_layerwise_offload")
+        ):
+            raise ValueError(
+                "minimax_h3_adaln_online requires DiT weights loaded on and resident in the compute device; "
+                "disable CPU, layerwise and distributed layerwise offload"
+            )
+        if bool(getattr(od_config.parallel_config, "use_hsdp", False)):
+            raise ValueError("minimax_h3_adaln_online does not support HSDP, which loads the DiT on the host")
+        if getattr(od_config, "host_weight_runtime_mode", "disabled") != "disabled":
+            raise ValueError("minimax_h3_adaln_online requires host_weight_runtime_mode=disabled")
+        schedule = self._base_schedule_by_partition[partition]
+        plans = timestep_plans(
+            schedule_contract(
+                mode="t2va",
+                num_steps=schedule.num_inference_steps,
+                base_schedule=schedule.base_schedule,
+                flow_shift=self.default_video_shift,
+                audio_flow_shift=self.default_audio_shift,
+            )
+        )
+        logger.info(
+            "MiniMax H3 online AdaLN: AdaLN weights are not kept; projections cover %d FastH3 T2VA timestep plans",
+            len(plans),
+        )
+        return plans
+
     def _configure_adaln_sidecar(
         self,
         transformer: MiniMaxH3DiTModel,
@@ -1172,8 +1241,7 @@ class MiniMaxH3Pipeline(
 
         from .adaln_cache import MiniMaxH3AdalnCache, file_digest
 
-        config = self.od_config.cache_config
-        path = config.get(key) if isinstance(config, Mapping) else getattr(config, key, None)
+        path = _cache_setting(self.od_config.cache_config, key)
         if path is None or not transformer.adaln_cache.max_bytes:
             return
         try:
@@ -2565,6 +2633,17 @@ class MiniMaxH3Pipeline(
         )
         if continuation is not None and quality_plan.cache_dit is not None:
             raise OmniClientError("MiniMax H3 continuation requires uncached denoising; set quality=lossless")
+        if getattr(transformer, "adaln_table", None) is not None:
+            # Online AdaLN stores projections for the pinned plain-T2VA
+            # timesteps only, and Cache-DiT would hand every block the first
+            # block's projection. Reject before any denoise work starts.
+            if quality_plan.cache_dit is not None:
+                raise OmniClientError("MiniMax H3 online AdaLN does not support Cache-DiT; set quality=lossless")
+            if extra.get("audio_mode") == "lock_source" or any(value is not None for value in latent_edit.values()):
+                raise OmniClientError(
+                    "MiniMax H3 online AdaLN serves plain T2VA only; latent-mask edits and "
+                    "audio_mode=lock_source change the denoiser timesteps"
+                )
         self._cache_dit_runtime.prepare(quality_plan.cache_dit)
         return {
             "continuation": continuation,

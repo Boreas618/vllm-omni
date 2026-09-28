@@ -10,7 +10,7 @@ layout.
 from __future__ import annotations
 
 import math
-from collections.abc import Iterable, Mapping
+from collections.abc import Iterable, Mapping, Sequence
 from dataclasses import dataclass
 from typing import TYPE_CHECKING, Any
 
@@ -56,6 +56,7 @@ from vllm_omni.diffusion.models.host_weight_contract import FinalLayoutModelCont
 from vllm_omni.platforms import current_omni_platform
 
 from .adaln_cache import MiniMaxH3RuntimeAdalnCache
+from .adaln_table import MiniMaxH3AdalnTable, MiniMaxH3AdalnTableBuilder
 from .fasth3 import _resolve_native_target
 
 if TYPE_CHECKING:
@@ -749,6 +750,10 @@ class MiniMaxH3AdalnProj(nn.Module):
     [M, t_dim] -> [M, 3*6H] -> view(M*3, 6H) -> chunk(6).
     The final layer uses one modality and produces two H-wide vectors:
     [M, t_dim] -> [M, 2H] -> chunk(2).
+
+    With ``resident=False`` the module owns no projection weights. Callers then
+    pass the precomputed ``[M, out_features]`` projection as ``modulation``
+    (see :class:`MiniMaxH3AdalnTable`) and the module only splits it.
     """
 
     def __init__(
@@ -761,6 +766,7 @@ class MiniMaxH3AdalnProj(nn.Module):
         modality_num: int,
         prefix: str,
         adaln_cache: MiniMaxH3RuntimeAdalnCache | None = None,
+        resident: bool = True,
     ) -> None:
         super().__init__()
         if out_features != expand_ratio * arch.hidden_size * modality_num:
@@ -772,28 +778,42 @@ class MiniMaxH3AdalnProj(nn.Module):
         self.expand_ratio = expand_ratio
         self.modality_num = modality_num
         self.hidden_size = arch.hidden_size
-        self.linear = ColumnParallelLinear(
-            arch.time_embed_dim,
-            out_features,
-            bias=True,
-            gather_output=True,
-            params_dtype=_BF16_DTYPE,
-            quant_config=quant_config,
-            prefix=f"{prefix}.linear",
+        self.linear = (
+            ColumnParallelLinear(
+                arch.time_embed_dim,
+                out_features,
+                bias=True,
+                gather_output=True,
+                params_dtype=_BF16_DTYPE,
+                quant_config=quant_config,
+                prefix=f"{prefix}.linear",
+            )
+            if resident
+            else None
         )
 
-    def forward(self, t_emb: torch.Tensor) -> tuple[torch.Tensor, ...]:
-        """t_emb: [M, t_dim] -> expand_ratio tensors of [M*modality_num, H]."""
+    def project(self, t_emb: torch.Tensor) -> torch.Tensor:
+        """t_emb: [M, t_dim] fp32 -> [M, out_features] bf16 projection."""
 
-        def project() -> torch.Tensor:
+        def compute() -> torch.Tensor:
             x = nn.functional.silu(t_emb)
             return self.linear(x.to(_BF16_DTYPE))[0]
 
-        x = (
-            project()
-            if self._adaln_cache is None
-            else self._adaln_cache.project(self._cache_name, self.linear, t_emb, project)
-        )
+        if self._adaln_cache is None:
+            return compute()
+        return self._adaln_cache.project(self._cache_name, self.linear, t_emb, compute)
+
+    def forward(
+        self,
+        t_emb: torch.Tensor,
+        modulation: torch.Tensor | None = None,
+    ) -> tuple[torch.Tensor, ...]:
+        """t_emb: [M, t_dim] -> expand_ratio tensors of [M*modality_num, H].
+
+        ``modulation`` is an already computed contiguous ``[M, out_features]``
+        projection of ``t_emb``; when given, ``t_emb`` is not read.
+        """
+        x = self.project(t_emb) if modulation is None else modulation
         m = x.shape[0]
         x = x.view(m * self.modality_num, self.expand_ratio * self.hidden_size)
         return tuple(x.chunk(self.expand_ratio, dim=-1))
@@ -890,6 +910,7 @@ class MiniMaxH3DiTBlock(nn.Module):
         *,
         prefix: str,
         adaln_cache: MiniMaxH3RuntimeAdalnCache | None = None,
+        resident_adaln: bool = True,
     ) -> None:
         super().__init__()
         self.norm1 = _norm(arch.hidden_size, eps=arch.norm_eps)
@@ -914,6 +935,7 @@ class MiniMaxH3DiTBlock(nn.Module):
             modality_num=MINIMAX_H3_ADALN_MODALITY_NUM,
             prefix=f"{prefix}.adaln_proj",
             adaln_cache=adaln_cache,
+            resident=resident_adaln,
         )
 
     def forward(
@@ -930,13 +952,16 @@ class MiniMaxH3DiTBlock(nn.Module):
         sp_seq_lens: list[int] | None = None,
         video_layout: VideoTokenLayout | None = None,
         vsa_prefix_segments: tuple[int, ...] = (),
+        modulation: torch.Tensor | None = None,
     ) -> torch.Tensor:
         """x: [T, H]; t_emb: [M, t_dim]; combined_indices: [T]
         (= inverse_indices * modality_num + token_tags.clamp(min=0)).
 
         Each block computes AdaLN parameters once, then applies
         norm1 -> scale/shift -> attention -> gated residual, followed by
-        norm2 -> scale/shift -> MLP -> gated residual.
+        norm2 -> scale/shift -> MLP -> gated residual. ``modulation`` is this
+        block's precomputed ``[M, 18H]`` AdaLN projection in online AdaLN mode;
+        otherwise the block projects ``t_emb`` itself.
         """
         (
             shift_msa,
@@ -945,7 +970,7 @@ class MiniMaxH3DiTBlock(nn.Module):
             shift_mlp,
             scale_mlp,
             gate_mlp,
-        ) = self.adaln_proj(t_emb)
+        ) = self.adaln_proj(t_emb, modulation)
 
         residual = x
         h = rms_norm_indexed_scale_shift(
@@ -990,6 +1015,7 @@ class MiniMaxH3FinalLayer(nn.Module):
         *,
         prefix: str,
         adaln_cache: MiniMaxH3RuntimeAdalnCache | None = None,
+        resident_adaln: bool = True,
     ) -> None:
         super().__init__()
         video_patch_dim = arch.latents_dim * arch.patch_size[0] * arch.patch_size[1] * arch.patch_size[2]
@@ -1002,6 +1028,7 @@ class MiniMaxH3FinalLayer(nn.Module):
             modality_num=1,
             prefix=f"{prefix}.adaln_proj",
             adaln_cache=adaln_cache,
+            resident=resident_adaln,
         )
         self.video_out = ColumnParallelLinear(
             arch.hidden_size,
@@ -1028,13 +1055,16 @@ class MiniMaxH3FinalLayer(nn.Module):
         *,
         t_emb: torch.Tensor,
         inverse_indices: torch.Tensor,
+        modulation: torch.Tensor | None = None,
     ) -> tuple[torch.Tensor, torch.Tensor]:
         """x: [T, H] -> (video_logits [T, 96] fp32, audio_logits [T, 32] fp32).
 
         Apply single-modality shift/scale AdaLN to the final normalized
         activations, cast to fp32, then apply both output heads to all rows.
+        ``modulation`` is the precomputed ``[M, 2H]`` AdaLN projection in
+        online AdaLN mode.
         """
-        shift, scale = self.adaln_proj(t_emb)
+        shift, scale = self.adaln_proj(t_emb, modulation)
         h = self.norm(x)
         h = indexed_scale_shift_(h, shift, scale, inverse_indices)
         # Preserve full precision through both final output projections.
@@ -1042,6 +1072,54 @@ class MiniMaxH3FinalLayer(nn.Module):
         video, _ = self.video_out(h)
         audio, _ = self.audio_out(h)
         return video, audio
+
+
+def build_online_adaln(
+    arch: MiniMaxH3DiTArchConfig,
+    plans: Sequence[torch.Tensor],
+    *,
+    compile_blocks: bool,
+    compile_dynamic: bool,
+) -> tuple[MiniMaxH3AdalnTable, MiniMaxH3AdalnTableBuilder]:
+    """Allocate an online AdaLN table and the builder that fills it from a weight stream.
+
+    The builder's carriers are one block-shaped and one final-shaped resident
+    :class:`MiniMaxH3AdalnProj`, allocated on the current default device and
+    under the current vLLM config, exactly like the resident projections they
+    stand in for. Callers keep the builder outside any module tree and drop it
+    once :meth:`MiniMaxH3AdalnTableBuilder.finish` succeeds.
+    """
+    table = MiniMaxH3AdalnTable(
+        plans,
+        num_layers=arch.num_layers,
+        block_features=arch.adaln_out_features,
+        final_features=arch.final_adaln_out_features,
+    )
+    block_projection = MiniMaxH3AdalnProj(
+        arch,
+        arch.adaln_out_features,
+        None,
+        expand_ratio=6,
+        modality_num=MINIMAX_H3_ADALN_MODALITY_NUM,
+        prefix="adaln_table.blocks",
+    )
+    final_projection = MiniMaxH3AdalnProj(
+        arch,
+        arch.final_adaln_out_features,
+        None,
+        expand_ratio=2,
+        modality_num=1,
+        prefix="adaln_table.final_layer",
+    )
+    builder = MiniMaxH3AdalnTableBuilder(
+        table,
+        num_layers=arch.num_layers,
+        block_projection=block_projection,
+        final_projection=final_projection,
+        compile_blocks=compile_blocks,
+        compile_dynamic=compile_dynamic,
+    )
+    return table, builder
 
 
 class MiniMaxH3SPPrepare(nn.Module):
@@ -1163,7 +1241,16 @@ class MiniMaxH3DiTModel(nn.Module):
         quant_config: QuantizationConfig | None = None,
         *,
         diffusers_weights: bool | None = None,
+        adaln_plans: Sequence[torch.Tensor] | None = None,
     ) -> None:
+        """Build the DiT.
+
+        ``adaln_plans`` selects online AdaLN mode: the sorted unique FP32
+        timestep plans of a pinned schedule. The blocks and the final layer
+        then own no AdaLN projection weights; :meth:`load_weights` computes
+        their outputs for exactly these plans into :attr:`adaln_table` and
+        forwards reject any other timesteps.
+        """
         super().__init__()
         tf_config = od_config.tf_model_config
         config_mapping = tf_config.to_dict() if hasattr(tf_config, "to_dict") else dict(tf_config)
@@ -1188,7 +1275,17 @@ class MiniMaxH3DiTModel(nn.Module):
         )
         if type(enabled) is not bool:
             raise ValueError("minimax_h3_adaln_cache must be a boolean")
-        self.adaln_cache = MiniMaxH3RuntimeAdalnCache(max_bytes=256 * 1024**2 if enabled else 0)
+        resident_adaln = adaln_plans is None
+        if not resident_adaln:
+            if get_tensor_model_parallel_world_size() != 1:
+                raise ValueError("online AdaLN requires DiT tensor_parallel_size=1")
+            if quant_config is not None:
+                raise ValueError(
+                    "online AdaLN requires an unquantized transformer; its projections use the BF16 linear path"
+                )
+        # Online AdaLN owns no projection weights, so the runtime cache has
+        # nothing to memoize.
+        self.adaln_cache = MiniMaxH3RuntimeAdalnCache(max_bytes=256 * 1024**2 if enabled and resident_adaln else 0)
         self.od_config = od_config
         self.parallel_config = od_config.parallel_config
         self.hidden_size = arch.hidden_size
@@ -1253,6 +1350,7 @@ class MiniMaxH3DiTModel(nn.Module):
                     quant_config,
                     prefix=f"blocks.{i}",
                     adaln_cache=self.adaln_cache,
+                    resident_adaln=resident_adaln,
                 )
                 for i in range(arch.num_layers)
             ]
@@ -1266,8 +1364,59 @@ class MiniMaxH3DiTModel(nn.Module):
             quant_config,
             prefix="final_layer",
             adaln_cache=self.adaln_cache,
+            resident_adaln=resident_adaln,
         )
+        self.adaln_table: MiniMaxH3AdalnTable | None = None
+        self._adaln_builder: MiniMaxH3AdalnTableBuilder | None = None
+        if not resident_adaln:
+            self._init_online_adaln(adaln_plans)
         self._mark_missing_params_required()
+
+    def _init_online_adaln(self, plans: Sequence[torch.Tensor]) -> None:
+        """Allocate the AdaLN table and the builder that fills it during load."""
+        od_config = self.od_config
+        if od_config.diffusion_compile_granularity != "regional":
+            raise ValueError("online AdaLN reproduces regionally compiled or eager blocks; full-model compile differs")
+        # Mirror DiffusionModelRunner: blocks are regionally compiled unless
+        # eager execution is forced or the platform lacks inductor.
+        compile_blocks = not od_config.enforce_eager and current_omni_platform.supports_torch_inductor()
+        self.adaln_table, self._adaln_builder = build_online_adaln(
+            self.arch,
+            plans,
+            compile_blocks=compile_blocks,
+            compile_dynamic=bool(od_config.diffusion_compile_dynamic),
+        )
+        logger.info(
+            "MiniMax H3 online AdaLN: %d timestep plans, %.1f MiB table, %s block projections",
+            len(self.adaln_table.plans),
+            sum(buffer.numel() * buffer.element_size() for buffer in self.adaln_table.buffers()) / 1024**2,
+            "compiled" if compile_blocks else "eager",
+        )
+
+    def adaln_modulation(
+        self,
+        unique_timesteps: torch.Tensor,
+    ) -> tuple[torch.Tensor | None, torch.Tensor | None]:
+        """Return the precomputed ``(block rows [L, M, 18H], final rows [M, 2H])``.
+
+        Resident AdaLN returns ``(None, None)``: every block and the final
+        layer project ``t_emb`` themselves.
+        """
+        table = getattr(self, "adaln_table", None)
+        if table is None:
+            return None, None
+        return table.lookup(unique_timesteps)
+
+    def _adaln_plan_embeddings(self) -> list[torch.Tensor]:
+        """Embed every table plan exactly as ``forward`` embeds its timesteps.
+
+        ``forward`` passes the FP32 unique timesteps, already on the model
+        device, to the same eager time embedder under inference mode.
+        """
+        assert self.adaln_table is not None
+        device = self.time_embedder.proj_in.weight.device
+        with torch.inference_mode():
+            return [self.time_embedder(plan.to(device)) for plan in self.adaln_table.plans]
 
     def enable_vsa_gates(self, *, sparsity: float | None = None) -> None:
         """Give every DiT block's attention a VSA compression gate.
@@ -1360,7 +1509,12 @@ class MiniMaxH3DiTModel(nn.Module):
         self,
         weights: Iterable[tuple[str, torch.Tensor]],
     ) -> set[str]:
-        """Load native or Diffusers H3 weights with the existing TP-aware loaders."""
+        """Load native or Diffusers H3 weights with the existing TP-aware loaders.
+
+        In online AdaLN mode the AdaLN projection tensors never reach a
+        parameter: the table builder consumes them, and the method raises if
+        the stream leaves any projection or the time embedder missing.
+        """
         if getattr(self, "adaln_cache", None) is not None:
             self.adaln_cache.clear()
         params = dict(self.named_parameters())
@@ -1369,6 +1523,8 @@ class MiniMaxH3DiTModel(nn.Module):
         diffusers_weights = getattr(self, "_diffusers_weights", False)
         qkv_parts: dict[str, set[str]] = {}
         source_names: set[str] = set()
+        adaln_builder = getattr(self, "_adaln_builder", None)
+        time_embedder_names = {name for name in params if name.startswith("time_embedder.")}
         for name, loaded_weight in weights:
             layout = "plain"
             if diffusers_weights:
@@ -1380,6 +1536,9 @@ class MiniMaxH3DiTModel(nn.Module):
                 if target is None or kind not in {"weight", "bias"}:
                     raise ValueError(f"unsupported Diffusers H3 weight: {name}")
                 name, layout = f"{target[0]}.{kind}", target[1]
+            if adaln_builder is not None and name in adaln_builder.names:
+                adaln_builder.add(name, loaded_weight)
+                continue
             param = params.get(name)
             if param is None:
                 if diffusers_weights:
@@ -1415,6 +1574,17 @@ class MiniMaxH3DiTModel(nn.Module):
             else:
                 weight_loader(param, loaded_weight)
             loaded.add(name)
+            if (
+                adaln_builder is not None
+                and name in time_embedder_names
+                and adaln_builder.awaiting_embeddings
+                and time_embedder_names <= loaded
+            ):
+                adaln_builder.set_embeddings(self._adaln_plan_embeddings())
+        if adaln_builder is not None:
+            adaln_builder.finish()
+            # Release the carrier projection weights; the table is complete.
+            self._adaln_builder = None
         if diffusers_weights:
             for name, parts in qkv_parts.items():
                 if parts != {"q", "k", "v"}:
@@ -1643,6 +1813,10 @@ class MiniMaxH3DiTModel(nn.Module):
 
         if getattr(self, "adaln_cache", None) is not None:
             self.adaln_cache.prepare(t_emb)
+        # Online AdaLN: this forward's projections come from the table, looked
+        # up on the host outside the compiled blocks; each block receives its
+        # own contiguous [M, 18H] rows.
+        block_modulation, final_modulation = self.adaln_modulation(unique_timesteps)
 
         combined_indices = (inverse_indices * MINIMAX_H3_ADALN_MODALITY_NUM + token_tags.clamp(min=0)).to(device)
         inverse_indices = inverse_indices.to(device)
@@ -1664,7 +1838,7 @@ class MiniMaxH3DiTModel(nn.Module):
                 block_rope,
                 block_combined,
             )
-        for block in self.blocks:
+        for index, block in enumerate(self.blocks):
             hidden = block(
                 hidden,
                 t_emb=t_emb,
@@ -1676,6 +1850,7 @@ class MiniMaxH3DiTModel(nn.Module):
                 num_requests=num_requests,
                 video_layout=video_layout,
                 vsa_prefix_segments=vsa_prefix_segments,
+                modulation=None if block_modulation is None else block_modulation[index],
             )
         if local_len == seq_len:
             hidden = self.sp_gather(hidden)
@@ -1683,6 +1858,7 @@ class MiniMaxH3DiTModel(nn.Module):
                 hidden,
                 t_emb=t_emb,
                 inverse_indices=inverse_indices,
+                modulation=final_modulation,
             )
         else:
             local_inverse_indices = inverse_indices.narrow(
@@ -1694,6 +1870,7 @@ class MiniMaxH3DiTModel(nn.Module):
                 hidden,
                 t_emb=t_emb,
                 inverse_indices=local_inverse_indices,
+                modulation=final_modulation,
             )
             compact_logits = torch.cat((video_logits, audio_logits), dim=-1)
             compact_logits = self.sp_gather(compact_logits)
@@ -1726,4 +1903,5 @@ __all__ = [
     "MINIMAX_H3_FP32_PARAM_NAMES",
     "MiniMaxH3DiTModel",
     "_reorder_grouped_qkv_to_qkv",
+    "build_online_adaln",
 ]

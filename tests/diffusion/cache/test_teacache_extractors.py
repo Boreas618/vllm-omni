@@ -859,8 +859,8 @@ class TestMiniMaxH3Extractor(BaseExtractorTest):
                 super().__init__()
                 self.block_indices: list[torch.Tensor] = []
 
-            def adaln_proj(self, t_emb):
-                del t_emb
+            def adaln_proj(self, t_emb, modulation=None):
+                del t_emb, modulation
                 zeros = torch.zeros(3, hidden_size, dtype=torch.float32)
                 return zeros, zeros
 
@@ -875,8 +875,8 @@ class TestMiniMaxH3Extractor(BaseExtractorTest):
                 return hidden + 1
 
         class _StrictSPFinalLayer(nn.Module):
-            def forward(self, hidden, *, t_emb, inverse_indices):
-                del t_emb, inverse_indices
+            def forward(self, hidden, *, t_emb, inverse_indices, modulation=None):
+                del t_emb, inverse_indices, modulation
                 assert hidden.shape == (local_len, hidden_size)
                 return hidden[:, :video_width].float(), hidden[:, :audio_width].float()
 

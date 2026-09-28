@@ -1392,6 +1392,34 @@ This release supports T2VA only, with local or pure Ulysses attention. Additiona
 LoRA adapters, Ref2VA and FL2VA conditioning are unsupported. The legacy
 four-step adapter keeps its original sampling and fixed-top-k behavior.
 
+#### Online AdaLN
+
+The AdaLN projections of the 50 DiT blocks and the final layer depend only on
+the denoising timesteps, yet their BF16 weights occupy 24.3 GiB on every GPU.
+Because V2 pins its schedule, every T2VA request evaluates the same eight
+timestep plans. Online AdaLN computes those projections while the checkpoint
+loads and never keeps the weights:
+
+```bash
+--cache-config '{"minimax_h3_adaln_online": true}'
+```
+
+Each AdaLN tensor from the weight stream is projected for every plan at the
+served row count, through the same linear layer and execution mode as a
+resident projection (regionally compiled for the blocks unless
+`--enforce-eager`; the final layer is never compiled). The outputs fill a
+148 MiB table and the tensor is discarded. Each forward looks up its plan by
+the exact FP32 bits of its unique timesteps. Timesteps outside the table raise
+an error rather than falling back: latent-mask edits, `audio_mode=lock_source`,
+co-batched step-mode requests at different steps and any other schedule need
+the resident weights.
+
+Startup rejects DiT tensor parallelism, a quantized transformer, CPU, layerwise
+and distributed layerwise offload, HSDP, the host weight runtime, AdaLN
+sidecars, full-model compilation and Cache-DiT, which passes one block's
+arguments to every block. Requests with `quality=high` are rejected for the
+same reason.
+
 ## Key parameters
 
 | Parameter | Recommended value | Notes |
