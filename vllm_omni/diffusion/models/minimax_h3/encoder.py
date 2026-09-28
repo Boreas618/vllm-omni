@@ -1101,7 +1101,12 @@ class MiniMaxH3Qwen3VLEncoder(nn.Module):
         load_model: bool,
         encoder_group: Any | None = None,
         quant_config: QuantizationConfig | None = None,
+        load_vision: bool = True,
     ) -> None:
+        """``load_vision=False`` builds no Qwen3-VL vision tower: the encoder then
+        serves text-only prompts, skips the checkpoint's ``model.visual.*``
+        tensors, and rejects image or video inputs.
+        """
         super().__init__()
         self.device_target = device
         self.encoder_group = encoder_group
@@ -1120,8 +1125,12 @@ class MiniMaxH3Qwen3VLEncoder(nn.Module):
         self.video_token_id = int(config.video_token_id)
         self._tp_size = int(encoder_group.world_size) if encoder_group is not None else 1
         dtype = torch.bfloat16
-        self.vision = MiniMaxH3Qwen3VLVisionModel(config.vision_config)
-        self.vision.to(dtype=dtype)
+        # Text-only prompts still need the merge size for M-RoPE positions.
+        self.spatial_merge_size = int(config.vision_config.spatial_merge_size)
+        self.vision: MiniMaxH3Qwen3VLVisionModel | None = None
+        if load_vision:
+            self.vision = MiniMaxH3Qwen3VLVisionModel(config.vision_config)
+            self.vision.to(dtype=dtype)
         self.text_model = MiniMaxH3Qwen3VLTextModel(
             encoder_group,
             config.text_config,
@@ -1131,9 +1140,10 @@ class MiniMaxH3Qwen3VLEncoder(nn.Module):
         )
         self.text_model.to(dtype=dtype)
         logger.info(
-            "MiniMax H3 Qwen3-VL encoder: %d retained decoder layers, text_encoder_tp_size=%d, vision replicated",
+            "MiniMax H3 Qwen3-VL encoder: %d retained decoder layers, text_encoder_tp_size=%d, %s",
             MINIMAX_H3_QWEN3VL_SELECTED_LM_LAYER,
             self._tp_size,
+            "vision replicated" if load_vision else "no vision tower",
         )
 
     @property
@@ -1148,6 +1158,8 @@ class MiniMaxH3Qwen3VLEncoder(nn.Module):
         if name == "lm_head.weight" or name == "model.language_model.norm.weight":
             return None
         if name.startswith("model.visual."):
+            if self.vision is None:
+                return None
             return ("vision." + name[len("model.visual.") :], None)
         if name.startswith("model.language_model."):
             rest = name[len("model.language_model.") :]
@@ -1233,7 +1245,8 @@ class MiniMaxH3Qwen3VLEncoder(nn.Module):
                 self._omni_non_block_stager = stager
             stager.load()
             return
-        self.vision.to(self.device_target)
+        if self.vision is not None:
+            self.vision.to(self.device_target)
         self.text_model.to(self.device_target)
 
     def offload_to_cpu(self) -> None:
@@ -1253,12 +1266,15 @@ class MiniMaxH3Qwen3VLEncoder(nn.Module):
                     child.to("cpu")
                 self._release_omni_component_cache()
             return
-        self.vision.to("cpu")
+        if self.vision is not None:
+            self.vision.to("cpu")
         self.text_model.to("cpu")
         torch.accelerator.empty_cache()
 
     def _omni_non_block_modules(self) -> list[nn.Module]:
-        modules = [child for name, child in self.vision.named_children() if name != "blocks"]
+        modules = []
+        if self.vision is not None:
+            modules.extend(child for name, child in self.vision.named_children() if name != "blocks")
         modules.extend(child for name, child in self.text_model.named_children() if name != "layers")
         return modules
 
@@ -1284,6 +1300,8 @@ class MiniMaxH3Qwen3VLEncoder(nn.Module):
         pixel_values_videos: torch.Tensor | None = None,
         video_grid_thw: torch.Tensor | None = None,
     ) -> torch.Tensor:
+        if self.vision is None and (pixel_values is not None or pixel_values_videos is not None):
+            raise ValueError("MiniMax H3 text encoder was built without the Qwen3-VL vision tower")
         device = self.device_target
         ids = input_ids.to(device, torch.long)[None]
         attention_mask = torch.ones_like(ids)
@@ -1327,7 +1345,7 @@ class MiniMaxH3Qwen3VLEncoder(nn.Module):
             image_grid_thw=image_grid_thw.to(device, torch.long) if image_grid_thw is not None else None,
             video_grid_thw=video_grid_thw.to(device, torch.long) if video_grid_thw is not None else None,
             attention_mask=attention_mask,
-            spatial_merge_size=int(self.vision.config.spatial_merge_size),
+            spatial_merge_size=self.spatial_merge_size,
         )
         hidden = self.text_model(
             inputs_embeds,

@@ -853,17 +853,21 @@ class MiniMaxH3Pipeline(
             raise ValueError("MiniMax-H3 is CFG-distilled and has no negative branch; cfg_parallel_size must be 1")
         self.device = get_local_device()
         self.load_text_encoder = od_config.model_loaded.get("text_encoder", True)
+        # With a local text encoder, vae_encoder=false and vision_tower=false
+        # serve prompts without media: the video/audio VAE encoders and the
+        # Qwen3-VL vision tower are not built, and requests with media that
+        # needs them are rejected in _check_local_media_encoders.
         self.load_vae_encoder = od_config.model_loaded.get("vae_encoder", True)
-        if self.load_vae_encoder is False and self.load_text_encoder is True:
-            raise ValueError(
-                "MiniMax H3 does not support local text encoding with external media conditioning; "
-                "set text_encoder=false or enable vae_encoder"
-            )
+        self.load_vision_tower = od_config.model_loaded.get("vision_tower", True)
         self._encoder_modules = ["text_encoder"] if self.load_text_encoder else []
         self._PROFILER_TARGETS = list(type(self)._PROFILER_TARGETS)
         encoder_block_attrs = dict(self._offload_plan.encoder_block_attrs)
         if not self.load_text_encoder:
             encoder_block_attrs.pop("text_encoder", None)
+        elif not self.load_vision_tower:
+            encoder_block_attrs["text_encoder"] = tuple(
+                path for path in encoder_block_attrs["text_encoder"] if not path.startswith("vision.")
+            )
         on_demand_component_paths = set(self._offload_plan.on_demand_component_paths)
         if not self.load_text_encoder:
             on_demand_component_paths.discard("text_encoder")
@@ -1052,6 +1056,7 @@ class MiniMaxH3Pipeline(
                 load_model=rank < text_encoder_tp_size,
                 encoder_group=self.text_encoder_group,
                 quant_config=_resolve_minimax_h3_text_encoder_quant_config(od_config.quantization_config),
+                load_vision=self.load_vision_tower,
             )
             if rank < text_encoder_tp_size:
                 self.weights_sources.append(
@@ -2405,6 +2410,7 @@ class MiniMaxH3Pipeline(
                     task=task,
                     prepared_reference_videos=self._extract_prepared_reference_videos(raw_prompt),
                 )
+                self._check_local_media_encoders(prepared)
                 if prompts is not None:
                     continuation = resolve_continuation(
                         sampling.extra_args or {},
@@ -2451,6 +2457,37 @@ class MiniMaxH3Pipeline(
                 window_text.append(self.encode_prompt(replace(prepared, prompt=prompt) if rank == 0 else None))
         media = self._encode_local_media(prepared.media if prepared is not None else None)
         return MiniMaxH3EncoderConditioning.from_components(MiniMaxH3TextConditioning(hidden, tags), media), window_text
+
+    def _check_local_media_encoders(self, prepared: PreparedEncoderInputs) -> None:
+        """Reject request media that needs an encoder this deployment did not build.
+
+        Runs on rank 0 before any encoder collective. ``prepared.media`` holds
+        what the VAE encoders would consume (reference images and videos,
+        their soundtracks, standalone and lock_source driving audio, and
+        latent-mask edit sources); ``prepared.images`` and
+        ``prepared.qwen_videos`` are the Qwen3-VL vision inputs.
+        """
+        media = prepared.media
+        needs_vae_encoder = bool(
+            media.images
+            or media.videos
+            or media.audios
+            or any(item is not None for item in media.video_audios)
+            or media.video_edit is not None
+            or media.audio_edit is not None
+        )
+        if needs_vae_encoder and not getattr(self, "load_vae_encoder", True):
+            raise OmniClientError(
+                "this MiniMax H3 deployment has no VAE encoders (model_loaded.vae_encoder=false); reference "
+                "images, videos, audio and latent-mask edit sources are unsupported"
+            )
+        # The vision tower only runs when this deployment encodes the prompt.
+        local_text = getattr(self, "load_text_encoder", True)
+        if (prepared.images or prepared.qwen_videos) and local_text and not getattr(self, "load_vision_tower", True):
+            raise OmniClientError(
+                "this MiniMax H3 deployment has no Qwen3-VL vision tower (model_loaded.vision_tower=false); "
+                "image and video conditioning is unsupported"
+            )
 
     def _prepare_request_inputs(self, raw_prompt: Any, sampling: Any) -> dict[str, Any]:
         if (getattr(sampling, "extra_args", None) or {}).get(

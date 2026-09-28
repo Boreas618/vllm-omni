@@ -29,6 +29,17 @@ local Qwen call. Setting `model_loaded.text_encoder: false` while leaving
 `model_loaded.vae_encoder: true` requires precomputed text conditioning;
 reference media is still encoded locally.
 
+Text-only serving with the local text encoder can skip the media encoders:
+`model_loaded.vae_encoder: false` drops the video and audio VAE encoders
+(1.07 GB of device memory per GPU; they are still read from disk), and
+`model_loaded.vision_tower: false` never builds the Qwen3-VL vision tower on
+the text-encoder ranks (1.1 GiB). Requests with reference images, videos or
+audio, `lock_source` driving audio, or latent-mask edit sources are then
+rejected. A single-stage server sets these with
+`--stage-overrides '{"0": {"model_loaded": {"vae_encoder": false, "vision_tower": false}}}'`;
+the object replaces the default `model_loaded`, and omitted keys default to
+loading the component.
+
 The generated MP4 contains H.264 video and synchronized stereo audio.
 
 ## Prerequisites
